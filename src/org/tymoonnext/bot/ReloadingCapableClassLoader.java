@@ -41,7 +41,7 @@ public class ReloadingCapableClassLoader extends ClassLoader{
         //This is to avoid reloading the superclass. Reloading it would result in a desynchronized environment and thus in ClassCastExceptions.
         if( className.equals(Module.class.getName())) throw new IOException();
         
-        File f = new File(Commons.f_MODULES, className.substring(Commons.MODULE_PACKAGE.length())+".class");
+        File f = new File(Commons.f_MODULES, className.substring(Commons.MODULE_PACKAGE.length()).replaceAll("\\.", File.pathSeparator) +".class");
         byte buff[] = new byte[(int) f.length()];
         DataInputStream dis = new DataInputStream(new FileInputStream(f));
         dis.readFully(buff);
