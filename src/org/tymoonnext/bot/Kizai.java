@@ -274,7 +274,7 @@ public class Kizai{
         }
     }
     
-    private synchronized void invokeEventMethod(EventListener m, String func, Event ev){
+    private void invokeEventMethod(EventListener m, String func, Event ev){
         try{
             Method method = m.getClass().getMethod(func, ev.getClass());
             method.invoke(m, ev);

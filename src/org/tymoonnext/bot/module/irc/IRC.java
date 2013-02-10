@@ -1,37 +1,5 @@
 package org.tymoonnext.bot.module.irc;
 
-import org.tymoonnext.bot.event.IRCBot.FileTransferEvent;
-import org.tymoonnext.bot.event.IRCBot.DccSendRequestEvent;
-import org.tymoonnext.bot.event.IRCBot.PartEvent;
-import org.tymoonnext.bot.event.IRCBot.UnknownEvent;
-import org.tymoonnext.bot.event.IRCBot.ModeEvent;
-import org.tymoonnext.bot.event.IRCBot.UserListEvent;
-import org.tymoonnext.bot.event.IRCBot.KickEvent;
-import org.tymoonnext.bot.event.IRCBot.InviteEvent;
-import org.tymoonnext.bot.event.IRCBot.FingerEvent;
-import org.tymoonnext.bot.event.IRCBot.DisconnectEvent;
-import org.tymoonnext.bot.event.IRCBot.ChannelChangeEvent;
-import org.tymoonnext.bot.event.IRCBot.UserModeEvent;
-import org.tymoonnext.bot.event.IRCBot.ChannelInfoEvent;
-import org.tymoonnext.bot.event.IRCBot.ServerResponseEvent;
-import org.tymoonnext.bot.event.IRCBot.ChatRequestEvent;
-import org.tymoonnext.bot.event.IRCBot.NoticeEvent;
-import org.tymoonnext.bot.event.IRCBot.DeopEvent;
-import org.tymoonnext.bot.event.IRCBot.PrivateMessageEvent;
-import org.tymoonnext.bot.event.IRCBot.ServerPingEvent;
-import org.tymoonnext.bot.event.IRCBot.VersionEvent;
-import org.tymoonnext.bot.event.IRCBot.DccChatRequestEvent;
-import org.tymoonnext.bot.event.IRCBot.JoinEvent;
-import org.tymoonnext.bot.event.IRCBot.ActionEvent;
-import org.tymoonnext.bot.event.IRCBot.PingEvent;
-import org.tymoonnext.bot.event.IRCBot.TimeEvent;
-import org.tymoonnext.bot.event.IRCBot.SendEvent;
-import org.tymoonnext.bot.event.IRCBot.ConnectEvent;
-import org.tymoonnext.bot.event.IRCBot.MessageEvent;
-import org.tymoonnext.bot.event.IRCBot.TopicEvent;
-import org.tymoonnext.bot.event.IRCBot.OpEvent;
-import org.tymoonnext.bot.event.IRCBot.QuitEvent;
-import org.tymoonnext.bot.event.IRCBot.NickEvent;
 import NexT.data.DObject;
 import java.io.IOException;
 import java.util.HashMap;
@@ -41,6 +9,7 @@ import org.jibble.pircbot.IrcException;
 import org.jibble.pircbot.PircBot;
 import org.jibble.pircbot.User;
 import org.tymoonnext.bot.Kizai;
+import org.tymoonnext.bot.event.IRCBot.*;
 import org.tymoonnext.bot.stream.Stream;
 
 /**
