@@ -17,7 +17,7 @@ public class Replace extends Module implements EventListener{
 
     public Replace(Kizai bot){
         super(bot);
-        bot.bindEvent(MessageEvent.class, this, "onMessage");
+        try{bot.bindEvent(MessageEvent.class, this, "onMessage");}catch(NoSuchMethodException ex){}
     }
 
     public void shutdown(){

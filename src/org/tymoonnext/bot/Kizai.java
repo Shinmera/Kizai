@@ -5,10 +5,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import org.tymoonnext.bot.event.CommandEvent;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.Event;
+import org.tymoonnext.bot.event.EventBind;
 import org.tymoonnext.bot.event.EventListener;
 import org.tymoonnext.bot.event.ModuleLoadEvent;
 import org.tymoonnext.bot.event.ModuleUnloadEvent;
@@ -31,7 +33,7 @@ public class Kizai{
     private ClassLoader classLoader;
     private HashMap<String,Module> modules;
     private HashMap<String,ArrayList<CommandListener>> commands;
-    private HashMap<Class<? extends Event>,HashMap<EventListener,String>> events;
+    private HashMap<Class<? extends Event>,TreeSet<EventBind>> events;
     private HashMap<String,Stream> streams;
     private Configuration conf;
     
@@ -39,7 +41,7 @@ public class Kizai{
         conf = new Configuration();
         modules = new HashMap<String, Module>();
         commands = new HashMap<String, ArrayList<CommandListener>>();
-        events = new HashMap<Class<? extends Event>, HashMap<EventListener,String>>();
+        events = new HashMap<Class<? extends Event>,TreeSet<EventBind>>();
         streams = new HashMap<String, Stream>();
         classLoader = new ReloadingCapableClassLoader();
         
@@ -47,7 +49,7 @@ public class Kizai{
         
         commands.put(CommandEvent.CMD_ANY, new ArrayList<CommandListener>());
         commands.put(CommandEvent.CMD_UNBOUND, new ArrayList<CommandListener>());
-        events.put(Event.class, new HashMap<EventListener,String>());
+        events.put(Event.class, new TreeSet<EventBind>());
         streams.put("stdout", Commons.stdout);
         
         loadModule("Core");
@@ -182,12 +184,28 @@ public class Kizai{
      * @param evt The Class to listen for.
      * @param m The Listener.
      * @param func The function to call on the Listener.
+     * @param priority The listener priority. The higher, the earlier the event
+     * will arrive at the specified listener.
+     * @throws NoSuchMethodException if the specified Method cannot be found
+     * within the listener.
      */
-    public synchronized void bindEvent(Class<? extends Event> evt, EventListener m, String func){
+    public synchronized void bindEvent(Class<? extends Event> evt, EventListener m, String func, int priority) throws NoSuchMethodException{
         Commons.log.info("[MAIN] "+m+" Binding event "+evt.getSimpleName()+" to function "+func);
-        if(!events.containsKey(evt))events.put(evt, new HashMap<EventListener, String>());
-        events.get(evt).put(m, func);
+        if(!events.containsKey(evt))events.put(evt, new TreeSet<EventBind>());
+        events.get(evt).add(new EventBind(m, func, priority));
     }
+    
+    /**
+     * Bind the listener's function func to the Event Class. The function should
+     * expect only one argument, the Event that is passed to it. You can listen
+     * to any event if you register the general Event class.
+     * @param evt The Class to listen for.
+     * @param m The Listener.
+     * @param func The function to call on the Listener.
+     * @throws NoSuchMethodException if the specified Method cannot be found
+     * within the listener.
+     */
+    public synchronized void bindEvent(Class<? extends Event> evt, EventListener m, String func) throws NoSuchMethodException{bindEvent(evt, m, func);}
     
     /**
      * Unregister the given stream.
@@ -267,33 +285,16 @@ public class Kizai{
         Commons.log.fine("[MAIN] Event "+ev);
         for(Class<? extends Event> c : events.keySet()){
             if(c.isInstance(ev)){
-                for(EventListener m : events.get(c).keySet()){
-                    invokeEventMethod(m, events.get(c).get(m), ev);
+                for(EventBind bind : events.get(c)){
+                    bind.invoke(ev);
                 }
             }
-        }
-    }
-    
-    private void invokeEventMethod(EventListener m, String func, Event ev){
-        try{
-            Method method = m.getClass().getMethod(func, ev.getClass());
-            method.invoke(m, ev);
-        }catch(IllegalAccessException ex){
-            Commons.log.log(Level.WARNING, "[MAIN] Failed to invoke method on "+m+":"+func+" for "+ev, ex);
-        }catch(IllegalArgumentException ex){
-            Commons.log.log(Level.WARNING, "[MAIN] Failed to invoke method on "+m+":"+func+" for "+ev, ex);
-        }catch(InvocationTargetException ex){
-            Commons.log.log(Level.WARNING, "[MAIN] Failed to invoke method on "+m+":"+func+" for "+ev, ex);
-        }catch(NoSuchMethodException ex){
-            Commons.log.log(Level.WARNING, "[MAIN] Failed to invoke method on "+m+":"+func+" for "+ev, ex);
-        }catch(SecurityException ex){
-            Commons.log.log(Level.WARNING, "[MAIN] Failed to invoke method on "+m+":"+func+" for "+ev, ex);
         }
     }
     
     public synchronized Module getModule(String name){return modules.get(name);}
     public synchronized Stream getStream(String name){return streams.get(name);}
     public synchronized Configuration getConfig(){return conf;}
-    public synchronized Module[] getCommandHandlers(String commandType){return commands.get(commandType).toArray(new Module[commands.get(commandType).size()]);}
-    public synchronized Module[] getEventHandlers(Class<? extends Event> event){return events.get(event).keySet().toArray(new Module[events.get(event).size()]);}
+    public synchronized CommandListener[] getCommandHandlers(String commandType){return commands.get(commandType).toArray(new CommandListener[commands.get(commandType).size()]);}
+    public synchronized EventListener[] getEventListeners(Class<? extends Event> event){return events.get(event).toArray(new EventListener[events.get(event).size()]);}
 }

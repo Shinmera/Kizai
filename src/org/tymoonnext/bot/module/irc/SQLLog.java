@@ -49,16 +49,18 @@ public class SQLLog extends Module implements EventListener, CommandListener{
     
     public SQLLog(Kizai bot){
         super(bot);
-        bot.bindEvent(MessageEvent.class, this, "onMessage");
-        bot.bindEvent(TopicEvent.class, this, "onTopic");
-        bot.bindEvent(ModeEvent.class, this, "onMode");
-        bot.bindEvent(NickEvent.class, this, "onNick");
-        bot.bindEvent(JoinEvent.class, this, "onJoin");
-        bot.bindEvent(KickEvent.class, this, "onKick");
-        bot.bindEvent(PartEvent.class, this, "onPart");
-        bot.bindEvent(QuitEvent.class, this, "onQuit");
-        bot.bindEvent(ActionEvent.class, this, "onAction");
-        bot.bindEvent(SendEvent.class, this, "onSend");
+        try{
+            bot.bindEvent(MessageEvent.class, this, "onMessage");
+            bot.bindEvent(TopicEvent.class, this, "onTopic");
+            bot.bindEvent(ModeEvent.class, this, "onMode");
+            bot.bindEvent(NickEvent.class, this, "onNick");
+            bot.bindEvent(JoinEvent.class, this, "onJoin");
+            bot.bindEvent(KickEvent.class, this, "onKick");
+            bot.bindEvent(PartEvent.class, this, "onPart");
+            bot.bindEvent(QuitEvent.class, this, "onQuit");
+            bot.bindEvent(ActionEvent.class, this, "onAction");
+            bot.bindEvent(SendEvent.class, this, "onSend");
+        }catch(NoSuchMethodException ex){}
     }
 
     @Override

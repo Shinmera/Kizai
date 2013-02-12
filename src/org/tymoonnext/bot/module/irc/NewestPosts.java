@@ -28,7 +28,7 @@ public class NewestPosts extends TimedModule implements EventListener{
     
     public NewestPosts(Kizai bot){
         super(bot);
-        bot.bindEvent(ModuleLoadEvent.class, this, "onModuleLoad");
+        try{bot.bindEvent(ModuleLoadEvent.class, this, "onModuleLoad");}catch(NoSuchMethodException ex){}
     }
     
     public void onModuleLoad(ModuleLoadEvent ev){

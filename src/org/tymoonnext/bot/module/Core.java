@@ -27,7 +27,7 @@ public class Core extends Module implements CommandListener,EventListener{
         bot.registerCommand("module-reload", this);
         bot.registerCommand("module-unload", this);
         bot.registerCommand("info", this);
-        bot.bindEvent(CommandEvent.class, this, "propagateCommandEvent");
+        try{bot.bindEvent(CommandEvent.class, this, "propagateCommandEvent");}catch(NoSuchMethodException ex){}
         
         HashMap<String,DObject> mods = (HashMap<String,DObject>)bot.getConfig().get("modules").get();
         for(String mod : mods.keySet()){

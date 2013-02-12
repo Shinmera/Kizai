@@ -26,7 +26,7 @@ public class IRCBot extends Module implements CommandListener,EventListener{
         
         irc = new IRC(bot, config);
         bot.registerStream("irc", irc);
-        bot.bindEvent(MessageEvent.class, this, "onMessage");
+        try{bot.bindEvent(MessageEvent.class, this, "onMessage");}catch(NoSuchMethodException ex){}
     }
 
     public void shutdown(){
