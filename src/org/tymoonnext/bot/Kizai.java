@@ -286,7 +286,8 @@ public class Kizai{
         for(Class<? extends Event> c : events.keySet()){
             if(c.isInstance(ev)){
                 for(EventBind bind : events.get(c)){
-                    bind.invoke(ev);
+                    if(!ev.isHalted())
+                        bind.invoke(ev);
                 }
             }
         }
