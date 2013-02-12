@@ -228,7 +228,14 @@ public class Kizai{
      * @param m The EventListener to unbind.
      */
     public synchronized void unbindEvent(Class<? extends Event> evt, EventListener m){
-        if(events.containsKey(evt))events.get(evt).remove(m);
+        if(events.containsKey(evt)){
+            for(EventBind bind : events.get(evt)){
+                if(bind.getListener() == m){
+                    events.get(evt).remove(bind);
+                    break;
+                }
+            }
+        }
     }
     
     /**
@@ -247,7 +254,7 @@ public class Kizai{
      */
     public synchronized void unbindAllEvents(EventListener m){
         for(Class ev : events.keySet()){
-            events.get(ev).remove(m);
+            unbindEvent(ev, m);
         }
     }
     
