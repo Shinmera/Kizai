@@ -192,6 +192,13 @@ public class Kizai{
     public synchronized void bindEvent(Class<? extends Event> evt, EventListener m, String func, int priority) throws NoSuchMethodException{
         Commons.log.info("[MAIN] "+m+" Binding event "+evt.getSimpleName()+" to function "+func);
         if(!events.containsKey(evt))events.put(evt, new TreeSet<EventBind>());
+        else{
+            for(EventBind bind : events.get(evt)){
+                if(bind.getListener() == m)
+                    throw new IllegalArgumentException("Listener "+m+" is already bound to "+evt.getSimpleName()+".");
+            }
+        }
+        
         EventBind bind = new EventBind(m, evt, func, priority);
         events.get(evt).add(bind);
     }
