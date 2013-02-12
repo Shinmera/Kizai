@@ -2,6 +2,7 @@ package org.tymoonnext.bot.module;
 
 import NexT.data.DObject;
 import java.util.HashMap;
+import java.util.Set;
 import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.CommandEvent;
@@ -29,13 +30,25 @@ public class Core extends Module implements CommandListener,EventListener{
         bot.registerCommand("info", this);
         try{bot.bindEvent(CommandEvent.class, this, "propagateCommandEvent");}catch(NoSuchMethodException ex){}
         
+        Commons.log.info(toString()+" Autoloading modules...");
         HashMap<String,DObject> mods = (HashMap<String,DObject>)bot.getConfig().get("modules").get();
         for(String mod : mods.keySet()){
             if((Boolean)mods.get(mod).get("autoload").get() == true){
-                Commons.log.info(toString()+" Autoloading "+mod);
-                bot.loadModule(mod);
+                Commons.log.info(toString()+" Loading "+mod);
+                loadModByConfig(mod);
             }
         }
+    }
+    
+    public void loadModByConfig(String mod){
+        DObject modObj = bot.getConfig().get("modules").get(mod);
+        if(modObj.contains("depends")){
+            for(String dep : (Set<String>)modObj.get("depends").getKeySet()){
+                Commons.log.info(toString()+" Loading dependency "+dep);
+                loadModByConfig(mod);
+            }
+        }
+        bot.loadModule(mod);
     }
 
     public void shutdown(){
