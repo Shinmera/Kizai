@@ -11,7 +11,8 @@ import org.tymoonnext.bot.event.IRCBot.MessageEvent;
 import org.tymoonnext.bot.module.irc.IRC;
 
 /**
- * 
+ * IRCBot Module that provides an interface to an IRC server. See
+ * org.tymoonnext.bot.module.irc.IRC for main IRC funcs.
  * @author Shinmera
  * @license GPLv3
  * @version 0.0.0

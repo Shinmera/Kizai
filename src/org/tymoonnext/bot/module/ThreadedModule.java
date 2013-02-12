@@ -4,7 +4,7 @@ import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
 
 /**
- * 
+ * Module extension that implements a threaded module.
  * @author Shinmera
  * @license GPLv3
  * @version 0.0.0

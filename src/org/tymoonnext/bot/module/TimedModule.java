@@ -5,7 +5,8 @@ import java.util.TimerTask;
 import org.tymoonnext.bot.Kizai;
 
 /**
- * 
+ * Module extension that provides a timed module, which runs its function in a
+ * fixed interval. Useful for polling and other services.
  * @author Shinmera
  * @license GPLv3
  * @version 0.0.0

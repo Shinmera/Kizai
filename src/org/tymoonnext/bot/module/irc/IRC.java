@@ -13,10 +13,11 @@ import org.tymoonnext.bot.event.IRCBot.*;
 import org.tymoonnext.bot.stream.Stream;
 
 /**
- * 
+ * IRC class that links the PircBot functions to the event system.
  * @author Shinmera
  * @license GPLv3
  * @version 0.0.0
+ * @todo Properly respect event cancelling
  */
 public class IRC extends PircBot implements Stream{
     private Kizai bot;

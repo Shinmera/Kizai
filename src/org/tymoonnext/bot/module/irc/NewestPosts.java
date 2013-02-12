@@ -17,10 +17,12 @@ import org.tymoonnext.bot.module.IRCBot;
 import org.tymoonnext.bot.module.TimedModule;
 
 /**
- * 
+ * Newest posts module that fetches the RSS feed from TyNET/Purplish.
  * @author Shinmera
  * @license GPLv3
  * @version 0.0.0
+ * @todo Very static, should be extended for general purpose usage.
+ * @todo remove IRC deps.
  */
 public class NewestPosts extends TimedModule implements EventListener{
     private String lastTitle = "";

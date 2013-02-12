@@ -13,10 +13,11 @@ import org.tymoonnext.bot.event.EventBind;
 import org.tymoonnext.bot.event.EventListener;
 
 /**
- * 
+ * Core module that provides essential Kizai functionality. Also handles
+ * initial module and dependency load.
  * @author Shinmera
  * @license GPLv3
- * @version 0.0.0
+ * @version 1.1.1
  */
 public class Core extends Module implements CommandListener,EventListener{
     

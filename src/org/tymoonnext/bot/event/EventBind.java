@@ -26,6 +26,10 @@ public class EventBind implements Comparable{
     public EventListener getListener(){return listener;}
     public Method getMethod(){return method;}
     
+    /**
+     * Invoke this bind's method with the specified Event.
+     * @param ev The event to pass.
+     */
     public void invoke(Event ev){
         try{
             method.invoke(listener, ev);

@@ -6,7 +6,7 @@ import org.tymoonnext.bot.event.IRCBot.MessageEvent;
 import org.tymoonnext.bot.module.Module;
 
 /**
- * 
+ * Very simple module that replaces the previous message it received.
  * @author Shinmera
  * @license GPLv3
  * @version 0.0.0

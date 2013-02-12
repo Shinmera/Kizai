@@ -4,7 +4,7 @@ import org.tymoonnext.bot.module.Module;
 import org.tymoonnext.bot.stream.Stream;
 
 /**
- * 
+ * Event issued on module unload.
  * @author Shinmera
  * @license GPLv3
  * @version 0.0.0

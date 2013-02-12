@@ -6,7 +6,7 @@ import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.CommandEvent;
 
 /**
- * 
+ * Primitive Command Line interface
  * @author Shinmera
  * @license GPLv3
  * @version 0.0.0

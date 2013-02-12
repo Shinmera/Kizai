@@ -22,7 +22,7 @@ import org.tymoonnext.bot.event.IRCBot.TopicEvent;
 import org.tymoonnext.bot.module.Module;
 
 /**
- * 
+ * Logging class that saves everything to an SQL table.
  * @author Shinmera
  * @license GPLv3
  * @version 0.0.0

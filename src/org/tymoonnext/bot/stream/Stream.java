@@ -1,7 +1,7 @@
 package org.tymoonnext.bot.stream;
 
 /**
- * 
+ * Stream interface
  * @author Shinmera
  * @license GPLv3
  * @version 0.0.0
