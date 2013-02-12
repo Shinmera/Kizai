@@ -7,6 +7,7 @@ import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.CommandEvent;
 import org.tymoonnext.bot.event.CommandListener;
+import org.tymoonnext.bot.event.EventBind;
 import org.tymoonnext.bot.event.EventListener;
 
 /**
@@ -27,8 +28,14 @@ public class Core extends Module implements CommandListener,EventListener{
         bot.registerCommand("module-load", this);
         bot.registerCommand("module-reload", this);
         bot.registerCommand("module-unload", this);
+        bot.registerCommand("bind-list", this);
+        bot.registerCommand("bind-add", this);
+        bot.registerCommand("bind-remove", this);
+        bot.registerCommand("command-list", this);
+        bot.registerCommand("command-add", this);
+        bot.registerCommand("command-remove", this);
         bot.registerCommand("info", this);
-        try{bot.bindEvent(CommandEvent.class, this, "propagateCommandEvent");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(CommandEvent.class, this, "propagateCommandEvent");}catch(NoSuchMethodException ex){ex.printStackTrace();}
         
         Commons.log.info(toString()+" Autoloading modules...");
         HashMap<String,DObject> mods = (HashMap<String,DObject>)bot.getConfig().get("modules").get();
@@ -87,6 +94,15 @@ public class Core extends Module implements CommandListener,EventListener{
             }else{
                 cmd.getStream().send(toString()+" Failed to reload module!", cmd.getChannel());
             }
+        }else if(cmd.getCommand().equals("bind-list")){
+            cmd.getStream().send(toString()+" Binds (Event Priority Listener:Function)", cmd.getChannel());
+            for(Class c : bot.getBoundEvents()){
+                for(EventBind bind : bot.getEventBinds(c)){
+                    cmd.getStream().send("> "+c.getSimpleName()+" "+bind.getPriority()+" "+bind.getListener().getClass().getSimpleName()+":"+bind.getMethod().getName(), cmd.getChannel());
+                }
+            }
+        }else if(cmd.getCommand().equals("bind-add")){
+        }else if(cmd.getCommand().equals("bind-remove")){
         }else if(cmd.getCommand().equals("info")){
             cmd.getStream().send(Commons.FQDN+" v"+Commons.VERSION+" ("+Commons.LICENSE+") by "+Commons.COREDEV+" "+Commons.WEBSITE, cmd.getChannel());
         }else if(cmd.getCommand().equals(CommandEvent.CMD_UNBOUND)){

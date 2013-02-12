@@ -192,20 +192,22 @@ public class Kizai{
     public synchronized void bindEvent(Class<? extends Event> evt, EventListener m, String func, int priority) throws NoSuchMethodException{
         Commons.log.info("[MAIN] "+m+" Binding event "+evt.getSimpleName()+" to function "+func);
         if(!events.containsKey(evt))events.put(evt, new TreeSet<EventBind>());
-        events.get(evt).add(new EventBind(m, func, priority));
+        EventBind bind = new EventBind(m, evt, func, priority);
+        events.get(evt).add(bind);
     }
     
     /**
      * Bind the listener's function func to the Event Class. The function should
      * expect only one argument, the Event that is passed to it. You can listen
-     * to any event if you register the general Event class.
+     * to any event if you register the general Event class. The priority is set
+     * to 0 by default.
      * @param evt The Class to listen for.
      * @param m The Listener.
      * @param func The function to call on the Listener.
      * @throws NoSuchMethodException if the specified Method cannot be found
      * within the listener.
      */
-    public synchronized void bindEvent(Class<? extends Event> evt, EventListener m, String func) throws NoSuchMethodException{bindEvent(evt, m, func);}
+    public synchronized void bindEvent(Class<? extends Event> evt, EventListener m, String func) throws NoSuchMethodException{bindEvent(evt, m, func, 0);}
     
     /**
      * Unregister the given stream.
@@ -304,5 +306,7 @@ public class Kizai{
     public synchronized Stream getStream(String name){return streams.get(name);}
     public synchronized Configuration getConfig(){return conf;}
     public synchronized CommandListener[] getCommandHandlers(String commandType){return commands.get(commandType).toArray(new CommandListener[commands.get(commandType).size()]);}
-    public synchronized EventListener[] getEventListeners(Class<? extends Event> event){return events.get(event).toArray(new EventListener[events.get(event).size()]);}
+    public synchronized CommandListener[] getRegisteredCommands(){return commands.keySet().toArray(new CommandListener[commands.size()]);}
+    public synchronized EventBind[] getEventBinds(Class<? extends Event> event){return events.get(event).toArray(new EventBind[events.get(event).size()]);}
+    public synchronized Class[] getBoundEvents(){return events.keySet().toArray(new Class[events.size()]);}
 }
