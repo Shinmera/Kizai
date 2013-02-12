@@ -3,6 +3,8 @@ package org.tymoonnext.bot.module;
 import NexT.data.DObject;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.CommandEvent;
@@ -74,6 +76,11 @@ public class Core extends Module implements CommandListener,EventListener{
             cmd.getStream().send(toString()+" Loading config...", cmd.getChannel());
             bot.getConfig().load(Commons.f_CONFIG);
         }else if(cmd.getCommand().equals("module-load")){
+            if(cmd.getArgs() == null){
+                cmd.getStream().send(toString()+" Required args: Module ...", cmd.getChannel());
+                return;
+            }
+            
             cmd.getStream().send(toString()+" Loading module "+cmd.getArgs()+"...", cmd.getChannel());
             if(bot.loadModule(cmd.getArgs())){
                 cmd.getStream().send(toString()+" Module loaded!", cmd.getChannel());
@@ -81,6 +88,11 @@ public class Core extends Module implements CommandListener,EventListener{
                 cmd.getStream().send(toString()+" Failed to load module!", cmd.getChannel());
             }
         }else if(cmd.getCommand().equals("module-unload")){
+            if(cmd.getArgs() == null){
+                cmd.getStream().send(toString()+" Required args: Module ...", cmd.getChannel());
+                return;
+            }
+            
             cmd.getStream().send(toString()+" Unloading module "+cmd.getArgs()+" ...", cmd.getChannel());
             if(bot.unloadModule(cmd.getArgs())){
                 cmd.getStream().send(toString()+" Module unloaded!", cmd.getChannel());
@@ -88,6 +100,11 @@ public class Core extends Module implements CommandListener,EventListener{
                 cmd.getStream().send(toString()+" Failed to unload module!", cmd.getChannel());
             }
         }else if(cmd.getCommand().equals("module-reload")){
+            if(cmd.getArgs() == null){
+                cmd.getStream().send(toString()+" Required args: Module ...", cmd.getChannel());
+                return;
+            }
+            
             cmd.getStream().send(toString()+" Reloading module "+cmd.getArgs()+" ...", cmd.getChannel());
             if(bot.reloadModule(cmd.getArgs())){
                 cmd.getStream().send(toString()+" Module reloaded!", cmd.getChannel());
@@ -102,7 +119,65 @@ public class Core extends Module implements CommandListener,EventListener{
                 }
             }
         }else if(cmd.getCommand().equals("bind-add")){
+            if((cmd.getArgs() == null) || (cmd.getArgs().split(" ").length<3)){
+                cmd.getStream().send(toString()+" Required args: bindClass bindModule bindFunc [bindPrio]", cmd.getChannel());
+                return;
+            }
+            
+            String[] args = cmd.getArgs().split(" ");
+            String bindClass = args[0];
+            String bindModule = args[1];
+            String bindFunc = args[2];
+            int bindPrio = 0;
+            if(args.length>3)bindPrio = Integer.parseInt(args[3]);
+            
+            if(bot.getModule(bindModule) == null){
+                cmd.getStream().send(toString()+" Module '"+bindModule+"' not found.", cmd.getChannel());
+                return;
+            }
+            if(!(bot.getModule(bindModule) instanceof EventListener)){
+                cmd.getStream().send(toString()+" Module '"+bindModule+"' is not an event listener.", cmd.getChannel());
+                return;
+            }
+            
+            try{
+                Class bindC = Class.forName(bindClass);
+                try {
+                    bot.bindEvent(bindC, (EventListener)bot.getModule(bindModule), bindFunc, bindPrio);
+                } catch (NoSuchMethodException ex) {
+                    cmd.getStream().send(toString()+" No such function '"+bindFunc+"'..", cmd.getChannel());
+                    return;
+                }
+            }catch(ClassNotFoundException ex){
+                cmd.getStream().send(toString()+" Bind class '"+bindClass+"' not found.", cmd.getChannel());
+                return;
+            }
+            
+            cmd.getStream().send(toString()+" Binding for "+bindClass+" to "+bindModule+":"+bindFunc+" with prio "+bindPrio+" added.", cmd.getChannel());
         }else if(cmd.getCommand().equals("bind-remove")){
+            if((cmd.getArgs() == null) || (cmd.getArgs().split(" ").length<2)){
+                cmd.getStream().send(toString()+" Required args: bindClass bindModule", cmd.getChannel());
+                return;
+            }
+            
+            String[] args = cmd.getArgs().split(" ");
+            String bindClass = args[0];
+            String bindModule = args[1];
+            
+            if(bot.getModule(bindModule) == null){
+                cmd.getStream().send(toString()+" Module '"+bindModule+"' not found.", cmd.getChannel());
+                return;
+            }
+            
+            try{
+                Class bindC = Class.forName(bindClass);
+                bot.unbindEvent(bindC, (EventListener)bot.getModule(bindModule));
+            }catch(ClassNotFoundException ex){
+                cmd.getStream().send(toString()+" Bind class '"+bindClass+"' not found.", cmd.getChannel());
+                return;
+            }
+            
+            cmd.getStream().send(toString()+" Binding for "+bindClass+" to "+bindModule+" removed.", cmd.getChannel());
         }else if(cmd.getCommand().equals("info")){
             cmd.getStream().send(Commons.FQDN+" v"+Commons.VERSION+" ("+Commons.LICENSE+") by "+Commons.COREDEV+" "+Commons.WEBSITE, cmd.getChannel());
         }else if(cmd.getCommand().equals(CommandEvent.CMD_UNBOUND)){
