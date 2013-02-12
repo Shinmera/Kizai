@@ -16,7 +16,6 @@ public class CommandEvent extends Event{
     private String channel;
     private String command;
     private String args;
-    private boolean cancelled=false;
     
     public CommandEvent(Stream origin, String command){this(origin, command, (String)null);}
     public CommandEvent(Stream origin, String command, String args){this(origin, command, args, null);}
@@ -37,9 +36,6 @@ public class CommandEvent extends Event{
     public String getCommand(){return command;}
     public String getArgs(){return args;}
     public Stream getStream(){return origin;}
-    public boolean isCancelled(){return cancelled;}
-    
-    public void setCancelled(boolean c){cancelled=c;}
     
     public String toString(){
         return "<"+getClass().getSimpleName()+"|"+command+">";
