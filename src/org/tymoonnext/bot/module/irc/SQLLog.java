@@ -26,6 +26,7 @@ import org.tymoonnext.bot.module.Module;
  * @author Shinmera
  * @license GPLv3
  * @version 0.0.0
+ * @todo load db stuff from config
  */
 public class SQLLog extends Module implements EventListener, CommandListener{
     public static final char TYPE_MESSAGE= 'm';
@@ -39,12 +40,12 @@ public class SQLLog extends Module implements EventListener, CommandListener{
     public static final char TYPE_ACTION = 'a';
     public static final char TYPE_SEND   = 's';
     
-    private String sqlhost = "future";
+    private String sqlhost;
     private int sqlport = 3306;
-    private String sqldb = "irc";
-    private String sqluser = "irc";
-    private String sqlpw = "MqFsyzQnxA7EwfZC";
-    private String sqltable = "bot_log";
+    private String sqldb;
+    private String sqluser;
+    private String sqlpw;
+    private String sqltable;
     private SQLWrapper wrapper;
     
     public SQLLog(Kizai bot){
