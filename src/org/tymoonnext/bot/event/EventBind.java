@@ -41,7 +41,7 @@ public class EventBind implements Comparable{
     }
 
     public int compareTo(Object o) {
-        return priority - ((EventBind)o).getPriority();
+        return ((EventBind)o).getPriority() - priority;
     }
     
     public String toString(){
