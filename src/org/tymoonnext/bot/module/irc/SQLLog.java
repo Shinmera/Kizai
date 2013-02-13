@@ -19,6 +19,7 @@ import org.tymoonnext.bot.event.IRCBot.PartEvent;
 import org.tymoonnext.bot.event.IRCBot.QuitEvent;
 import org.tymoonnext.bot.event.IRCBot.SendEvent;
 import org.tymoonnext.bot.event.IRCBot.TopicEvent;
+import org.tymoonnext.bot.ConfigLoader;
 import org.tymoonnext.bot.module.Module;
 
 /**
@@ -39,15 +40,14 @@ public class SQLLog extends Module implements EventListener, CommandListener{
     public static final char TYPE_ACTION = 'a';
     public static final char TYPE_SEND   = 's';
     
-    private String sqlhost = "future";
-    private int sqlport = 3306;
-    private String sqldb = "irc";
-    private String sqluser = "irc";
-    private String sqlpw = "MqFsyzQnxA7EwfZC";
-    private String sqltable = "bot_log";
+    class C extends ConfigLoader{
+        public String host, db, user, pw, table;
+        public Integer port = 3306;
+    };
+    private C conf = new C();
     private SQLWrapper wrapper;
     
-    public SQLLog(Kizai bot){
+    public SQLLog(Kizai bot) throws NSQLException{
         super(bot);
         try{
             bot.bindEvent(MessageEvent.class, this, "onMessage");
@@ -61,6 +61,8 @@ public class SQLLog extends Module implements EventListener, CommandListener{
             bot.bindEvent(ActionEvent.class, this, "onAction");
             bot.bindEvent(SendEvent.class, this, "onSend");
         }catch(NoSuchMethodException ex){}
+        conf.load(bot.getConfig().get("modules").get("irc.SQLLog"));
+        wrapper = new SQLWrapper(conf.user, conf.pw, conf.db, conf.host, conf.port);
     }
 
     @Override
@@ -75,7 +77,7 @@ public class SQLLog extends Module implements EventListener, CommandListener{
     public void insertUpdate(char type, String channel, String sender, String message){
         try{
             int timestamp = (int)(System.currentTimeMillis() / 1000L);
-            DataModel model = DataModel.getHull(sqltable);
+            DataModel model = DataModel.getHull(conf.table);
             model.set("channel", channel);
             model.set("user", sender);
             model.set("action", type+"");
