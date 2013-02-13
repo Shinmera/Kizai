@@ -32,7 +32,7 @@ public class Kizai{
     
     private ClassLoader classLoader;
     private HashMap<String,Module> modules;
-    private HashMap<String,ArrayList<CommandListener>> commands;
+    private HashMap<String,CommandListener> commands;
     private HashMap<Class<? extends Event>,TreeSet<EventBind>> events;
     private HashMap<String,Stream> streams;
     private Configuration conf;
@@ -40,15 +40,13 @@ public class Kizai{
     public Kizai(){
         conf = new Configuration();
         modules = new HashMap<String, Module>();
-        commands = new HashMap<String, ArrayList<CommandListener>>();
+        commands = new HashMap<String, CommandListener>();
         events = new HashMap<Class<? extends Event>,TreeSet<EventBind>>();
         streams = new HashMap<String, Stream>();
         classLoader = new ReloadingCapableClassLoader();
         
         conf.load(Commons.f_CONFIG);
         
-        commands.put(CommandEvent.CMD_ANY, new ArrayList<CommandListener>());
-        commands.put(CommandEvent.CMD_UNBOUND, new ArrayList<CommandListener>());
         events.put(Event.class, new TreeSet<EventBind>());
         streams.put("stdout", Commons.stdout);
         
@@ -165,16 +163,26 @@ public class Kizai{
     }
     
     /**
-     * Bind the listener to the given command String. You can use the special
-     * types in the CommandEvent class to register for either unbound or any
-     * command.
+     * Bind the listener to the given command String. If the command is already
+     * registered for another listener, an IllegalArgumentException is thrown.
      * @param cmd The command to listen for.
      * @param m The listener.
      */
-    public synchronized void registerCommand(String cmd, CommandListener m){
+    public synchronized void registerCommand(String cmd, CommandListener m){registerCommand(cmd, m, false);}
+    
+    /**
+     * Bind the listener to the given command String.
+     * @param cmd The command to listen for.
+     * @param m The listener.
+     * @param force Whether to override an existing listener.
+     */
+    public synchronized void registerCommand(String cmd, CommandListener m, boolean force){
+        if(commands.containsKey(cmd)){
+            if(!force)  throw new IllegalArgumentException(cmd+" is already used!");
+            else        Commons.log.info("[MAIN] "+m+" is overriding "+commands.get(cmd)+".");
+        }
         Commons.log.info("[MAIN] "+m+" Registering command "+cmd);
-        if(!commands.containsKey(cmd))commands.put(cmd, new ArrayList<CommandListener>());
-        commands.get(cmd).add(m);
+        commands.put(cmd, m);
     }
     
     /**
@@ -228,7 +236,7 @@ public class Kizai{
      * @param m The CommandListener to unbind.
      */
     public synchronized void unregisterCommand(String cmd, CommandListener m){
-        if(commands.containsKey(cmd))commands.get(cmd).remove(m);
+        commands.remove(cmd);
     }
     
     /**
@@ -253,7 +261,8 @@ public class Kizai{
      */
     public synchronized void unregisterAllCommands(CommandListener m){
         for(String cmd : commands.keySet()){
-            commands.get(cmd).remove(m);
+            if(commands.get(cmd) == m)
+                commands.remove(cmd);
         }
     }
     
@@ -274,9 +283,6 @@ public class Kizai{
      */
     public synchronized void command(CommandEvent ev){
         Commons.log.fine("[MAIN] Command "+ev);
-        for(CommandListener m : commands.get(CommandEvent.CMD_ANY)){
-            m.onCommand(ev);
-        }
         
         if(!commands.containsKey(ev.getCommand())){
             if(!ev.getCommand().equals(CommandEvent.CMD_UNBOUND)){
@@ -288,7 +294,7 @@ public class Kizai{
                                         ev.getUser(), ev.getChannel()));
             }
         }else{
-            for(CommandListener m : commands.get(ev.getCommand())){m.onCommand(ev);}
+            commands.get(ev.getCommand()).onCommand(ev);
         }
     }
     
@@ -312,8 +318,8 @@ public class Kizai{
     public synchronized Module getModule(String name){return modules.get(name);}
     public synchronized Stream getStream(String name){return streams.get(name);}
     public synchronized Configuration getConfig(){return conf;}
-    public synchronized CommandListener[] getCommandHandlers(String commandType){return commands.get(commandType).toArray(new CommandListener[commands.get(commandType).size()]);}
-    public synchronized CommandListener[] getRegisteredCommands(){return commands.keySet().toArray(new CommandListener[commands.size()]);}
+    public synchronized CommandListener getCommandHandler(String commandType){return commands.get(commandType);}
+    public synchronized String[] getRegisteredCommands(){return commands.keySet().toArray(new String[commands.size()]);}
     public synchronized EventBind[] getEventBinds(Class<? extends Event> event){return events.get(event).toArray(new EventBind[events.get(event).size()]);}
     public synchronized Class[] getBoundEvents(){return events.keySet().toArray(new Class[events.size()]);}
 }
