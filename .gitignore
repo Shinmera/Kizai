@@ -1,3 +1,5 @@
 *.class 
 /build/
 /run/modules
+/nbproject/private/private.properties
+
