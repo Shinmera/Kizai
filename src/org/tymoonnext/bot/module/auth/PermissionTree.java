@@ -36,10 +36,10 @@ public class PermissionTree {
         branch=branch.trim().toLowerCase();
         if(branch.isEmpty())return true;
         
-        String[] leaves = branch.split("\\\\.");
+        String[] leaves = branch.split("\\.");
         
         for(String _branch : perms){
-            String[] _leaves = _branch.split("\\\\.");
+            String[] _leaves = _branch.split("\\.");
             
             for(int i=0;i<leaves.length;i++){
                 if(leaves[i].equals("*"))return true;   //Allow all below this.
