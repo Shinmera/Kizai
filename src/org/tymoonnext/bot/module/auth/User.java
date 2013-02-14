@@ -10,33 +10,35 @@ import org.tymoonnext.bot.Commons;
  */
 public class User {
     private String id;
-    private String pwHash;
     private PermissionTree perms;
     private Group group;
     private Session session;
     
-    public User(){
+    public User(String id){
+        this.id=id;
+        session = new Session();
     }
     
+    public void setPermissions(PermissionTree tree){perms=tree;}
+    public void setGroup(Group group){this.group=group;}
+    
     public String getID(){return id;}
-    public String getPasswordHash(){return pwHash;}
     public Group getGroup(){return group;}
     public Session getSession(){return session;}
     
-    public boolean authenticate(String pw){
-        String hpw = Commons.hash(pw);
-        if(pwHash.equals(hpw)){
-            
-            
-            return true;
-        }else{
-            session = null;
-            return false;
-        }
+    public void login(){
+        session = new Session();
+    }
+    
+    public void logout(){
+        session.invalidate();
     }
     
     public boolean check(String branch){
-        return perms.check(branch) || group.check(branch);
+        if(!session.isValid())return false;
+        if((group != null) && (group.check(branch)))return true;
+        if((perms != null) && (perms.check(branch)))return true;
+        return false;
     }
     
     public String toString(){return "/"+getClass().getSimpleName()+":"+id+"/";}

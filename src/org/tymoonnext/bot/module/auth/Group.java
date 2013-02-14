@@ -10,7 +10,9 @@ public class Group {
     private String id;
     private PermissionTree perms;
     
-    public Group(){
+    public Group(String id, PermissionTree perms){
+        this.id=id;
+        this.perms=perms;
     }
     
     public PermissionTree getPermissions(){return perms;}

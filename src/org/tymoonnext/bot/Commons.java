@@ -92,6 +92,15 @@ public class Commons {
         return null;
     }
     
+    /**
+     * Converts the given string into a hash. The algorithm used depends on the
+     * availability of algorithms: SHA-512 SHA-1 SHA MD5 PLAIN
+     * Note that if no hashing algorithms could be loaded for your system, the
+     * input will be returned in plain format. Pay attention to the init
+     * sequence to see if the hashing algorithm failed to load.
+     * @param in The string to hash.
+     * @return The hashed value.
+     */
     public static String hash(String in){
         if(md == null) return in;
         
