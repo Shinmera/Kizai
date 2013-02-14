@@ -1,5 +1,6 @@
 package org.tymoonnext.bot.module.auth;
 
+import NexT.data.DObject;
 import org.tymoonnext.bot.Commons;
 
 /**
@@ -13,8 +14,9 @@ public class User {
     private PermissionTree perms;
     private Group group;
     private Session session;
+    private DObject conf;
     
-    public User(String id){
+    public User(String id, DObject d){
         this.id=id;
         session = new Session();
     }
@@ -25,9 +27,11 @@ public class User {
     public String getID(){return id;}
     public Group getGroup(){return group;}
     public Session getSession(){return session;}
+    public DObject getConfig(){return conf;}
+    public PermissionTree getPerms(){return perms;}
     
     public void login(){
-        session = new Session();
+        session.makeValid();
     }
     
     public void logout(){

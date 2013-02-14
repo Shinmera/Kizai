@@ -26,5 +26,5 @@ public abstract class SessionFactory {
         return (User)auth.invoke("getUser", ID);
     }
     
-    public abstract void authenticate(String... userinf);
+    public abstract boolean authenticate(String... userinf);
 }

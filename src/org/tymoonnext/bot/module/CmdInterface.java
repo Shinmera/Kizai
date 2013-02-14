@@ -1,5 +1,6 @@
 package org.tymoonnext.bot.module;
 
+import NexT.data.DObject;
 import java.util.Scanner;
 import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
@@ -44,10 +45,14 @@ public class CmdInterface extends ThreadedModule{
     
     private class SF extends SessionFactory{
         public SF(Kizai bot){super(bot);}
-        public void authenticate(String... userinf) {
+        public boolean authenticate(String... userinf) {
             if(getUser(userinf[0]) == null){
-                addUser(new User(userinf[0]));
+                User user = new User(userinf[0], new DObject());
+                addUser(user);
+            }else{
+                getUser(userinf[0]).getSession().makeValid();
             }
+            return true;
         }
     
     }

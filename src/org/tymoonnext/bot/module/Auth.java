@@ -1,6 +1,7 @@
 package org.tymoonnext.bot.module;
 
 import NexT.data.DObject;
+import NexT.util.Toolkit;
 import java.io.File;
 import java.util.HashMap;
 import org.tymoonnext.bot.Commons;
@@ -19,6 +20,8 @@ import org.tymoonnext.bot.module.auth.User;
  * @version 0.0.0
  */
 public class Auth extends Module implements EventListener{
+    public static final File CONFIG = new File(Commons.f_BASEDIR, "auth.cfg");
+    
     private HashMap<String, User> users;
     private HashMap<String, Group> groups;
     private Configuration conf;
@@ -29,11 +32,22 @@ public class Auth extends Module implements EventListener{
         groups = new HashMap<String, Group>();
         conf = new Configuration();
         
-        conf.load(new File(Commons.f_BASEDIR, "auth.cfg"));
+        conf.load(CONFIG);
         for(Object group : conf.get("groups").getKeySet()){
-            System.out.println(">> "+group+" : "+conf.get("groups").get(group+"").toString());
             PermissionTree perms = new PermissionTree(conf.get("groups").get(group+"").toString().split("\n"));
             groups.put(group+"", new Group(group+"", perms));
+        }
+        for(Object username : conf.get("users").getKeySet()){
+            DObject uconf = conf.get("users").get(username+"");
+            User user = new User(username+"", uconf);
+            if(uconf.contains("perms")){
+                PermissionTree perms = new PermissionTree(uconf.get("perms").toString().split("\n"));
+                user.setPermissions(perms);
+            }
+            if(uconf.contains("group")){
+                user.setGroup(groups.get(uconf.get("group").toString()));
+            }
+            users.put(username+"", user);
         }
         
         //Believe me, we want to be the first with this.
@@ -43,12 +57,17 @@ public class Auth extends Module implements EventListener{
     @Override
     public void shutdown() {
         bot.unbindAllEvents(this);
+        conf.save(CONFIG);
     }
     
     public void checkCommand(CommandEvent cmd){
         if(!users.containsKey(cmd.getUser())){
-            Commons.log.info(toString()+" No user '"+cmd.getUser()+"', command blocked by default.");
-            cmd.setHalted(true);
+            if(!users.containsKey("any")){
+                Commons.log.info(toString()+" No user '"+cmd.getUser()+"', command blocked by default.");
+                cmd.setHalted(true);
+            }else if(!users.get("any").check("command."+cmd.getCommand())){
+                cmd.setHalted(true);
+            }
         }else if(!users.get(cmd.getUser()).check("command."+cmd.getCommand())){
             cmd.setHalted(true);
         }
@@ -56,18 +75,12 @@ public class Auth extends Module implements EventListener{
     }
     
     public void addUser(User u){
-        if(conf.get("users").contains(u.getID())){
-            DObject uconf = conf.get("users").get(u.getID());
-            if(uconf.contains("group")){
-                String group = uconf.get("group").toString();
-                if(groups.containsKey(group))
-                    u.setGroup(groups.get(group));
-            }
-            if(uconf.contains("perms")){
-                u.setPermissions(new PermissionTree(uconf.get("perms").toString().split("\n")));
-            }
-        }
         users.put(u.getID(), u);
+        DObject user;
+        if(u.getConfig() != null)user = u.getConfig();else user = new DObject();
+        if(u.getGroup() != null)user.set("group", u.getGroup().getID());
+        if(u.getPerms() != null)user.set("perms", Toolkit.implode(u.getPerms().getPermissions(), "\n"));
+        conf.get("users").set(u.getID(), user);
     }
     public User getUser(String ID){return users.get(ID);}
 }
