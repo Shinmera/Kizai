@@ -51,7 +51,7 @@ public class IRCBot extends Module implements CommandListener,EventListener{
                 cmd = ev.message.substring(config.get("cmd").toString().length());
                 args = null;
             }
-            bot.command(new CommandEvent(irc, cmd, args, ev.sender, ev.channel));
+            bot.event(new CommandEvent(irc, cmd, args, ev.sender, ev.channel));
         }
     }
 }

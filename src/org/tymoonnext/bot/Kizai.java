@@ -281,7 +281,7 @@ public class Kizai{
      * registered a handle for it.
      * @param ev The CommandEvent to relay.
      */
-    public synchronized void command(CommandEvent ev){
+    private synchronized void command(CommandEvent ev){
         Commons.log.fine("[MAIN] Command "+ev);
         
         if(!commands.containsKey(ev.getCommand())){

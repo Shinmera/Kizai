@@ -1,6 +1,8 @@
 package org.tymoonnext.bot.module;
 
 import NexT.data.DObject;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.logging.Level;
@@ -187,6 +189,21 @@ public class Core extends Module implements CommandListener,EventListener{
     }
 
     public void propagateCommandEvent(CommandEvent e){
-        bot.command(e);
+        try {
+            Method cmd = bot.getClass().getDeclaredMethod("command", CommandEvent.class);
+            cmd.setAccessible(true);
+            cmd.invoke(bot, e);
+            cmd.setAccessible(false);
+        } catch (IllegalAccessException ex) {
+            Commons.log.log(Level.WARNING,toString()+" Failed to propagate "+e+" to command function!", ex);
+        } catch (IllegalArgumentException ex) {
+            Commons.log.log(Level.WARNING,toString()+" Failed to propagate "+e+" to command function!", ex);
+        } catch (InvocationTargetException ex) {
+            Commons.log.log(Level.WARNING,toString()+" Failed to propagate "+e+" to command function!", ex);
+        } catch (NoSuchMethodException ex) {
+            Commons.log.log(Level.WARNING,toString()+" Failed to propagate "+e+" to command function!", ex);
+        } catch (SecurityException ex) {
+            Commons.log.log(Level.WARNING,toString()+" Failed to propagate "+e+" to command function!", ex);
+        }
     }
 }

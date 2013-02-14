@@ -44,5 +44,5 @@ public abstract class Event {
      * See setCancelled() for that.
      * @param c 
      */
-    public void setHalted(boolean c){cancelled=c;}
+    public void setHalted(boolean c){halted=c;}
 }
