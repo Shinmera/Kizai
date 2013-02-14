@@ -16,6 +16,8 @@ import org.tymoonnext.bot.event.ModuleLoadEvent;
 import org.tymoonnext.bot.event.ModuleUnloadEvent;
 import org.tymoonnext.bot.module.Module;
 import org.tymoonnext.bot.stream.Stream;
+import sun.misc.Signal;
+import sun.misc.SignalHandler;
 
 /**
  * Main Bot class that handles all event, command and module capabilities.
@@ -23,7 +25,7 @@ import org.tymoonnext.bot.stream.Stream;
  * @license GPLv3
  * @version 2.0.1
  */
-public class Kizai{
+public class Kizai implements SignalHandler{
     public static void main(String[] args){new Kizai();}
     
     static{
@@ -50,7 +52,28 @@ public class Kizai{
         events.put(Event.class, new TreeSet<EventBind>());
         streams.put("stdout", Commons.stdout);
         
+        try{Signal.handle(new Signal("INT"), this);
+        }catch(IllegalArgumentException ex){Commons.log.log(Level.WARNING, "[INIT] Failed to register INT signal handler.", ex);}
+        try{Signal.handle(new Signal("TERM"), this);
+        }catch(IllegalArgumentException ex){Commons.log.log(Level.WARNING, "[INIT] Failed to register TERM signal handler.", ex);}
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            public void run() {shutdown();}
+        }));
+        
         loadModule("Core");
+    }
+    
+    /**
+     * Handles SIGTERM and binds it to shutdown.
+     * @param sig 
+     */
+    public void handle(Signal sig){
+        if(sig.getName().equals("INT") || sig.getName().equals("TERM")){
+            Commons.log.log(Level.SEVERE, "[MAIN] Received SIGTERM!");
+            shutdown();
+        }else{
+            SignalHandler.SIG_DFL.handle(sig);
+        }
     }
     
     /**
