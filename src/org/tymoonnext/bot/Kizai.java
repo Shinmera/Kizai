@@ -283,7 +283,7 @@ public class Kizai implements SignalHandler{
      * @param m The CommandListener to unbind.
      */
     public synchronized void unregisterAllCommands(CommandListener m){
-        for(String cmd : commands.keySet()){
+        for(String cmd : commands.keySet().toArray(new String[commands.size()])){
             if(commands.get(cmd) == m)
                 commands.remove(cmd);
         }
@@ -294,7 +294,7 @@ public class Kizai implements SignalHandler{
      * @param m The EventListener to unbind.
      */
     public synchronized void unbindAllEvents(EventListener m){
-        for(Class ev : events.keySet()){
+        for(Class ev : events.keySet().toArray(new Class[events.size()])){
             unbindEvent(ev, m);
         }
     }
