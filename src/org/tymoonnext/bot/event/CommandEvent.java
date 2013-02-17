@@ -25,7 +25,7 @@ public class CommandEvent extends Event{
         this.user=user;
         this.channel=channel;
         this.args=args;
-        this.command=command.trim();
+        this.command=command.trim().toLowerCase();
     }
     public CommandEvent(String command, CommandEvent evt){
         this(evt.getStream(), command, evt.getArgs(), evt.getUser(), evt.getChannel());
