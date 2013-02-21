@@ -1,6 +1,5 @@
 package org.tymoonnext.bot.module.core;
 
-import NexT.data.DObject;
 import java.util.Scanner;
 import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;

@@ -14,7 +14,8 @@ import org.tymoonnext.bot.event.auth.UserVerifyEvent;
 import org.tymoonnext.bot.module.Module;
 
 /**
- *
+ * User database for the Auth system. Contains and manages user configurations
+ * and propagates AuthEvents to UserVerifyEvents.
  * @author Shinmera
  * @license GPLv3
  * @version 0.0.0
@@ -37,6 +38,22 @@ public class UserDB extends Module implements EventListener{
         load();
     }
     
+    /**
+     * Register a new user in the database. This immediately also offloads the
+     * user to save his configuration to disk.
+     * @param user 
+     * @see UserDB#offload(org.tymoonnext.bot.module.auth.User) 
+     */
+    public void register(User user){
+        users.put(user.getName(), user);
+        offload(user);
+    }
+    
+    /**
+     * Loads all users and their configurations. The username specified in the
+     * configuration has to match the filename or the config in question will
+     * be ignored.
+     */
     public void load(){
         File[] cfgfiles = config.configdir.listFiles();
         for(File file : cfgfiles){
@@ -51,18 +68,33 @@ public class UserDB extends Module implements EventListener{
         }
     }
     
+    /**
+     * Offload all users.
+     * @see UserDB#offload(org.tymoonnext.bot.module.auth.User) 
+     */
     public void offload(){
         for(User user : users.values()){
-            Commons.log.info(toString()+" Offloading " + user + "...");
-            Toolkit.saveStringToFile(DParse.parse(user.getConfig(), true), new File(config.configdir, user.getName()));
+            offload(user);
         }
     }
+    
+    /**
+     * Saves the user's configuration file to disk. It also strictly sets the
+     * configuration values of "name" and "UID" to the user's fixed name and
+     * UID fields.
+     * @param user The user to offload.
+     */
+    public void offload(User user){
+        Commons.log.info(toString()+" Offloading " + user + "...");
+        user.getConfig().set("name", user.getName());
+        user.getConfig().set("UID", user.getUID());
+        Toolkit.saveStringToFile(DParse.parse(user.getConfig(), true), new File(config.configdir, user.getName()));
+    }
 
-    @Override
     public void shutdown() {
+        bot.unbindAllEvents(this);
         offload();
         config.save();
-        bot.unbindAllEvents(this);
     }
     
     public void onAuth(AuthEvent evt){

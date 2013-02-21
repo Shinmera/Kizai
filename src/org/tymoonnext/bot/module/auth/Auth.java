@@ -1,7 +1,5 @@
 package org.tymoonnext.bot.module.auth;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.EventListener;
@@ -10,7 +8,8 @@ import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.module.Module;
 
 /**
- *
+ * Very simple authentication Module that issues AuthEvents on CommandEvents
+ * and halts their execution in case no authentication succeeds.
  * @author Shinmera
  * @license GPLv3
  * @version 0.0.0

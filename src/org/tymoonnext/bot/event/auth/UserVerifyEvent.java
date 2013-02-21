@@ -5,7 +5,8 @@ import org.tymoonnext.bot.module.auth.User;
 import org.tymoonnext.bot.stream.Stream;
 
 /**
- *
+ * Event sent out by the UserDB that allows the AuthImplementors to perform
+ * their checks on the requested user.
  * @author Shinmera
  * @license GPLv3
  * @version 0.0.0

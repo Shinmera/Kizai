@@ -7,7 +7,10 @@ import org.tymoonnext.bot.event.EventListener;
 import org.tymoonnext.bot.event.auth.UserVerifyEvent;
 
 /**
- *
+ * Base class for authentication handlers. UserVerifyEvents will only be sent to
+ * classes that extend this and are bound to the UserVerifyEvent in Kizai. A
+ * child class of this should provide a mechanism to verify a user's session and
+ * set the grant status on the UserVerifyEvent.
  * @author Shinmera
  * @license GPLv3
  * @version 0.0.0

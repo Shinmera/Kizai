@@ -44,6 +44,11 @@ public class EventBind implements Comparable{
         }
     }
 
+    /**
+     * Comparator to enable sorting by priority.
+     * @param o
+     * @return 
+     */
     public int compareTo(Object o) {
         return ((EventBind)o).getPriority() - priority;
     }

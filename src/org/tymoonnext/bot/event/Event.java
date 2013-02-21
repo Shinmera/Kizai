@@ -3,7 +3,7 @@ package org.tymoonnext.bot.event;
 import org.tymoonnext.bot.stream.Stream;
 
 /**
- * 
+ * Base Event class.
  * @author Shinmera
  * @license GPLv3
  * @version 0.0.0

@@ -4,7 +4,8 @@ import org.tymoonnext.bot.event.Event;
 import org.tymoonnext.bot.stream.Stream;
 
 /**
- * 
+ * CommandEvent used to exchange user-issued commands between streams and
+ * listeners.
  * @author Shinmera
  * @license GPLv3
  * @version 0.0.0

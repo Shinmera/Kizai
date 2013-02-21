@@ -6,7 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 
+ * Noload annotation used for the automatic ConfigLoader. If this annotation is
+ * set, the value will not be loaded from the config.
  * @author Shinmera
  * @license GPLv3
  * @version 0.0.0
