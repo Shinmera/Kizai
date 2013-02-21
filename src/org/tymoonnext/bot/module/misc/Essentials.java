@@ -1,4 +1,4 @@
-package org.tymoonnext.bot.module;
+package org.tymoonnext.bot.module.misc;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -11,12 +11,13 @@ import java.util.logging.Level;
 import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.ConfigLoader;
 import org.tymoonnext.bot.Kizai;
-import org.tymoonnext.bot.event.CommandEvent;
+import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.EventListener;
 import org.tymoonnext.bot.event.IRCBot.MessageEvent;
 import org.tymoonnext.bot.meta.noload;
 import org.tymoonnext.bot.meta.nosave;
+import org.tymoonnext.bot.module.Module;
 
 /**
  * 
@@ -43,7 +44,7 @@ public class Essentials extends Module implements CommandListener, EventListener
         bot.registerCommand("uptime", this);
         bot.registerCommand("google", this);
         try{bot.bindEvent(MessageEvent.class, this, "onMessage"); }catch(NoSuchMethodException ex){}
-        config.load(bot.getConfig().get("modules").get("Essentials"));
+        config.load(bot.getConfig().get("modules").get("misc.Essentials"));
         dateFormat = new SimpleDateFormat(config.dateFormat);
         timeFormat = new SimpleDateFormat(config.timeFormat);
         System.out.println("UPTIME: "+config.longestUptime);

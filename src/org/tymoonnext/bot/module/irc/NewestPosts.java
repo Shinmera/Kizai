@@ -12,8 +12,7 @@ import java.util.logging.Level;
 import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.EventListener;
-import org.tymoonnext.bot.event.ModuleLoadEvent;
-import org.tymoonnext.bot.module.IRCBot;
+import org.tymoonnext.bot.event.core.ModuleLoadEvent;
 import org.tymoonnext.bot.module.TimedModule;
 
 /**

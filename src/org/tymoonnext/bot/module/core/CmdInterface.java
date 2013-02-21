@@ -1,10 +1,11 @@
-package org.tymoonnext.bot.module;
+package org.tymoonnext.bot.module.core;
 
 import NexT.data.DObject;
 import java.util.Scanner;
 import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
-import org.tymoonnext.bot.event.CommandEvent;
+import org.tymoonnext.bot.event.core.CommandEvent;
+import org.tymoonnext.bot.module.ThreadedModule;
 
 /**
  * Primitive Command Line interface

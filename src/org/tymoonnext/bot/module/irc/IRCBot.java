@@ -1,13 +1,14 @@
-package org.tymoonnext.bot.module;
+package org.tymoonnext.bot.module.irc;
 
 import NexT.data.DObject;
 import java.io.IOException;
 import org.jibble.pircbot.IrcException;
 import org.tymoonnext.bot.Kizai;
-import org.tymoonnext.bot.event.CommandEvent;
+import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.EventListener;
 import org.tymoonnext.bot.event.IRCBot.MessageEvent;
+import org.tymoonnext.bot.module.Module;
 import org.tymoonnext.bot.module.irc.IRC;
 
 /**
