@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
 import java.util.logging.Level;
-import org.tymoonnext.bot.event.CommandEvent;
+import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.Event;
 import org.tymoonnext.bot.event.EventBind;
 import org.tymoonnext.bot.event.EventListener;
-import org.tymoonnext.bot.event.ModuleLoadEvent;
-import org.tymoonnext.bot.event.ModuleUnloadEvent;
+import org.tymoonnext.bot.event.core.ModuleLoadEvent;
+import org.tymoonnext.bot.event.core.ModuleUnloadEvent;
 import org.tymoonnext.bot.module.Module;
 import org.tymoonnext.bot.stream.Stream;
 import sun.misc.Signal;
@@ -325,14 +325,26 @@ public class Kizai implements SignalHandler{
      * Triggers an event and propagates it to any EventListener that is bound to
      * the Event's Class.
      * @param ev The Event to trigger.
+     * @see Kizai#event(org.tymoonnext.bot.event.Event, java.lang.Class) 
      */
-    public synchronized void event(Event ev){
+    public synchronized void event(Event ev){event(ev, EventListener.class);}
+    
+    /**
+     * Triggers an event and propagates it to any EventListener that is bound to
+     * the Event's Class and extends the given listenerType class.
+     * @param ev The Event to trigger.
+     * @param listenerType A class type for to limit the propagation for 
+     * specific listeners.
+     */
+    public synchronized void event(Event ev, Class<? extends EventListener> listenerType){
         Commons.log.fine("[MAIN] Event "+ev);
         for(Class<? extends Event> c : events.keySet()){
             if(c.isInstance(ev)){
                 for(EventBind bind : events.get(c)){
-                    if(!ev.isHalted())
-                        bind.invoke(ev);
+                    if(listenerType.isInstance(bind.getListener())){
+                        if(!ev.isHalted())
+                            bind.invoke(ev);
+                    }
                 }
             }
         }
