@@ -7,6 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.tymoonnext.bot.stream.StdOut;
@@ -28,6 +29,7 @@ public class Commons {
     public static final File f_BASEDIR = new File(".");
     public static final File f_MODULES = new File(f_BASEDIR, "modules");
     public static final File f_CONFIG = new File(f_BASEDIR, "bot.cfg");
+    public static final File f_CONFIGDIR = new File(f_BASEDIR, "config");
     
     public static final Logger log = NLogger.get("kizai");
     public static final Stream stdout = new StdOut();
@@ -118,5 +120,9 @@ public class Commons {
             out.append(s);
         }
         return out.toString();
+    }
+    
+    public static String getUUID(){
+        return UUID.randomUUID().toString();
     }
 }
