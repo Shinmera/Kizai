@@ -18,7 +18,8 @@ public class Auth extends Module implements EventListener{
     
     public Auth(Kizai bot){
         super(bot);
-        try{bot.bindEvent(CommandEvent.class, this, "onCommandEvent");}catch(NoSuchMethodException ex){}
+        //Trust me, we want to be first with this.
+        try{bot.bindEvent(CommandEvent.class, this, "onCommandEvent", Integer.MAX_VALUE);}catch(NoSuchMethodException ex){}
     }
 
     @Override
