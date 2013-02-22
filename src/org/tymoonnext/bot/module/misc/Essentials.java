@@ -47,8 +47,6 @@ public class Essentials extends Module implements CommandListener, EventListener
         config.load(bot.getConfig().get("modules").get("misc.Essentials"));
         dateFormat = new SimpleDateFormat(config.dateFormat);
         timeFormat = new SimpleDateFormat(config.timeFormat);
-        System.out.println("UPTIME: "+config.longestUptime);
-        System.out.println("DATEFORMAT: "+config.dateFormat);
     }
 
     @Override
