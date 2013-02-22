@@ -20,6 +20,7 @@ public class User {
     private boolean loggedIn = false;
     
     public User(DObject conf){
+        if(!conf.contains("name")) throw new IllegalArgumentException("DObject does not contain name attribute!");
         name = conf.get("name").toString();
         if(!conf.contains("UID")){
             UID = Commons.getUUID();
@@ -69,5 +70,5 @@ public class User {
     public long getLastLoginTime(){return (Long)config.get("lastLogin").get();}
     public long getSessionTimeout(){return (Long)config.get("sessionTimeout").get();}
     
-    public String toString(){return "@" + this.getClass().getSimpleName() + ":" + UID + "@";}
+    public String toString(){return "@" + this.getClass().getSimpleName() + "|" + name + ":" + UID + "@";}
 }
