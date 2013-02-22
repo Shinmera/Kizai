@@ -5,11 +5,13 @@ import NexT.data.DParse;
 import NexT.util.Toolkit;
 import java.io.File;
 import java.util.HashMap;
+import java.util.logging.Level;
 import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.ConfigLoader;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.EventListener;
 import org.tymoonnext.bot.event.auth.AuthEvent;
+import org.tymoonnext.bot.event.auth.RetrieveUserEvent;
 import org.tymoonnext.bot.event.auth.UserVerifyEvent;
 import org.tymoonnext.bot.module.Module;
 
@@ -21,20 +23,18 @@ import org.tymoonnext.bot.module.Module;
  * @version 0.0.0
  */
 public class UserDB extends Module implements EventListener{
-    
-    private class C extends ConfigLoader{
-        public File configdir = new File(Commons.f_CONFIGDIR, "users");
-    }
-    
-    private C config = new C();
+    public static final File CONFIGDIR = new File(Commons.f_CONFIGDIR, "users");
     private HashMap<String, User> users;
+    private HashMap<String, User> userIDs;
     
     public UserDB(Kizai bot){
         super(bot);
         users = new HashMap<String, User>();
-        try{bot.bindEvent(AuthEvent.class, this, "onAuth");}catch(NoSuchMethodException ex){}
+        userIDs = new HashMap<String, User>();
+        //We have the last word on this, but also want to allow overrides.
+        try{bot.bindEvent(AuthEvent.class, this, "onAuth", Integer.MIN_VALUE+2);}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(RetrieveUserEvent.class, this, "onUser");}catch(NoSuchMethodException ex){}
         
-        config.load(bot.getConfig().get("modules").get("auth.UserDB"));
         load();
     }
     
@@ -46,6 +46,7 @@ public class UserDB extends Module implements EventListener{
      */
     public void register(User user){
         users.put(user.getName(), user);
+        userIDs.put(user.getUID(), user);
         offload(user);
     }
     
@@ -55,15 +56,20 @@ public class UserDB extends Module implements EventListener{
      * be ignored.
      */
     public void load(){
-        File[] cfgfiles = config.configdir.listFiles();
+        File[] cfgfiles = CONFIGDIR.listFiles();
         for(File file : cfgfiles){
             DObject<HashMap<String, DObject>> cfg = DParse.parse(file);
-            User user = new User(cfg);
-            if(user.getName().equals(file.getName())){
-                Commons.log.info(toString()+" Loading user " + user +".");
-                users.put(user.getName(), user);
-            }else{
-                Commons.log.warning(toString()+" File " + file.getPath() + " mismatches containing user " + user.getName()+". Skipping.");
+            try{
+                User user = new User(cfg);
+                if(user.getName().equals(file.getName())){
+                    Commons.log.info(toString()+" Loading user " + user +".");
+                    users.put(user.getName(), user);
+                    userIDs.put(user.getUID(), user);
+                }else{
+                    Commons.log.warning(toString()+" File " + file.getPath() + " mismatches containing user " + user.getName()+". Skipping.");
+                }
+            }catch(IllegalArgumentException ex){
+                Commons.log.log(Level.WARNING, toString()+" File " + file.getPath() + " failed to load.", ex);
             }
         }
     }
@@ -88,19 +94,32 @@ public class UserDB extends Module implements EventListener{
         Commons.log.info(toString()+" Offloading " + user + "...");
         user.getConfig().set("name", user.getName());
         user.getConfig().set("UID", user.getUID());
-        Toolkit.saveStringToFile(DParse.parse(user.getConfig(), true), new File(config.configdir, user.getName()));
+        Toolkit.saveStringToFile(DParse.parse(user.getConfig(), true), new File(CONFIGDIR, user.getName()));
     }
 
     public void shutdown() {
         bot.unbindAllEvents(this);
         offload();
-        config.save();
     }
     
     public void onAuth(AuthEvent evt){
         if(users.containsKey(evt.getCommand().getUser())){
-            UserVerifyEvent uevt = new UserVerifyEvent(evt.getStream(), users.get(evt.getCommand().getUser()));
-            bot.event(uevt, AuthImplementor.class);
+            User user = users.get(evt.getCommand().getUser());
+            UserVerifyEvent uevt = new UserVerifyEvent(evt.getStream(), user);
+            bot.event(uevt, SessionImplementor.class);
+            if(!user.isLoggedIn()){
+                Commons.log.info(toString()+" "+user+" has no active session. Blocking.");
+                evt.setGranted(false);
+            }
+        }else{
+            Commons.log.info(toString()+" User '"+evt.getCommand().getUser()+"' is unknown. Blocking.");
+            evt.setGranted(false);
         }
+    }
+    
+    public void onUser(RetrieveUserEvent evt){
+        //Set user if available
+        if(users.containsKey(evt.getIdent()))evt.setUser(users.get(evt.getIdent()));
+        if(userIDs.containsKey(evt.getIdent()))evt.setUser(userIDs.get(evt.getIdent()));
     }
 }
