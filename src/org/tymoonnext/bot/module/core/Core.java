@@ -53,11 +53,14 @@ public class Core extends Module implements CommandListener,EventListener{
     }
     
     public void loadModByConfig(String mod){
-        DObject modObj = bot.getConfig().get("modules").get(mod);
-        if(modObj.contains("depends")){
-            for(String dep : (Set<String>)modObj.get("depends").getKeySet()){
-                Commons.log.info(toString()+" Loading dependency "+dep);
-                loadModByConfig(mod);
+        if(bot.getConfig().get("modules").contains(mod)){
+            DObject modObj = bot.getConfig().get("modules").get(mod);
+            if(modObj.contains("depends")){
+                for(String dep : (Set<String>)modObj.get("depends").getKeySet()){
+                    dep = modObj.get("depends").get(dep).toString();
+                    Commons.log.info(toString()+" Loading dependency "+dep);
+                    loadModByConfig(dep);
+                }
             }
         }
         bot.loadModule(mod);
