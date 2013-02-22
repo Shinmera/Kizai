@@ -32,7 +32,10 @@ public class EventBind implements Comparable{
      */
     public void invoke(Event ev){
         try{
+            boolean wasAccessible = method.isAccessible();
+            method.setAccessible(true);
             method.invoke(listener, ev);
+            method.setAccessible(wasAccessible);
         }catch(IllegalAccessException ex){
             Commons.log.log(Level.WARNING, toString()+" Failed to invoke method for "+ev, ex);
         }catch(IllegalArgumentException ex){
