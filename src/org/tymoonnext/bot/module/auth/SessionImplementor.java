@@ -15,10 +15,10 @@ import org.tymoonnext.bot.event.auth.UserVerifyEvent;
  * @license GPLv3
  * @version 0.0.0
  */
-public abstract class AuthImplementor implements EventListener{
+public abstract class SessionImplementor implements EventListener{
     
-    public AuthImplementor(Kizai bot){this(bot, 0);}
-    public AuthImplementor(Kizai bot, int priority){
+    public SessionImplementor(Kizai bot){this(bot, 0);}
+    public SessionImplementor(Kizai bot, int priority){
         try {
             bot.bindEvent(UserVerifyEvent.class, this, "onUserVerify", priority);
         } catch (NoSuchMethodException ex) {
