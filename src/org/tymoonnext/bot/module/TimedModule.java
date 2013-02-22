@@ -2,6 +2,7 @@ package org.tymoonnext.bot.module;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
 
 /**
@@ -30,6 +31,7 @@ public abstract class TimedModule extends Module{
     }
     
     public void shutdown(){
+        Commons.log.info(toString()+" Cancelling timer...");
         timer.cancel();
     }
     

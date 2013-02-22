@@ -21,6 +21,7 @@ public abstract class ThreadedModule extends Module implements Runnable{
     }
 
     public void shutdown(){
+        Commons.log.info(toString()+" Interrupting thread...");
         interrupt();
     }
     public abstract void run();
