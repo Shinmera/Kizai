@@ -3,8 +3,10 @@ package org.tymoonnext.bot.module.core;
 import java.util.Scanner;
 import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
+import org.tymoonnext.bot.event.auth.UserVerifyEvent;
 import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.module.ThreadedModule;
+import org.tymoonnext.bot.module.auth.SessionImplementor;
 
 /**
  * Primitive Command Line interface
@@ -14,10 +16,12 @@ import org.tymoonnext.bot.module.ThreadedModule;
  */
 public class CmdInterface extends ThreadedModule{
     private Scanner in;
+    private StdSessionImplementor sessions;
     
     public CmdInterface(Kizai bot){
         super(bot);
         in = new Scanner(System.in);
+        sessions = new StdSessionImplementor(bot);
     }
 
     @Override
@@ -38,4 +42,14 @@ public class CmdInterface extends ThreadedModule{
         }
     }
 
+    class StdSessionImplementor extends SessionImplementor{
+        public StdSessionImplementor(Kizai bot){
+            super(bot);
+        }
+        
+        public void onUserVerify(UserVerifyEvent evt) {
+            if(evt.getStream() == Commons.stdout)evt.getUser().activateSession();
+        }
+        
+    }
 }
