@@ -2,16 +2,14 @@ package org.tymoonnext.bot;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
 import java.util.logging.Level;
-import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.Event;
 import org.tymoonnext.bot.event.EventBind;
 import org.tymoonnext.bot.event.EventListener;
+import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.event.core.ModuleLoadEvent;
 import org.tymoonnext.bot.event.core.ModuleUnloadEvent;
 import org.tymoonnext.bot.module.Module;
@@ -38,6 +36,7 @@ public class Kizai implements SignalHandler{
     private HashMap<Class<? extends Event>,TreeSet<EventBind>> events;
     private HashMap<String,Stream> streams;
     private Configuration conf;
+    private boolean shutdown = false;
     
     public Kizai(){
         conf = new Configuration();
@@ -57,10 +56,14 @@ public class Kizai implements SignalHandler{
         try{Signal.handle(new Signal("TERM"), this);
         }catch(IllegalArgumentException ex){Commons.log.log(Level.WARNING, "[INIT] Failed to register TERM signal handler.", ex);}
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            public void run() {shutdown();}
+            public void run() {if(!shutdown)shutdown();}
         }));
         
-        loadModule("Core");
+        loadModule("core.Core");
+        
+        while(!shutdown){
+            try{Thread.sleep(1000);}catch(Exception ex){/* Here be dragons */}
+        }//KEEPALIVE TICK
     }
     
     /**
@@ -70,7 +73,7 @@ public class Kizai implements SignalHandler{
     public void handle(Signal sig){
         if(sig.getName().equals("INT") || sig.getName().equals("TERM")){
             Commons.log.log(Level.SEVERE, "[MAIN] Received SIGTERM!");
-            shutdown();
+            if(!shutdown)shutdown();
         }else{
             SignalHandler.SIG_DFL.handle(sig);
         }
@@ -80,24 +83,28 @@ public class Kizai implements SignalHandler{
      * Shuts everything down.
      */
     public synchronized void shutdown(){
+        if(shutdown)return;
+        shutdown = true;
         try{
             Commons.log.info("[MAIN] Shutting down...");
-            Commons.log.info("[MAIN] Shutting down modules.");
-            for(Module mod : modules.values()){
-                try{mod.shutdown();
+            Commons.log.info("[MAIN] Turning off modules...");
+            for(Module mod : modules.values().toArray(new Module[modules.size()])){
+                try{unloadModule(mod);
                 }catch(Throwable t){
-                    Commons.log.log(Level.WARNING, "[MAIN]"+mod+" Failed to shutdown cleanly!", t);
+                    Commons.log.log(Level.WARNING, "[MAIN] "+mod+" Failed to shutdown cleanly!", t);
                 }
             }
-            Commons.log.info("[MAIN] Closing streams.");
-            for(Stream stream : streams.values()){
-                try{stream.close();
+            Commons.log.info("[MAIN] Closing streams...");
+            for(Stream stream : streams.values().toArray(new Stream[streams.size()])){
+                try{unregisterStream(stream);
                 }catch(Throwable t){
-                    Commons.log.log(Level.WARNING, "[MAIN]"+stream+" Failed to close cleanly!", t);
+                    Commons.log.log(Level.WARNING, "[MAIN] "+stream+" Failed to close cleanly!", t);
                 }
             }
             Commons.log.info("[MAIN] Saving config.");
             conf.save(Commons.f_CONFIG);
+        }catch(Throwable t){
+            Commons.log.log(Level.SEVERE, "[MAIN] WTF!", t);
         }finally{
             Commons.log.info("[MAIN] Goodbye!");
             System.exit(0);
@@ -142,23 +149,36 @@ public class Kizai implements SignalHandler{
     }
     
     /**
-     * Unloads the specified Module by calling its shutdown function. Note that
-     * the EventListener and CommandListeners that have been registered by the
-     * Module need to be unloaded in the shutdown function of the Module to
-     * guarantee a proper unloading process.
+     * Unloads the specified Module.
      * @param module The Class name of the Module to unload.
      * @return Whether the unloading succeeded.
+     * @see Kizai#unloadModule(org.tymoonnext.bot.module.Module) 
      */
     public synchronized boolean unloadModule(String module){
-        Commons.log.info("[MAIN] Attempting to unload "+module);
         if(!modules.containsKey(module)){
             Commons.log.warning("[MAIN] Module not loaded.");
             return false;
         }
-        Module mod = modules.get(module);
+        return unloadModule(modules.get(module));
+    }
+    
+    /**
+     * Unloads the specified Module by calling its shutdown function. Note that
+     * the EventListener and CommandListeners that have been registered by the
+     * Module need to be unloaded in the shutdown function of the Module to
+     * guarantee a proper unloading process.
+     * @param mod The module instance to unload.
+     * @return Whether the unloading succeeded.
+     */
+    public synchronized boolean unloadModule(Module mod){
+        Commons.log.info("[MAIN] Attempting to unload "+mod);
         event(new ModuleUnloadEvent(Commons.stdout, mod));
         mod.shutdown();
-        modules.remove(module);
+        for(String key : modules.keySet().toArray(new String[modules.size()])){
+            if(modules.get(key) == mod){
+                modules.remove(key);
+            }
+        }
         return true;
     }
     
@@ -183,6 +203,25 @@ public class Kizai implements SignalHandler{
     public synchronized void registerStream(String id, Stream stream){
         Commons.log.info("[MAIN] Registering stream "+id);
         streams.put(id, stream);
+    }
+    
+    /**
+     * Removes the stream by its ID.
+     * @param id The ID of the stream to remove.
+     * @see Kizai#unregisterStream(org.tymoonnext.bot.stream.Stream) 
+     */
+    public synchronized void unregisterStream(String id){
+        unregisterStream(streams.get(id));
+    }
+    
+    /**
+     * Removes the Stream and calls its close function.
+     * @param stream The stream to unregister.
+     */
+    public synchronized void unregisterStream(Stream stream){
+        Commons.log.info("[MAIN] Unegistering stream "+stream);
+        stream.close();
+        streams.remove(stream);
     }
     
     /**
@@ -248,17 +287,12 @@ public class Kizai implements SignalHandler{
     public synchronized void bindEvent(Class<? extends Event> evt, EventListener m, String func) throws NoSuchMethodException{bindEvent(evt, m, func, 0);}
     
     /**
-     * Unregister the given stream.
-     * @param id The Stream to unregister.
-     */
-    public synchronized void unregisterStream(String id){streams.remove(id);}
-    
-    /**
      * Unregister a given listener from a specific command.
      * @param cmd The command to unregister from.
      * @param m The CommandListener to unbind.
      */
     public synchronized void unregisterCommand(String cmd, CommandListener m){
+        Commons.log.info("[MAIN] "+m+" Unregistering command "+cmd);
         commands.remove(cmd);
     }
     
@@ -271,6 +305,7 @@ public class Kizai implements SignalHandler{
         if(events.containsKey(evt)){
             for(EventBind bind : events.get(evt)){
                 if(bind.getListener() == m){
+                    Commons.log.info("[MAIN] "+m+" Unbinding event "+evt);
                     events.get(evt).remove(bind);
                     break;
                 }
