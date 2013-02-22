@@ -35,6 +35,8 @@ public abstract class ConfigLoader {
      * @see noload
      */
     public void load(DObject configblock){
+        if(configblock == null) throw new IllegalArgumentException("Configblock cannot be null!");
+        
         Class c = this.getClass();
         Field[] fields = c.getDeclaredFields();
         for(Field field : fields){
