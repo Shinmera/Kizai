@@ -20,7 +20,7 @@ import org.tymoonnext.bot.stream.Stream;
  * @version 0.0.0
  */
 public class Commons {
-    public static final String VERSION = "2.3.3";
+    public static final String VERSION = "2.4.2";
     public static final String FQDN = "機材";
     public static final String LICENSE = "GPLv3";
     public static final String COREDEV = "TymoonNET/NexT";
@@ -31,8 +31,10 @@ public class Commons {
     public static final File f_CONFIG = new File(f_BASEDIR, "bot.cfg");
     public static final File f_CONFIGDIR = new File(f_BASEDIR, "config");
     
-    public static final Logger log = NLogger.get("kizai");
     public static final Level LOGLEVEL = Level.INFO;
+    public static final Level LOGLEVEL_FILE = Level.FINEST;
+    
+    public static final Logger log = NLogger.get("kizai", LOGLEVEL, LOGLEVEL_FILE);
     public static final Stream stdout = new StdOut();
     
     public static final String MODULE_PACKAGE = "org.tymoonnext.bot.module.";
@@ -41,7 +43,6 @@ public class Commons {
     public static MessageDigest md;
     
     static{
-        log.setLevel(LOGLEVEL);
         try{ md = MessageDigest.getInstance("SHA-512");
             log.finer("+COMMONS+ Choosing SHA-512 as hashing algorithm.");
         }catch(NoSuchAlgorithmException ex){
