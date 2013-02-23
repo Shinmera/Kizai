@@ -136,4 +136,8 @@ public class Commons {
         log.finer("+COMMONS+ Generating UUID: "+uid);
         return uid;
     }
+    
+    public static String getVersionString(){
+        return Commons.FQDN+" v"+Commons.VERSION+" ("+Commons.LICENSE+") by "+Commons.COREDEV+" "+Commons.WEBSITE;
+    }
 }

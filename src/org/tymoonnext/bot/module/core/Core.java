@@ -194,7 +194,7 @@ public class Core extends Module implements CommandListener,EventListener{
             
             cmd.getStream().send(toString()+" Binding for "+bindClass+" to "+bindModule+" removed.", cmd.getChannel());
         }else if(cmd.getCommand().equals("info")){
-            cmd.getStream().send(Commons.FQDN+" v"+Commons.VERSION+" ("+Commons.LICENSE+") by "+Commons.COREDEV+" "+Commons.WEBSITE, cmd.getChannel());
+            cmd.getStream().send(Commons.getVersionString(), cmd.getChannel());
         }else if(cmd.getCommand().equals(CommandEvent.CMD_UNBOUND)){
             cmd.getStream().send(toString()+" Unbound command: "+cmd.getArgs(), cmd.getChannel());
         }
