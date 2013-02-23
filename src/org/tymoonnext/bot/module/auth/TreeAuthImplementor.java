@@ -90,13 +90,18 @@ public class TreeAuthImplementor extends Module implements EventListener{
             String[] _leaves = _branch.trim().toLowerCase().split("\\.");
             
             for(int i=0;i<leaves.length;i++){
-                if(leaves[i].equals("*")) return true;          //Check-branch allows anything here, matches.
+                if(leaves[i].equals("*")) return true;              //Check-branch allows anything here, matches.
                 if(_leaves[i].equals("*")){
-                                                                //Tree-branch allows anything here, skip leaf.
+                                                                    //Tree-branch allows anything here, skip leaf.
                 }else{
-                    if(!leaves[i].equals(_leaves[i])) break;    //Leaf mismatch, leave this branch.
+                    if(_leaves[i].contains("*")){                   //Check for partial leaf matching.
+                        String regex = _leaves[i].replace("*", ".*");
+                        if(!leaves[i].matches(regex)) break;        //Leaf mismatch, leave this branch.
+                    }else{
+                        if(!leaves[i].equals(_leaves[i])) break;    //Leaf mismatch, leave this branch.
+                    }
                 }
-                if(_leaves.length-1 == i) return true;          //Tree-branch reached endpoint, ignore further check-branch leaves.
+                if(_leaves.length-1 == i) return true;              //Tree-branch reached endpoint, ignore further check-branch leaves.
             }
         }
         return false;
