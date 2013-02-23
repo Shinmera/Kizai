@@ -42,6 +42,8 @@ public class Core extends Module implements CommandListener,EventListener{
         bot.registerCommand("info", this);
         try{bot.bindEvent(CommandEvent.class, this, "propagateCommandEvent");}catch(NoSuchMethodException ex){}
         
+        bot.loadModule("group.CommandGroupHandler");
+        
         Commons.log.info(toString()+" Autoloading modules...");
         HashMap<String,DObject> mods = (HashMap<String,DObject>)bot.getConfig().get("modules").get();
         for(String mod : mods.keySet()){
