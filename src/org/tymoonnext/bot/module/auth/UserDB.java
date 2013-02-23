@@ -10,7 +10,8 @@ import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.EventListener;
 import org.tymoonnext.bot.event.auth.AuthEvent;
-import org.tymoonnext.bot.event.auth.RetrieveUserEvent;
+import org.tymoonnext.bot.event.auth.UserRegisterEvent;
+import org.tymoonnext.bot.event.auth.UserRetrieveEvent;
 import org.tymoonnext.bot.event.auth.UserVerifyEvent;
 import org.tymoonnext.bot.module.Module;
 
@@ -32,7 +33,8 @@ public class UserDB extends Module implements EventListener{
         userIDs = new HashMap<String, User>();
         //We have the last word on this, but also want to allow overrides.
         try{bot.bindEvent(AuthEvent.class, this, "onAuth", Integer.MIN_VALUE+2);}catch(NoSuchMethodException ex){}
-        try{bot.bindEvent(RetrieveUserEvent.class, this, "onUser");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(UserRetrieveEvent.class, this, "onUser");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(UserRegisterEvent.class, this, "onUserRegister");}catch(NoSuchMethodException ex){}
         
         load();
     }
@@ -44,6 +46,7 @@ public class UserDB extends Module implements EventListener{
      * @see UserDB#offload(org.tymoonnext.bot.module.auth.User) 
      */
     public void register(User user){
+        Commons.log.info(toString()+" Registering user "+user);
         users.put(user.getName().toLowerCase(), user);
         userIDs.put(user.getUID(), user);
         offload(user);
@@ -55,6 +58,7 @@ public class UserDB extends Module implements EventListener{
      * be ignored.
      */
     public void load(){
+        Commons.log.info(toString()+" Loading all users from disk...");
         File[] cfgfiles = CONFIGDIR.listFiles();
         for(File file : cfgfiles){
             DObject<HashMap<String, DObject>> cfg = DParse.parse(file);
@@ -116,9 +120,12 @@ public class UserDB extends Module implements EventListener{
         }
     }
     
-    public void onUser(RetrieveUserEvent evt){
-        //Set user if available
+    public void onUser(UserRetrieveEvent evt){
         if(users.containsKey(evt.getIdent().toLowerCase()))evt.setUser(users.get(evt.getIdent().toLowerCase()));
         if(userIDs.containsKey(evt.getIdent()))evt.setUser(userIDs.get(evt.getIdent()));
+    }
+    
+    public void onUserRegister(UserRegisterEvent evt){
+        register(evt.getUser());
     }
 }
