@@ -12,7 +12,8 @@ import org.tymoonnext.bot.event.IRCBot.KickEvent;
 import org.tymoonnext.bot.event.IRCBot.NoticeEvent;
 import org.tymoonnext.bot.event.IRCBot.PartEvent;
 import org.tymoonnext.bot.event.IRCBot.QuitEvent;
-import org.tymoonnext.bot.event.auth.RetrieveUserEvent;
+import org.tymoonnext.bot.event.auth.UserRegisterEvent;
+import org.tymoonnext.bot.event.auth.UserRetrieveEvent;
 import org.tymoonnext.bot.event.auth.UserVerifyEvent;
 import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.module.auth.SessionImplementor;
@@ -72,7 +73,7 @@ public class NickServSessionImplementor extends SessionImplementor implements Co
     public void onDisconnect(DisconnectEvent evt){unidentifyAll();}
     
     private User getUser(String user){
-        RetrieveUserEvent evt = new RetrieveUserEvent(user);
+        UserRetrieveEvent evt = new UserRetrieveEvent(user);
         bot.event(evt);
         return evt.getUser();
     }
@@ -123,7 +124,15 @@ public class NickServSessionImplementor extends SessionImplementor implements Co
     }
 
     public void onCommand(CommandEvent evt){
-        requestIdent(evt.getStream(), getUser(evt.getUser()));
+        User user = getUser(evt.getUser());
+        if(user == null){
+            evt.getStream().send("[Auth] Creating new profile...", evt.getChannel());
+            DObject conf = new DObject();
+            conf.set("name", evt.getUser());
+            user = new User(conf);
+            bot.event(new UserRegisterEvent(evt.getStream(), user));
+        }
+        requestIdent(evt.getStream(), user);
     }
     
     public void shutdown(){
