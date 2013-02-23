@@ -77,8 +77,6 @@ public class TreeAuthImplementor extends Module implements EventListener{
                     if(checkBranch(permtree, checkbranch)){
                         Commons.log.info(toString()+" Granting permission for "+checkbranch+" (any)");
                         evt.setGranted(true);
-                    }else{
-                        Commons.log.info(toString()+" Denying permission for "+checkbranch+" (any)");
                     }
                 }
             }
