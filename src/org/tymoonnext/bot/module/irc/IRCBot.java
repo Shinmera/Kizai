@@ -33,7 +33,6 @@ public class IRCBot extends Module implements CommandListener,EventListener{
     public void shutdown(){
         bot.unbindAllEvents(this);
         bot.unregisterAllCommands(this);
-        bot.unregisterStream("irc");
     }
     
     public IRC getIRC(){return irc;}
