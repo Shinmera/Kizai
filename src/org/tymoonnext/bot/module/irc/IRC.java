@@ -27,7 +27,7 @@ public class IRC extends PircBot implements Stream{
         DObject server = config.get("server");
         setLogin(config.get("login").toString());
         setName(config.get("nick").toString());
-        connect(server.get("host").toString(), (Integer)server.get("port").get(), server.get("pass").toString());
+        connect(server.get("host").toString(), (int)(long)(Long)server.get("port").get(), server.get("pass").toString());
 
         DObject channels = server.get("channels");
         for(String channel : ((HashMap<String,DObject>)channels.get()).keySet()){

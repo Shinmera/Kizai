@@ -37,7 +37,7 @@ public class NewestPosts extends TimedModule implements EventListener{
             try{
                 Method m = ev.getModule().getClass().getMethod("getIRC");
                 irc = (IRC)m.invoke(ev.getModule());
-                schedule((Integer)bot.getConfig().get("modules").get("irc.NewestPosts").get("interval").get());
+                schedule((Long)bot.getConfig().get("modules").get("irc.NewestPosts").get("interval").get());
             }catch(Exception ex){
                 Commons.log.log(Level.WARNING, toString()+" Failed to hook into IRC. Module is useless!", ex);
                 bot.unloadModule("irc.NewestPosts");
