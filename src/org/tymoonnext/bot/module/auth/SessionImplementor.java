@@ -5,6 +5,7 @@ import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.EventListener;
 import org.tymoonnext.bot.event.auth.UserVerifyEvent;
+import org.tymoonnext.bot.module.Module;
 
 /**
  * Base class for authentication handlers. UserVerifyEvents will only be sent to
@@ -15,10 +16,11 @@ import org.tymoonnext.bot.event.auth.UserVerifyEvent;
  * @license GPLv3
  * @version 0.0.0
  */
-public abstract class SessionImplementor implements EventListener{
+public abstract class SessionImplementor extends Module implements EventListener{
     
     public SessionImplementor(Kizai bot){this(bot, 0);}
     public SessionImplementor(Kizai bot, int priority){
+        super(bot);
         try {
             bot.bindEvent(UserVerifyEvent.class, this, "onUserVerify", priority);
         } catch (NoSuchMethodException ex) {
@@ -27,4 +29,9 @@ public abstract class SessionImplementor implements EventListener{
     }
     
     public abstract void onUserVerify(UserVerifyEvent evt);
+
+    @Override
+    public void shutdown(){
+        bot.unbindAllEvents(this);
+    }
 }
