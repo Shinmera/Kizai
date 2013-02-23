@@ -32,7 +32,6 @@ public class NewestPosts extends TimedModule{
     
     public void shutdown(){
         super.shutdown();
-        bot.unbindAllEvents(this);
     }
 
     public void run(){

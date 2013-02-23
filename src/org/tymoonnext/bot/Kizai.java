@@ -5,7 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.Event;
@@ -391,7 +390,7 @@ public class Kizai implements SignalHandler{
     /**
      * Broadcast a message to all registered streams, on all destinations. Do 
      * note that the handling of the destinations is stream dependant.
-     * @param message The mssage to broadcast.
+     * @param message The message to broadcast.
      * @see Kizai#broadcast(java.lang.String, java.lang.String) 
      */
     public synchronized void broadcast(String message){broadcast(message, "*");}
