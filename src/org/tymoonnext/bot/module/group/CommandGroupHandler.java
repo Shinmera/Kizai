@@ -1,6 +1,7 @@
 package org.tymoonnext.bot.module.group;
 
 import java.util.HashMap;
+import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.EventListener;
 import org.tymoonnext.bot.event.group.GroupRegisterEvent;
@@ -32,6 +33,7 @@ public class CommandGroupHandler extends Module implements EventListener{
     
     public void onGroupRegister(GroupRegisterEvent evt){
         if(!groups.containsKey(evt.getGroupName())){
+            Commons.log.info(toString()+" Creating command group "+evt.getGroupName());
             CommandGroup group = new CommandGroup(bot, evt.getGroupName());
             group.onGroupRegisterEvent(evt);
             groups.put(evt.getGroupName(), group);

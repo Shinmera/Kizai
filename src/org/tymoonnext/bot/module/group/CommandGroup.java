@@ -27,6 +27,7 @@ public class CommandGroup implements CommandListener{
     
     public void onCommand(CommandEvent cmd){
         if(cmd.getCommand().equals(name)){
+            Commons.log.fine(toString()+" Received group command ("+cmd.getArgs()+")");
             if((cmd.getArgs() == null) || (cmd.getArgs().trim().isEmpty()) || (cmd.getArgs().equalsIgnoreCase("help"))){
                 onHelp(cmd);
             }else{ 
