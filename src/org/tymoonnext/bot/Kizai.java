@@ -2,6 +2,8 @@ package org.tymoonnext.bot;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -33,7 +35,7 @@ public class Kizai implements SignalHandler{
     private ClassLoader classLoader;
     private HashMap<String,Module> modules;
     private HashMap<String,CommandListener> commands;
-    private HashMap<Class<? extends Event>,TreeSet<EventBind>> events;
+    private HashMap<Class<? extends Event>,ArrayList<EventBind>> events;
     private HashMap<String,Stream> streams;
     private Configuration conf;
     private boolean shutdown = false;
@@ -42,13 +44,13 @@ public class Kizai implements SignalHandler{
         conf = new Configuration();
         modules = new HashMap<String, Module>();
         commands = new HashMap<String, CommandListener>();
-        events = new HashMap<Class<? extends Event>,TreeSet<EventBind>>();
+        events = new HashMap<Class<? extends Event>,ArrayList<EventBind>>();
         streams = new HashMap<String, Stream>();
         classLoader = new ReloadingCapableClassLoader();
         
         conf.load(Commons.f_CONFIG);
         
-        events.put(Event.class, new TreeSet<EventBind>());
+        events.put(Event.class, new ArrayList<EventBind>());
         streams.put("stdout", Commons.stdout);
         
         try{Signal.handle(new Signal("INT"), this);
@@ -241,9 +243,9 @@ public class Kizai implements SignalHandler{
     public synchronized void registerCommand(String cmd, CommandListener m, boolean force){
         if(commands.containsKey(cmd)){
             if(!force)  throw new IllegalArgumentException(cmd+" is already used!");
-            else        Commons.log.info("[MAIN] "+m+" is overriding "+commands.get(cmd)+".");
+            else        Commons.log.info("[MAIN]"+m+" is overriding "+commands.get(cmd)+".");
         }
-        Commons.log.info("[MAIN] "+m+" Registering command "+cmd);
+        Commons.log.info("[MAIN]"+m+" Registering command "+cmd);
         commands.put(cmd, m);
     }
     
@@ -260,8 +262,8 @@ public class Kizai implements SignalHandler{
      * within the listener.
      */
     public synchronized void bindEvent(Class<? extends Event> evt, EventListener m, String func, int priority) throws NoSuchMethodException{
-        Commons.log.info("[MAIN] "+m+" Binding event "+evt.getSimpleName()+" to function "+func);
-        if(!events.containsKey(evt))events.put(evt, new TreeSet<EventBind>());
+        Commons.log.info("[MAIN]"+m+" Binding event "+evt.getSimpleName()+" to function "+func);
+        if(!events.containsKey(evt))events.put(evt, new ArrayList<EventBind>());
         else{
             for(EventBind bind : events.get(evt)){
                 if(bind.getListener() == m)
@@ -271,6 +273,7 @@ public class Kizai implements SignalHandler{
         
         EventBind bind = new EventBind(m, evt, func, priority);
         events.get(evt).add(bind);
+        Collections.sort(events.get(evt));
     }
     
     /**
@@ -292,7 +295,7 @@ public class Kizai implements SignalHandler{
      * @param m The CommandListener to unbind.
      */
     public synchronized void unregisterCommand(String cmd, CommandListener m){
-        Commons.log.info("[MAIN] "+m+" Unregistering command "+cmd);
+        Commons.log.info("[MAIN]"+m+" Unregistering command "+cmd);
         commands.remove(cmd);
     }
     
@@ -305,7 +308,7 @@ public class Kizai implements SignalHandler{
         if(events.containsKey(evt)){
             for(EventBind bind : events.get(evt)){
                 if(bind.getListener() == m){
-                    Commons.log.info("[MAIN] "+m+" Unbinding event "+evt);
+                    Commons.log.info("[MAIN]"+m+" Unbinding event "+evt);
                     events.get(evt).remove(bind);
                     break;
                 }
