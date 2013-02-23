@@ -31,7 +31,7 @@ public class Essentials extends Module implements CommandListener, EventListener
         @nosave @noload public String userAgent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.28 (KHTML, like Gecko) Chrome/26.0.1398.0 Safari/537.28";
         @nosave public String dateFormat = "d.M.yyyy";
         @nosave public String timeFormat = "H:mm:ss z";
-        @nosave public long longestUptime = 0;
+        public long longestUptime = 0;
     }
     private C config = new C();
     private SimpleDateFormat dateFormat;
@@ -69,11 +69,11 @@ public class Essentials extends Module implements CommandListener, EventListener
             cmd.getStream().send("Uptime since "+dateFormat.format(new Date(Commons.STARTUP_TIME))+" "+
                                                  timeFormat.format(new Date(Commons.STARTUP_TIME))+": "+
                                                  comps[3]+"d "+comps[2]+"h "+comps[1]+"m "+comps[0]+"s.", cmd.getChannel());
-            //if(config.longestUptime > curUptime){
+            if(config.longestUptime > curUptime){
                 comps = toTimeComponents(config.longestUptime);
                 cmd.getStream().send("Longest recorded uptime: "+
                                                  comps[3]+"d "+comps[2]+"h "+comps[1]+"m "+comps[0]+"s.", cmd.getChannel());
-            //}
+            }
         }else if(cmd.getCommand().equals("google")){
             if(cmd.getArgs() == null){
                 cmd.getStream().send("Please specify a search term.", cmd.getChannel());
