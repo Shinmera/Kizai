@@ -13,15 +13,15 @@ public class ActionEvent extends IRCEvent{
     public String sender;
     public String login;
     public String host;
-    public String target;
+    public String recipient;
     
-    public ActionEvent(IRC bot, String sender, String action, String target){this(bot, sender, action, target, null, null);}
-    public ActionEvent(IRC bot, String sender, String action, String target, String host, String login){
+    public ActionEvent(IRC bot, String sender, String action, String recipient){this(bot, sender, action, recipient, null, null);}
+    public ActionEvent(IRC bot, String sender, String action, String recipient, String host, String login){
         super(bot);
         this.action=action;
         this.sender=sender;
         this.host=host;
         this.login=login;
-        this.target=target;
+        this.recipient=recipient;
     }
 }

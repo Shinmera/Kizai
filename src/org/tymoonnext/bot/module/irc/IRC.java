@@ -53,257 +53,359 @@ public class IRC extends PircBot implements Stream{
     }
 
     protected void onConnect(){
-        super.onConnect();
-        bot.event(new DisconnectEvent(this));
+        DisconnectEvent evt = new DisconnectEvent(this);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onConnect();
     }
 
     protected void onDisconnect(){
-        super.onDisconnect();
-        bot.event(new ConnectEvent(this));
+        ConnectEvent evt = new ConnectEvent(this);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onDisconnect();
     }
 
     protected void onMessage(String channel, String sender, String login, String hostname, String message){
-        super.onMessage(channel, sender, login, hostname, message);
-        bot.event(new MessageEvent(this, sender, message, channel, hostname, login));
+        MessageEvent evt = new MessageEvent(this, sender, message, channel, hostname, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onMessage(evt.channel, evt.sender, evt.login, evt.host, evt.message);
     }
 
     protected void onPrivateMessage(String sender, String login, String hostname, String message){
-        super.onPrivateMessage(sender, login, hostname, message);
-        bot.event(new PrivateMessageEvent(this, sender, message, hostname, login));
+        PrivateMessageEvent evt = new PrivateMessageEvent(this, sender, message, hostname, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onPrivateMessage(evt.sender, evt.login, evt.host, evt.message);
     }
 
-    protected void onAction(String sender, String login, String hostname, String target, String action){
-        super.onAction(sender, login, hostname, target, action);
-        bot.event(new ActionEvent(this, sender, action, target, hostname, login));
+    protected void onAction(String sender, String login, String hostname, String recipient, String action){
+        ActionEvent evt = new ActionEvent(this, sender, action, recipient, hostname, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onAction(evt.sender, evt.login, evt.host, evt.recipient, evt.action);
     }
 
     protected void onJoin(String channel, String sender, String login, String hostname){
-        super.onJoin(channel, sender, login, hostname);
-        bot.event(new JoinEvent(this, sender, channel, hostname, login));
+        JoinEvent evt = new JoinEvent(this, sender, channel, hostname, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onJoin(evt.channel, evt.sender, evt.login, evt.host);
     }
 
     protected void onPart(String channel, String sender, String login, String hostname){
-        super.onPart(channel, sender, login, hostname);
-        bot.event(new PartEvent(this, sender, channel, hostname, login));
+        PartEvent evt = new PartEvent(this, sender, channel, hostname, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onPart(evt.channel, evt.sender, evt.login, evt.host);
     }
 
     protected void onKick(String channel, String kickerNick, String kickerLogin, String kickerHostname, String recipientNick, String reason){
-        super.onKick(channel, kickerNick, kickerLogin, kickerHostname, recipientNick, reason);
-        bot.event(new KickEvent(this, kickerNick, channel, kickerHostname, kickerLogin, recipientNick, reason));
+        KickEvent evt = new KickEvent(this, kickerNick, channel, kickerHostname, kickerLogin, recipientNick, reason);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onKick(evt.channel, evt.sender, evt.login, evt.host, evt.recipient, evt.reason);
     }
 
-    protected void onQuit(String sourceNick, String sourceLogin, String sourceHostname, String reason){
-        super.onQuit(sourceNick, sourceLogin, sourceHostname, reason);
-        bot.event(new QuitEvent(this, sourceNick, reason, sourceHostname, sourceLogin));
+    protected void onQuit(String sender, String login, String host, String reason){
+        QuitEvent evt = new QuitEvent(this, sender, reason, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onQuit(evt.sender, evt.login, evt.host, evt.reason);
     }
 
     protected void onNickChange(String oldNick, String login, String hostname, String newNick){
-        super.onNickChange(oldNick, login, hostname, newNick);
-        bot.event(new NickEvent(this, oldNick, hostname, login, newNick));
+        NickEvent evt = new NickEvent(this, oldNick, hostname, login, newNick);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onNickChange(evt.sender, evt.login, evt.host, evt.newNick);
     }
 
-    protected void onMode(String channel, String sourceNick, String sourceLogin, String sourceHostname, String mode){
-        super.onMode(channel, sourceNick, sourceLogin, sourceHostname, mode);
-        bot.event(new ModeEvent(this, sourceNick, channel, mode, sourceHostname, sourceLogin));
+    protected void onMode(String channel, String sender, String login, String host, String mode){
+        ModeEvent evt = new ModeEvent(this, sender, channel, mode, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onMode(evt.channel, evt.sender, evt.login, evt.host, evt.mode);
     }
 
-    protected void onUserMode(String targetNick, String sourceNick, String sourceLogin, String sourceHostname, String mode){
-        super.onUserMode(targetNick, sourceNick, sourceLogin, sourceHostname, mode);
-        bot.event(new UserModeEvent(this, sourceNick, targetNick, mode, sourceHostname, sourceLogin));
+    protected void onUserMode(String recipientNick, String sender, String login, String host, String mode){
+        UserModeEvent evt = new UserModeEvent(this, sender, recipientNick, mode, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onUserMode(evt.recipient, evt.sender, evt.login, evt.host, evt.mode);
     }
 
     protected void onChannelInfo(String channel, int userCount, String topic){
-        super.onChannelInfo(channel, userCount, topic);
-        bot.event(new ChannelInfoEvent(this, channel, userCount, topic));
+        ChannelInfoEvent evt = new ChannelInfoEvent(this, channel, userCount, topic);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onChannelInfo(evt.channel, evt.userCount, evt.topic);
     }
 
     protected void onTopic(String channel, String topic, String setBy, long date, boolean changed){
-        super.onTopic(channel, topic, setBy, date, changed);
-        bot.event(new TopicEvent(this, channel, topic, setBy, date, changed));
+        TopicEvent evt = new TopicEvent(this, channel, topic, setBy, date, changed);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onTopic(evt.channel, evt.topic, evt.sender, evt.date, evt.changed);
     }
 
     protected void onUserList(String channel, User[] users){
-        super.onUserList(channel, users);
-        bot.event(new UserListEvent(this, channel, users));
+        UserListEvent evt = new UserListEvent(this, channel, users);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onUserList(evt.channel, evt.users);
     }
 
-    protected void onOp(String channel, String sourceNick, String sourceLogin, String sourceHostname, String recipient){
-        super.onOp(channel, sourceNick, sourceLogin, sourceHostname, recipient);
-        bot.event(new OpEvent(this, sourceNick, channel, sourceHostname, sourceLogin, recipient));
+    protected void onOp(String channel, String sender, String login, String host, String recipient){
+        OpEvent evt = new OpEvent(this, sender, channel, host, login, recipient);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onOp(evt.channel, evt.sender, evt.login, evt.host, evt.recipient);
     }
 
-    protected void onDeop(String channel, String sourceNick, String sourceLogin, String sourceHostname, String recipient){
-        super.onDeop(channel, sourceNick, sourceLogin, sourceHostname, recipient);
-        bot.event(new DeopEvent(this, sourceNick, channel, sourceHostname, sourceLogin, recipient));
+    protected void onDeop(String channel, String sender, String login, String host, String recipient){
+        DeopEvent evt = new DeopEvent(this, sender, channel, host, login, recipient);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onDeop(evt.channel, evt.sender, evt.login, evt.host, evt.recipient);
     }
 
-    protected void onDccChatRequest(String sourceNick, String sourceLogin, String sourceHostname, long address, int port){
-        super.onDccChatRequest(sourceNick, sourceLogin, sourceHostname, address, port);
-        bot.event(new DccChatRequestEvent(this, sourceNick, sourceHostname, sourceLogin, address, port));
+    protected void onDccChatRequest(String sender, String login, String host, long address, int port){
+        DccChatRequestEvent evt = new DccChatRequestEvent(this, sender, host, login, address, port);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onDccChatRequest(evt.sender, evt.login, evt.host, evt.address, evt.port);
     }
 
-    protected void onDccSendRequest(String sourceNick, String sourceLogin, String sourceHostname, String filename, long address, int port, int size){
-        super.onDccSendRequest(sourceNick, sourceLogin, sourceHostname, filename, address, port, size);
-        bot.event(new DccSendRequestEvent(this, sourceNick, filename, sourceHostname, sourceLogin, address, port, size));
+    protected void onDccSendRequest(String sender, String login, String host, String filename, long address, int port, int size){
+        DccSendRequestEvent evt = new DccSendRequestEvent(this, sender, filename, host, login, address, port, size);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onDccSendRequest(evt.sender, evt.login, evt.host, evt.file, evt.address, evt.port, evt.size);
     }
 
     protected void onIncomingFileTransfer(DccFileTransfer transfer){
-        super.onIncomingFileTransfer(transfer);
-        bot.event(new FileTransferEvent(this, transfer));
+        FileTransferEvent evt = new FileTransferEvent(this, transfer);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onIncomingFileTransfer(evt.transfer);
     }
     
     protected void onFileTransferFinished(DccFileTransfer transfer, Exception e){
-        super.onFileTransferFinished(transfer, e);
-        bot.event(new FileTransferEvent(this, transfer, e, true));
+        FileTransferEvent evt = new FileTransferEvent(this, transfer, e, true);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onFileTransferFinished(evt.transfer, evt.exception);
     }
 
     protected void onIncomingChatRequest(DccChat chat){
-        super.onIncomingChatRequest(chat);
-        bot.event(new ChatRequestEvent(this, chat));
+        ChatRequestEvent evt = new ChatRequestEvent(this, chat);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onIncomingChatRequest(evt.chat);
     }
 
     protected void onServerPing(String response){
-        super.onServerPing(response);
-        bot.event(new ServerPingEvent(this, response));
+        ServerPingEvent evt = new ServerPingEvent(this, response);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onServerPing(evt.response);
     }
 
-    protected void onFinger(String sourceNick, String sourceLogin, String sourceHostname, String target){
-        super.onFinger(sourceNick, sourceLogin, sourceHostname, target);
-        bot.event(new FingerEvent(this, sourceNick, target, sourceHostname, sourceLogin));
+    protected void onFinger(String sender, String login, String host, String recipient){
+        FingerEvent evt = new FingerEvent(this, sender, recipient, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onFinger(evt.sender, evt.login, evt.host, evt.recipient);
     }
 
-    protected void onTime(String sourceNick, String sourceLogin, String sourceHostname, String target){
-        super.onTime(sourceNick, sourceLogin, sourceHostname, target);
-        bot.event(new TimeEvent(this, sourceNick, target, sourceHostname, sourceLogin));
+    protected void onTime(String sender, String login, String host, String recipient){
+        TimeEvent evt = new TimeEvent(this, sender, recipient, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onTime(evt.sender, evt.login, evt.host, evt.recipient);
     }
 
-    protected void onVersion(String sourceNick, String sourceLogin, String sourceHostname, String target){
-        super.onVersion(sourceNick, sourceLogin, sourceHostname, target);
-        bot.event(new VersionEvent(this, sourceNick, target, sourceHostname, sourceLogin));
+    protected void onVersion(String sender, String login, String host, String recipient){
+        VersionEvent evt = new VersionEvent(this, sender, recipient, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onVersion(evt.sender, evt.login, evt.host, evt.recipient);
     }
 
-    protected void onNotice(String sourceNick, String sourceLogin, String sourceHostname, String target, String notice){
-        super.onNotice(sourceNick, sourceLogin, sourceHostname, target, notice);
-        bot.event(new NoticeEvent(this, sourceNick, target, notice, sourceHostname, sourceLogin));
+    protected void onNotice(String sender, String login, String host, String recipient, String notice){
+        NoticeEvent evt = new NoticeEvent(this, sender, recipient, notice, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onNotice(evt.sender, evt.login, evt.host, evt.recipient, evt.notice);
     }
 
-    protected void onPing(String sourceNick, String sourceLogin, String sourceHostname, String target, String pingValue){
-        super.onPing(sourceNick, sourceLogin, sourceHostname, target, pingValue);
-        bot.event(new PingEvent(this, sourceNick, target, pingValue, sourceHostname, sourceLogin));
+    protected void onPing(String sender, String login, String host, String recipient, String pingValue){
+        PingEvent evt = new PingEvent(this, sender, recipient, pingValue, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onPing(evt.sender, evt.login, evt.host, evt.recipient, evt.ping);
     }
     
-    protected void onInvite(String targetNick, String sourceNick, String sourceLogin, String sourceHostname, String channel){
-        super.onInvite(targetNick, sourceNick, sourceLogin, sourceHostname, channel);
-        bot.event(new InviteEvent(this, sourceNick, targetNick, channel, sourceHostname, sourceLogin));
+    protected void onInvite(String recipientNick, String sender, String login, String host, String channel){
+        InviteEvent evt = new InviteEvent(this, sender, recipientNick, channel, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onInvite(evt.recipient, evt.sender, evt.login, evt.host, evt.channel);
     }
     
-    protected void onSetInviteOnly(String channel, String sourceNick, String sourceLogin, String sourceHostname){
-        super.onSetInviteOnly(channel, sourceNick, sourceLogin, sourceHostname);
-        bot.event(new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_SET_INVITE_ONLY, sourceNick, sourceHostname, sourceLogin));
+    protected void onSetInviteOnly(String channel, String sender, String login, String host){
+        ChannelChangeEvent evt = new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_SET_INVITE_ONLY, sender, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onSetInviteOnly(evt.channel, evt.sender, evt.login, evt.host);
     }
 
-    protected void onRemoveInviteOnly(String channel, String sourceNick, String sourceLogin, String sourceHostname){
-        super.onRemoveInviteOnly(channel, sourceNick, sourceLogin, sourceHostname);
-        bot.event(new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_REMOVE_INVITE_ONLY, sourceNick, sourceHostname, sourceLogin));
+    protected void onRemoveInviteOnly(String channel, String sender, String login, String host){
+        ChannelChangeEvent evt = new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_REMOVE_INVITE_ONLY, sender, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onRemoveInviteOnly(evt.channel, evt.sender, evt.login, evt.host);
     }
 
-    protected void onSetModerated(String channel, String sourceNick, String sourceLogin, String sourceHostname){
-        super.onSetModerated(channel, sourceNick, sourceLogin, sourceHostname);
-        bot.event(new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_SET_MODERATED, sourceNick, sourceHostname, sourceLogin));
+    protected void onSetModerated(String channel, String sender, String login, String host){
+        ChannelChangeEvent evt = new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_SET_MODERATED, sender, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onSetModerated(evt.channel, evt.sender, evt.login, evt.host);
     }
 
-    protected void onRemoveModerated(String channel, String sourceNick, String sourceLogin, String sourceHostname){
-        super.onRemoveModerated(channel, sourceNick, sourceLogin, sourceHostname);
-        bot.event(new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_REMOVE_MODERATED, sourceNick, sourceHostname, sourceLogin));
+    protected void onRemoveModerated(String channel, String sender, String login, String host){
+        ChannelChangeEvent evt = new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_REMOVE_MODERATED, sender, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onRemoveModerated(evt.channel, evt.sender, evt.login, evt.host);
     }
 
-    protected void onSetNoExternalMessages(String channel, String sourceNick, String sourceLogin, String sourceHostname){
-        super.onSetNoExternalMessages(channel, sourceNick, sourceLogin, sourceHostname);
-        bot.event(new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_SET_NO_EXTERNAL_MESSAGES, sourceNick, sourceHostname, sourceLogin));
+    protected void onSetNoExternalMessages(String channel, String sender, String login, String host){
+        ChannelChangeEvent evt = new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_SET_NO_EXTERNAL_MESSAGES, sender, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onSetNoExternalMessages(evt.channel, evt.sender, evt.login, evt.host);
     }
 
-    protected void onRemoveNoExternalMessages(String channel, String sourceNick, String sourceLogin, String sourceHostname){
-        super.onRemoveNoExternalMessages(channel, sourceNick, sourceLogin, sourceHostname);
-        bot.event(new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_REMOVE_NO_EXTERNAL_MESSAGES, sourceNick, sourceHostname, sourceLogin));
+    protected void onRemoveNoExternalMessages(String channel, String sender, String login, String host){
+        ChannelChangeEvent evt = new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_REMOVE_NO_EXTERNAL_MESSAGES, sender, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onRemoveNoExternalMessages(evt.channel, evt.sender, evt.login, evt.host);
     }
 
-    protected void onSetPrivate(String channel, String sourceNick, String sourceLogin, String sourceHostname){
-        super.onSetPrivate(channel, sourceNick, sourceLogin, sourceHostname);
-        bot.event(new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_SET_PRIVATE, sourceNick, sourceHostname, sourceLogin));
+    protected void onSetPrivate(String channel, String sender, String login, String host){
+        ChannelChangeEvent evt = new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_SET_PRIVATE, sender, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onSetPrivate(evt.channel, evt.sender, evt.login, evt.host);
     }
 
-    protected void onRemovePrivate(String channel, String sourceNick, String sourceLogin, String sourceHostname){
-        super.onRemovePrivate(channel, sourceNick, sourceLogin, sourceHostname);
-        bot.event(new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_REMOVE_PRIVATE, sourceNick, sourceHostname, sourceLogin));
+    protected void onRemovePrivate(String channel, String sender, String login, String host){
+        ChannelChangeEvent evt = new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_REMOVE_PRIVATE, sender, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onRemovePrivate(evt.channel, evt.sender, evt.login, evt.host);
     }
 
-    protected void onSetSecret(String channel, String sourceNick, String sourceLogin, String sourceHostname){
-        super.onSetSecret(channel, sourceNick, sourceLogin, sourceHostname);
-        bot.event(new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_SET_SECRET, sourceNick, sourceHostname, sourceLogin));
+    protected void onSetSecret(String channel, String sender, String login, String host){
+        ChannelChangeEvent evt = new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_SET_SECRET, sender, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onSetSecret(evt.channel, evt.sender, evt.login, evt.host);
     }
 
-    protected void onRemoveSecret(String channel, String sourceNick, String sourceLogin, String sourceHostname){
-        super.onRemoveSecret(channel, sourceNick, sourceLogin, sourceHostname);
-        bot.event(new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_REMOVE_SECRET, sourceNick, sourceHostname, sourceLogin));
+    protected void onRemoveSecret(String channel, String sender, String login, String host){
+        ChannelChangeEvent evt = new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_REMOVE_SECRET, sender, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onRemoveSecret(evt.channel, evt.sender, evt.login, evt.host);
     }
 
-    protected void onSetTopicProtection(String channel, String sourceNick, String sourceLogin, String sourceHostname){
-        super.onSetTopicProtection(channel, sourceNick, sourceLogin, sourceHostname);
-        bot.event(new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_SET_TOPIC_PROTECTION, sourceNick, sourceHostname, sourceLogin));
+    protected void onSetTopicProtection(String channel, String sender, String login, String host){
+        ChannelChangeEvent evt = new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_SET_TOPIC_PROTECTION, sender, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onSetTopicProtection(evt.channel, evt.sender, evt.login, evt.host);
     }
 
-    protected void onRemoveTopicProtection(String channel, String sourceNick, String sourceLogin, String sourceHostname){
-        super.onRemoveTopicProtection(channel, sourceNick, sourceLogin, sourceHostname);
-        bot.event(new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_REMOVE_TOPIC_PROTECTION, sourceNick, sourceHostname, sourceLogin));
+    protected void onRemoveTopicProtection(String channel, String sender, String login, String host){
+        ChannelChangeEvent evt = new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_REMOVE_TOPIC_PROTECTION, sender, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onRemoveTopicProtection(evt.channel, evt.sender, evt.login, evt.host);
     }
 
-    protected void onVoice(String channel, String sourceNick, String sourceLogin, String sourceHostname, String recipient){
-        super.onVoice(channel, sourceNick, sourceLogin, sourceHostname, recipient);
-        bot.event(new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_SET_VOICE, recipient, sourceNick, sourceHostname, sourceLogin));
+    protected void onVoice(String channel, String sender, String login, String host, String recipient){
+        ChannelChangeEvent evt = new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_SET_VOICE, recipient, sender, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onVoice(evt.channel, evt.sender, evt.login, evt.host, evt.args);
     }
 
-    protected void onDeVoice(String channel, String sourceNick, String sourceLogin, String sourceHostname, String recipient){
-        super.onDeVoice(channel, sourceNick, sourceLogin, sourceHostname, recipient);
-        bot.event(new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_REMOVE_VOICE, recipient, sourceNick, sourceHostname, sourceLogin));
+    protected void onDeVoice(String channel, String sender, String login, String host, String recipient){
+        ChannelChangeEvent evt = new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_REMOVE_VOICE, recipient, sender, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onDeVoice(evt.channel, evt.sender, evt.login, evt.host, evt.args);
     }
 
-    protected void onSetChannelBan(String channel, String sourceNick, String sourceLogin, String sourceHostname, String hostmask){
-        super.onSetChannelBan(channel, sourceNick, sourceLogin, sourceHostname, hostmask);
-        bot.event(new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_SET_BAN, hostmask, sourceNick, sourceHostname, sourceLogin));
+    protected void onSetChannelBan(String channel, String sender, String login, String host, String hostmask){
+        ChannelChangeEvent evt = new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_SET_BAN, hostmask, sender, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onSetChannelBan(evt.channel, evt.sender, evt.login, evt.host, evt.args);
     }
 
-    protected void onRemoveChannelBan(String channel, String sourceNick, String sourceLogin, String sourceHostname, String hostmask){
-        super.onRemoveChannelBan(channel, sourceNick, sourceLogin, sourceHostname, hostmask);
-        bot.event(new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_REMOVE_BAN, hostmask, sourceNick, sourceHostname, sourceLogin));
+    protected void onRemoveChannelBan(String channel, String sender, String login, String host, String hostmask){
+        ChannelChangeEvent evt = new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_REMOVE_BAN, hostmask, sender, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onRemoveChannelBan(evt.channel, evt.sender, evt.login, evt.host, evt.args);
     }
 
-    protected void onSetChannelKey(String channel, String sourceNick, String sourceLogin, String sourceHostname, String key){
-        super.onSetChannelKey(channel, sourceNick, sourceLogin, sourceHostname, key);
-        bot.event(new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_SET_KEY, key, sourceNick, sourceHostname, sourceLogin));
+    protected void onSetChannelKey(String channel, String sender, String login, String host, String key){
+        ChannelChangeEvent evt = new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_SET_KEY, key, sender, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onSetChannelKey(evt.channel, evt.sender, evt.login, evt.host, evt.args);
     }
 
-    protected void onRemoveChannelKey(String channel, String sourceNick, String sourceLogin, String sourceHostname, String key){
-        super.onRemoveChannelKey(channel, sourceNick, sourceLogin, sourceHostname, key);
-        bot.event(new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_REMOVE_KEY, key, sourceNick, sourceHostname, sourceLogin));
+    protected void onRemoveChannelKey(String channel, String sender, String login, String host, String key){
+        ChannelChangeEvent evt = new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_REMOVE_KEY, key, sender, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onRemoveChannelKey(evt.channel, evt.sender, evt.login, evt.host, evt.args);
     }
 
-    protected void onSetChannelLimit(String channel, String sourceNick, String sourceLogin, String sourceHostname, int limit){
-        super.onSetChannelLimit(channel, sourceNick, sourceLogin, sourceHostname, limit);
-        bot.event(new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_SET_LIMIT, limit+"", sourceNick, sourceHostname, sourceLogin));
+    protected void onSetChannelLimit(String channel, String sender, String login, String host, int limit){
+        ChannelChangeEvent evt = new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_SET_LIMIT, limit+"", sender, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onSetChannelLimit(evt.channel, evt.sender, evt.login, evt.host, Integer.parseInt(evt.args));
     }
 
-    protected void onRemoveChannelLimit(String channel, String sourceNick, String sourceLogin, String sourceHostname){
-        super.onRemoveChannelLimit(channel, sourceNick, sourceLogin, sourceHostname);
-        bot.event(new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_REMOVE_LIMIT, sourceNick, sourceHostname, sourceLogin));
+    protected void onRemoveChannelLimit(String channel, String sender, String login, String host){
+        ChannelChangeEvent evt = new ChannelChangeEvent(this, channel, ChannelChangeEvent.TYPE_REMOVE_LIMIT, sender, host, login);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onRemoveChannelLimit(evt.channel, evt.sender, evt.login, evt.host);
     }
 
     protected void onServerResponse(int code, String response){
-        super.onServerResponse(code, response);
-        bot.event(new ServerResponseEvent(this, code, response));
+        ServerResponseEvent evt = new ServerResponseEvent(this, code, response);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onServerResponse(evt.code, evt.line);
     }
 
     protected void onUnknown(String line){
-        super.onUnknown(line);
-        bot.event(new UnknownEvent(this, line));
+        UnknownEvent evt = new UnknownEvent(this, line);
+        bot.event(evt);
+        if(!evt.isCancelled())
+            super.onUnknown(evt.line);
     }
 }
