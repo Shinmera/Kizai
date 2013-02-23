@@ -7,7 +7,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.logging.Level;
 import org.tymoonnext.bot.Commons;
-import org.tymoonnext.bot.ConfigLoader;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.EventListener;
 import org.tymoonnext.bot.event.auth.AuthEvent;
@@ -45,7 +44,7 @@ public class UserDB extends Module implements EventListener{
      * @see UserDB#offload(org.tymoonnext.bot.module.auth.User) 
      */
     public void register(User user){
-        users.put(user.getName(), user);
+        users.put(user.getName().toLowerCase(), user);
         userIDs.put(user.getUID(), user);
         offload(user);
     }
@@ -63,7 +62,7 @@ public class UserDB extends Module implements EventListener{
                 User user = new User(cfg);
                 if(user.getName().equals(file.getName())){
                     Commons.log.info(toString()+" Loading user " + user +".");
-                    users.put(user.getName(), user);
+                    users.put(user.getName().toLowerCase(), user);
                     userIDs.put(user.getUID(), user);
                 }else{
                     Commons.log.warning(toString()+" File " + file.getPath() + " mismatches containing user " + user.getName()+". Skipping.");
@@ -92,9 +91,9 @@ public class UserDB extends Module implements EventListener{
      */
     public void offload(User user){
         Commons.log.info(toString()+" Offloading " + user + "...");
-        user.getConfig().set("name", user.getName());
+        user.getConfig().set("name", user.getName().toLowerCase());
         user.getConfig().set("UID", user.getUID());
-        Toolkit.saveStringToFile(DParse.parse(user.getConfig(), true), new File(CONFIGDIR, user.getName()));
+        Toolkit.saveStringToFile(DParse.parse(user.getConfig(), true), new File(CONFIGDIR, user.getName().toLowerCase()));
     }
 
     public void shutdown() {
@@ -103,8 +102,8 @@ public class UserDB extends Module implements EventListener{
     }
     
     public void onAuth(AuthEvent evt){
-        if(users.containsKey(evt.getCommand().getUser())){
-            User user = users.get(evt.getCommand().getUser());
+        if(users.containsKey(evt.getCommand().getUser().toLowerCase())){
+            User user = users.get(evt.getCommand().getUser().toLowerCase());
             UserVerifyEvent uevt = new UserVerifyEvent(evt.getStream(), user);
             bot.event(uevt, SessionImplementor.class);
             if(!user.isLoggedIn()){
@@ -119,7 +118,7 @@ public class UserDB extends Module implements EventListener{
     
     public void onUser(RetrieveUserEvent evt){
         //Set user if available
-        if(users.containsKey(evt.getIdent()))evt.setUser(users.get(evt.getIdent()));
+        if(users.containsKey(evt.getIdent().toLowerCase()))evt.setUser(users.get(evt.getIdent().toLowerCase()));
         if(userIDs.containsKey(evt.getIdent()))evt.setUser(userIDs.get(evt.getIdent()));
     }
 }
