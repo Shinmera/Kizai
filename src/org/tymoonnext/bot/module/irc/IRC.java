@@ -408,4 +408,6 @@ public class IRC extends PircBot implements Stream{
         if(!evt.isCancelled())
             super.onUnknown(evt.line);
     }
+    
+    public String toString(){return "~IRC~";}
 }
