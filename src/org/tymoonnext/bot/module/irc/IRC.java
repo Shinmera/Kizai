@@ -38,8 +38,12 @@ public class IRC extends PircBot implements Stream{
     }
     
     public void send(String msg, String dst){
-        bot.event(new SendEvent(this, dst, msg));
-        this.sendMessage(dst, msg);
+        if(dst.equals("*")){
+            sendToAll(msg);
+        }else{
+            bot.event(new SendEvent(this, dst, msg));
+            this.sendMessage(dst, msg);
+        }
     }
     
     public void sendToAll(String msg){
