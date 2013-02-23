@@ -94,14 +94,14 @@ public class Kizai implements SignalHandler{
             for(Module mod : modules.values().toArray(new Module[modules.size()])){
                 try{unloadModule(mod);
                 }catch(Throwable t){
-                    Commons.log.log(Level.WARNING, "[MAIN] "+mod+" Failed to shutdown cleanly!", t);
+                    Commons.log.log(Level.WARNING, "[MAIN]"+mod+" Failed to shutdown cleanly!", t);
                 }
             }
             Commons.log.info("[MAIN] Closing streams...");
             for(Stream stream : streams.values().toArray(new Stream[streams.size()])){
                 try{unregisterStream(stream);
                 }catch(Throwable t){
-                    Commons.log.log(Level.WARNING, "[MAIN] "+stream+" Failed to close cleanly!", t);
+                    Commons.log.log(Level.WARNING, "[MAIN]"+stream+" Failed to close cleanly!", t);
                 }
             }
             Commons.log.info("[MAIN] Saving config.");
