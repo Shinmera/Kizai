@@ -41,16 +41,21 @@ public class Commons {
     public static MessageDigest md;
     
     static{
+        log.setLevel(LOGLEVEL);
         try{ md = MessageDigest.getInstance("SHA-512");
+            log.finer("+COMMONS+ Choosing SHA-512 as hashing algorithm.");
         }catch(NoSuchAlgorithmException ex){
             log.log(Level.WARNING, "+COMMONS+ Cannot find SHA-512 algorithm!");
             try{ md = MessageDigest.getInstance("SHA-1");
+                log.finer("+COMMONS+ Choosing SHA-1 as hashing algorithm.");
             }catch(NoSuchAlgorithmException ex2){
                 log.log(Level.WARNING, "+COMMONS+ Cannot find SHA-1 algorithm!");
                 try{ md = MessageDigest.getInstance("SHA");
+                    log.finer("+COMMONS+ Choosing SHA as hashing algorithm.");
                 }catch(NoSuchAlgorithmException ex3){
                     log.log(Level.WARNING, "+COMMONS+ Cannot find SHA algorithm!");
                     try{ md = MessageDigest.getInstance("MD5");
+                        log.finer("+COMMONS+ Choosing MD5 as hashing algorithm.");
                     }catch(NoSuchAlgorithmException ex4){
                         log.log(Level.WARNING, "+COMMONS+ Cannot find MD5 algorithm!");
                         log.log(Level.WARNING, "+COMMONS+ Hashing function will always return input string!!");
@@ -58,7 +63,6 @@ public class Commons {
                 }
             }
         }
-        log.setLevel(LOGLEVEL);
     }
     
     /**
@@ -72,6 +76,7 @@ public class Commons {
      * @return The return value of the method or null on fail.
      */
     public static <T> T invoke(Object o, String func, Object... arg){
+        log.fine("+COMMONS+ Invoking '"+func+"' on '"+o+"' with args: "+Toolkit.implode(arg, ", "));
         Class[] classes = null;
         if(arg != null){
             classes = new Class[arg.length];
@@ -121,10 +126,13 @@ public class Commons {
             s = s.substring(s.length() - 2);
             out.append(s);
         }
+        log.finer("+COMMONS+ Hashing '"+in+"' to '"+out.toString()+"'");
         return out.toString();
     }
     
     public static String getUUID(){
-        return UUID.randomUUID().toString();
+        String uid = UUID.randomUUID().toString();
+        log.finer("+COMMONS+ Generating UUID: "+uid);
+        return uid;
     }
 }
