@@ -32,6 +32,7 @@ public class Commons {
     public static final File f_CONFIGDIR = new File(f_BASEDIR, "config");
     
     public static final Logger log = NLogger.get("kizai");
+    public static final Level LOGLEVEL = Level.INFO;
     public static final Stream stdout = new StdOut();
     
     public static final String MODULE_PACKAGE = "org.tymoonnext.bot.module.";
@@ -57,6 +58,7 @@ public class Commons {
                 }
             }
         }
+        log.setLevel(LOGLEVEL);
     }
     
     /**
