@@ -9,6 +9,7 @@ import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.IRCBot.DisconnectEvent;
 import org.tymoonnext.bot.event.IRCBot.JoinEvent;
 import org.tymoonnext.bot.event.IRCBot.KickEvent;
+import org.tymoonnext.bot.event.IRCBot.NickEvent;
 import org.tymoonnext.bot.event.IRCBot.NoticeEvent;
 import org.tymoonnext.bot.event.IRCBot.PartEvent;
 import org.tymoonnext.bot.event.IRCBot.QuitEvent;
@@ -40,6 +41,7 @@ public class NickServSessionImplementor extends SessionImplementor implements Co
         try{bot.bindEvent(QuitEvent.class, this, "onQuit");}catch(NoSuchMethodException ex){}
         try{bot.bindEvent(KickEvent.class, this, "onKick");}catch(NoSuchMethodException ex){}
         try{bot.bindEvent(JoinEvent.class, this, "onJoin");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(NickEvent.class, this, "onNick");}catch(NoSuchMethodException ex){}
         try{bot.bindEvent(DisconnectEvent.class, this, "onDisconnect");}catch(NoSuchMethodException ex){}
         bot.registerCommand("ident", this);
     }
@@ -69,6 +71,7 @@ public class NickServSessionImplementor extends SessionImplementor implements Co
     public void onPart(PartEvent evt){unidentifyUser(getUser(evt.sender));}
     public void onQuit(QuitEvent evt){unidentifyUser(getUser(evt.sender));}
     public void onKick(KickEvent evt){unidentifyUser(getUser(evt.recipient));}
+    public void onNick(NickEvent evt){unidentifyUser(getUser(evt.sender));}
     public void onJoin(JoinEvent evt){requestIdent(evt.getStream(),getUser(evt.sender));}
     public void onDisconnect(DisconnectEvent evt){unidentifyAll();}
     
