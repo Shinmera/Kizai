@@ -8,7 +8,7 @@ import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.EventListener;
 import org.tymoonnext.bot.event.auth.AuthEvent;
-import org.tymoonnext.bot.event.auth.RetrieveUserEvent;
+import org.tymoonnext.bot.event.auth.UserRetrieveEvent;
 import org.tymoonnext.bot.event.auth.UserVerifyEvent;
 import org.tymoonnext.bot.module.Module;
 
@@ -35,7 +35,7 @@ public class TreeAuthImplementor extends Module implements EventListener{
         checkbranch = checkbranch.trim().toLowerCase();
         
         //Get the User object from wherever
-        RetrieveUserEvent retrUser = new RetrieveUserEvent(evt.getStream(), evt.getCommand().getUser());
+        UserRetrieveEvent retrUser = new UserRetrieveEvent(evt.getStream(), evt.getCommand().getUser());
         bot.event(retrUser);
         User u = retrUser.getUser();
         if(u == null)return;
@@ -57,7 +57,7 @@ public class TreeAuthImplementor extends Module implements EventListener{
     
     public void onAuthFinal(AuthEvent evt){
         if(any == null && !checkedAny){
-            RetrieveUserEvent retrUser = new RetrieveUserEvent(evt.getStream(), "any");
+            UserRetrieveEvent retrUser = new UserRetrieveEvent(evt.getStream(), "any");
             bot.event(retrUser);
             any = retrUser.getUser();
             checkedAny = true;
