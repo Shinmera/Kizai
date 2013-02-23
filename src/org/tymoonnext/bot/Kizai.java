@@ -221,7 +221,7 @@ public class Kizai implements SignalHandler{
      * @param stream The stream to unregister.
      */
     public synchronized void unregisterStream(Stream stream){
-        Commons.log.info("[MAIN] Unegistering stream "+stream);
+        Commons.log.info("[MAIN] Unregistering stream "+stream);
         stream.close();
         streams.remove(stream);
     }
@@ -266,8 +266,8 @@ public class Kizai implements SignalHandler{
         if(!events.containsKey(evt))events.put(evt, new ArrayList<EventBind>());
         else{
             for(EventBind bind : events.get(evt)){
-                if(bind.getListener() == m)
-                    throw new IllegalArgumentException("Listener "+m+" is already bound to "+evt.getSimpleName()+".");
+                if(bind.getListener() == m && bind.getPriority() == priority)
+                    throw new IllegalArgumentException("Listener "+m+" is already bound to "+evt.getSimpleName()+" with priority "+priority+".");
             }
         }
         
@@ -385,6 +385,28 @@ public class Kizai implements SignalHandler{
                     }
                 }
             }
+        }
+    }
+    
+    /**
+     * Broadcast a message to all registered streams, on all destinations. Do 
+     * note that the handling of the destinations is stream dependant.
+     * @param message The mssage to broadcast.
+     * @see Kizai#broadcast(java.lang.String, java.lang.String) 
+     */
+    public synchronized void broadcast(String message){broadcast(message, "*");}
+    
+    /**
+     * Broadcast a message to all registered streams.
+     * @param message The message to broadcast.
+     * @param dest The destination to broadcast to. This is stream dependant.
+     * Generally, a destination of "*" should tell the stream to broadcast to
+     * any/all destinations it knows.
+     */
+    public synchronized void broadcast(String message, String dest){
+        Commons.log.fine("[MAIN] Broadcast '"+message+"' to "+dest);
+        for(Stream s : streams.values()){
+            s.send(message, dest);
         }
     }
     
