@@ -23,26 +23,11 @@ import org.tymoonnext.bot.module.TimedModule;
  * @todo Very static, should be extended for general purpose usage.
  * @todo remove IRC deps.
  */
-public class NewestPosts extends TimedModule implements EventListener{
+public class NewestPosts extends TimedModule{
     private String lastTitle = "";
-    private IRC irc;
     
     public NewestPosts(Kizai bot){
         super(bot);
-        try{bot.bindEvent(ModuleLoadEvent.class, this, "onModuleLoad");}catch(NoSuchMethodException ex){}
-    }
-    
-    public void onModuleLoad(ModuleLoadEvent ev){
-        if(IRCBot.class.getName().equals(ev.getModule().getClass().getName())){
-            try{
-                Method m = ev.getModule().getClass().getMethod("getIRC");
-                irc = (IRC)m.invoke(ev.getModule());
-                schedule((Long)bot.getConfig().get("modules").get("irc.NewestPosts").get("interval").get());
-            }catch(Exception ex){
-                Commons.log.log(Level.WARNING, toString()+" Failed to hook into IRC. Module is useless!", ex);
-                bot.unloadModule("irc.NewestPosts");
-            }
-        }
     }
     
     public void shutdown(){
@@ -58,7 +43,7 @@ public class NewestPosts extends TimedModule implements EventListener{
             SyndEntryImpl entry = ((SyndEntryImpl)feed.getEntries().get(0));
             if(!lastTitle.equals(entry.getTitle())){
                 lastTitle=entry.getTitle();
-                irc.sendToAll("[!] New post: "+((entry.getAuthor().trim().isEmpty()) ? "Anonymous" : entry.getAuthor().trim())+
+                bot.broadcast("[!] New post: "+((entry.getAuthor().trim().isEmpty()) ? "Anonymous" : entry.getAuthor().trim())+
                        ": "+entry.getTitle()+
                        " ( "+entry.getLink()+" )");
             }
