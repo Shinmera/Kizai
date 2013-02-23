@@ -70,5 +70,5 @@ public class User {
     public long getLastLoginTime(){return (Long)config.get("lastLogin").get();}
     public long getSessionTimeout(){return (Long)config.get("sessionTimeout").get();}
     
-    public String toString(){return "@" + this.getClass().getSimpleName() + "|" + name + ":" + UID + "@";}
+    public String toString(){return "@" + this.getClass().getSimpleName() + "|" + UID + ":" + name + "@";}
 }
