@@ -33,6 +33,7 @@ public class Auth extends Module implements EventListener{
         if(!auth.isGranted()){
             Commons.log.warning(toString()+" Not permitting "+evt+".");
             evt.setHalted(true);
+            evt.getStream().send(toString()+" Access denied.", evt.getChannel());
         }
     }
 }
