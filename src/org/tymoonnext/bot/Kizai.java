@@ -13,6 +13,7 @@ import org.tymoonnext.bot.event.EventListener;
 import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.event.core.ModuleLoadEvent;
 import org.tymoonnext.bot.event.core.ModuleUnloadEvent;
+import org.tymoonnext.bot.event.core.ShutdownEvent;
 import org.tymoonnext.bot.module.Module;
 import org.tymoonnext.bot.stream.Stream;
 import sun.misc.Signal;
@@ -88,6 +89,7 @@ public class Kizai implements SignalHandler{
         shutdown = true;
         try{
             Commons.log.info("[MAIN] Shutting down...");
+            event(new ShutdownEvent());
             Commons.log.info("[MAIN] Turning off modules...");
             for(Module mod : modules.values().toArray(new Module[modules.size()])){
                 try{unloadModule(mod);
@@ -242,7 +244,7 @@ public class Kizai implements SignalHandler{
     public synchronized void registerCommand(String cmd, CommandListener m, boolean force){
         if(commands.containsKey(cmd)){
             if(!force)  throw new IllegalArgumentException(cmd+" is already used!");
-            else        Commons.log.info("[MAIN]"+m+" is overriding "+commands.get(cmd)+".");
+            else        Commons.log.warning("[MAIN]"+m+" is overriding "+commands.get(cmd)+".");
         }
         Commons.log.info("[MAIN]"+m+" Registering command "+cmd);
         commands.put(cmd, m);
@@ -412,7 +414,7 @@ public class Kizai implements SignalHandler{
     public synchronized Module getModule(String name){return modules.get(name);}
     public synchronized Stream getStream(String name){return streams.get(name);}
     public synchronized Configuration getConfig(){return conf;}
-    public synchronized CommandListener getCommandHandler(String commandType){return commands.get(commandType);}
+    public synchronized CommandListener getCommandListener(String commandType){return commands.get(commandType);}
     public synchronized String[] getRegisteredCommands(){return commands.keySet().toArray(new String[commands.size()]);}
     public synchronized EventBind[] getEventBinds(Class<? extends Event> event){return events.get(event).toArray(new EventBind[events.get(event).size()]);}
     public synchronized Class[] getBoundEvents(){return events.keySet().toArray(new Class[events.size()]);}
