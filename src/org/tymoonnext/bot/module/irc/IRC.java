@@ -8,6 +8,7 @@ import org.jibble.pircbot.DccFileTransfer;
 import org.jibble.pircbot.IrcException;
 import org.jibble.pircbot.PircBot;
 import org.jibble.pircbot.User;
+import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.IRCBot.*;
 import org.tymoonnext.bot.stream.Stream;
@@ -27,6 +28,9 @@ public class IRC extends PircBot implements Stream{
         DObject server = config.get("server");
         setLogin(config.get("login").toString());
         setName(config.get("nick").toString());
+        setVersion(Commons.getVersionString());
+        setMessageDelay((Long)server.get("msgdelay").get());
+        setAutoNickChange(true);
         connect(server.get("host").toString(), (int)(long)(Long)server.get("port").get(), server.get("pass").toString());
 
         DObject channels = server.get("channels");
