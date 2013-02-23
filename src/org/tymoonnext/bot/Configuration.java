@@ -31,6 +31,7 @@ public class Configuration {
         return Toolkit.saveStringToFile(DParse.parse(conf, true), f);
     }
     
+    public DObject get(){return conf;}
     public DObject get(String name){return (DObject)conf.get(name);}
     public DObject getO(String name){return (DObject)conf.get(name).get();}
     public String getS(String name){return (String)conf.get(name).get();}
