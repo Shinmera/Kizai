@@ -1,5 +1,7 @@
 package org.tymoonnext.bot.event;
 
+import org.tymoonnext.bot.event.core.CommandEvent;
+
 /**
  * Command listener interface
  * @author Shinmera

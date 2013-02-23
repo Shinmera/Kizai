@@ -1,9 +1,10 @@
 package org.tymoonnext.bot.event;
 
+import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.stream.Stream;
 
 /**
- * 
+ * Base Event class.
  * @author Shinmera
  * @license GPLv3
  * @version 0.0.0
@@ -13,7 +14,9 @@ public abstract class Event {
     protected boolean cancelled = false;
     protected boolean halted = false;
     
-    public Event(Stream origin){this.origin=origin;}
+    public Event(Stream origin){
+        this.origin=origin;
+    }
     
     public String toString(){
         return "<"+this.getClass().getSimpleName()+">";
@@ -44,5 +47,5 @@ public abstract class Event {
      * See setCancelled() for that.
      * @param c 
      */
-    public void setHalted(boolean c){cancelled=c;}
+    public void setHalted(boolean c){halted=c;}
 }

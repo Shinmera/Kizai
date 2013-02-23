@@ -5,8 +5,8 @@ import NexT.mysql.NSQLException;
 import NexT.mysql.SQLWrapper;
 import java.util.logging.Level;
 import org.tymoonnext.bot.Commons;
+import org.tymoonnext.bot.ConfigLoader;
 import org.tymoonnext.bot.Kizai;
-import org.tymoonnext.bot.event.CommandEvent;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.EventListener;
 import org.tymoonnext.bot.event.IRCBot.ActionEvent;
@@ -19,6 +19,7 @@ import org.tymoonnext.bot.event.IRCBot.PartEvent;
 import org.tymoonnext.bot.event.IRCBot.QuitEvent;
 import org.tymoonnext.bot.event.IRCBot.SendEvent;
 import org.tymoonnext.bot.event.IRCBot.TopicEvent;
+import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.module.Module;
 
 /**
@@ -26,7 +27,6 @@ import org.tymoonnext.bot.module.Module;
  * @author Shinmera
  * @license GPLv3
  * @version 0.0.0
- * @todo load db stuff from config
  */
 public class SQLLog extends Module implements EventListener, CommandListener{
     public static final char TYPE_MESSAGE= 'm';
@@ -40,15 +40,14 @@ public class SQLLog extends Module implements EventListener, CommandListener{
     public static final char TYPE_ACTION = 'a';
     public static final char TYPE_SEND   = 's';
     
-    private String sqlhost;
-    private int sqlport = 3306;
-    private String sqldb;
-    private String sqluser;
-    private String sqlpw;
-    private String sqltable;
+    class C extends ConfigLoader{
+        public String host, db, user, pw, table;
+        public Integer port = 3306;
+    };
+    private C conf = new C();
     private SQLWrapper wrapper;
     
-    public SQLLog(Kizai bot){
+    public SQLLog(Kizai bot) throws NSQLException{
         super(bot);
         try{
             bot.bindEvent(MessageEvent.class, this, "onMessage");
@@ -62,6 +61,8 @@ public class SQLLog extends Module implements EventListener, CommandListener{
             bot.bindEvent(ActionEvent.class, this, "onAction");
             bot.bindEvent(SendEvent.class, this, "onSend");
         }catch(NoSuchMethodException ex){}
+        conf.load(bot.getConfig().get("modules").get("irc.SQLLog"));
+        wrapper = new SQLWrapper(conf.user, conf.pw, conf.db, conf.host, conf.port);
     }
 
     @Override
@@ -76,7 +77,7 @@ public class SQLLog extends Module implements EventListener, CommandListener{
     public void insertUpdate(char type, String channel, String sender, String message){
         try{
             int timestamp = (int)(System.currentTimeMillis() / 1000L);
-            DataModel model = DataModel.getHull(sqltable);
+            DataModel model = DataModel.getHull(conf.table);
             model.set("channel", channel);
             model.set("user", sender);
             model.set("action", type+"");
@@ -123,7 +124,7 @@ public class SQLLog extends Module implements EventListener, CommandListener{
     }
     
     public void onAction(ActionEvent ev){
-        insertUpdate(TYPE_ACTION, ev.target, ev.sender, ev.action);
+        insertUpdate(TYPE_ACTION, ev.recipient, ev.sender, ev.action);
     }
     
     public void onSend(SendEvent ev){

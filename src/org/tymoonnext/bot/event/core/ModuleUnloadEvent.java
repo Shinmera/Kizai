@@ -1,5 +1,6 @@
-package org.tymoonnext.bot.event;
+package org.tymoonnext.bot.event.core;
 
+import org.tymoonnext.bot.event.Event;
 import org.tymoonnext.bot.module.Module;
 import org.tymoonnext.bot.stream.Stream;
 

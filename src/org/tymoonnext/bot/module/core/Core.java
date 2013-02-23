@@ -1,16 +1,18 @@
-package org.tymoonnext.bot.module;
+package org.tymoonnext.bot.module.core;
 
 import NexT.data.DObject;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
-import org.tymoonnext.bot.event.CommandEvent;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.EventBind;
 import org.tymoonnext.bot.event.EventListener;
+import org.tymoonnext.bot.event.core.CommandEvent;
+import org.tymoonnext.bot.module.Module;
 
 /**
  * Core module that provides essential Kizai functionality. Also handles
@@ -38,7 +40,9 @@ public class Core extends Module implements CommandListener,EventListener{
         bot.registerCommand("command-add", this);
         bot.registerCommand("command-remove", this);
         bot.registerCommand("info", this);
-        try{bot.bindEvent(CommandEvent.class, this, "propagateCommandEvent");}catch(NoSuchMethodException ex){ex.printStackTrace();}
+        try{bot.bindEvent(CommandEvent.class, this, "propagateCommandEvent");}catch(NoSuchMethodException ex){}
+        
+        bot.loadModule("group.CommandGroupHandler");
         
         Commons.log.info(toString()+" Autoloading modules...");
         HashMap<String,DObject> mods = (HashMap<String,DObject>)bot.getConfig().get("modules").get();
@@ -50,15 +54,25 @@ public class Core extends Module implements CommandListener,EventListener{
         }
     }
     
-    public void loadModByConfig(String mod){
-        DObject modObj = bot.getConfig().get("modules").get(mod);
-        if(modObj.contains("depends")){
-            for(String dep : (Set<String>)modObj.get("depends").getKeySet()){
-                Commons.log.info(toString()+" Loading dependency "+dep);
-                loadModByConfig(mod);
+    public boolean loadModByConfig(String mod){
+        boolean depsfail = false;
+        if(bot.getConfig().get("modules").contains(mod)){
+            DObject modObj = bot.getConfig().get("modules").get(mod);
+            if(modObj.contains("depends")){
+                for(String dep : (Set<String>)modObj.get("depends").getKeySet()){
+                    dep = modObj.get("depends").get(dep).toString();
+                    Commons.log.info(toString()+" Loading dependency "+dep);
+                    if(!loadModByConfig(dep)){
+                        Commons.log.warning(toString()+" Dependency loading failed, abandoning module.");
+                        depsfail = true;
+                        break;
+                    }
+                }
             }
         }
-        bot.loadModule(mod);
+        if(!depsfail)
+            return bot.loadModule(mod);
+        return false;
     }
 
     public void shutdown(){
@@ -187,6 +201,21 @@ public class Core extends Module implements CommandListener,EventListener{
     }
 
     public void propagateCommandEvent(CommandEvent e){
-        bot.command(e);
+        try {
+            Method cmd = bot.getClass().getDeclaredMethod("command", CommandEvent.class);
+            cmd.setAccessible(true);
+            cmd.invoke(bot, e);
+            cmd.setAccessible(false);
+        } catch (IllegalAccessException ex) {
+            Commons.log.log(Level.WARNING,toString()+" Failed to propagate "+e+" to command function!", ex);
+        } catch (IllegalArgumentException ex) {
+            Commons.log.log(Level.WARNING,toString()+" Failed to propagate "+e+" to command function!", ex);
+        } catch (InvocationTargetException ex) {
+            Commons.log.log(Level.WARNING,toString()+" Failed to propagate "+e+" to command function!", ex);
+        } catch (NoSuchMethodException ex) {
+            Commons.log.log(Level.WARNING,toString()+" Failed to propagate "+e+" to command function!", ex);
+        } catch (SecurityException ex) {
+            Commons.log.log(Level.WARNING,toString()+" Failed to propagate "+e+" to command function!", ex);
+        }
     }
 }

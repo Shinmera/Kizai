@@ -2,20 +2,22 @@ package org.tymoonnext.bot;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.TreeSet;
 import java.util.logging.Level;
-import org.tymoonnext.bot.event.CommandEvent;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.Event;
 import org.tymoonnext.bot.event.EventBind;
 import org.tymoonnext.bot.event.EventListener;
-import org.tymoonnext.bot.event.ModuleLoadEvent;
-import org.tymoonnext.bot.event.ModuleUnloadEvent;
+import org.tymoonnext.bot.event.core.CommandEvent;
+import org.tymoonnext.bot.event.core.ModuleLoadEvent;
+import org.tymoonnext.bot.event.core.ModuleUnloadEvent;
+import org.tymoonnext.bot.event.core.ShutdownEvent;
 import org.tymoonnext.bot.module.Module;
 import org.tymoonnext.bot.stream.Stream;
+import sun.misc.Signal;
+import sun.misc.SignalHandler;
 
 /**
  * Main Bot class that handles all event, command and module capabilities.
@@ -23,7 +25,7 @@ import org.tymoonnext.bot.stream.Stream;
  * @license GPLv3
  * @version 2.0.1
  */
-public class Kizai{
+public class Kizai implements SignalHandler{
     public static void main(String[] args){new Kizai();}
     
     static{
@@ -32,51 +34,80 @@ public class Kizai{
     
     private ClassLoader classLoader;
     private HashMap<String,Module> modules;
-    private HashMap<String,ArrayList<CommandListener>> commands;
-    private HashMap<Class<? extends Event>,TreeSet<EventBind>> events;
+    private HashMap<String,CommandListener> commands;
+    private HashMap<Class<? extends Event>,ArrayList<EventBind>> events;
     private HashMap<String,Stream> streams;
     private Configuration conf;
+    private boolean shutdown = false;
     
     public Kizai(){
         conf = new Configuration();
         modules = new HashMap<String, Module>();
-        commands = new HashMap<String, ArrayList<CommandListener>>();
-        events = new HashMap<Class<? extends Event>,TreeSet<EventBind>>();
+        commands = new HashMap<String, CommandListener>();
+        events = new HashMap<Class<? extends Event>,ArrayList<EventBind>>();
         streams = new HashMap<String, Stream>();
         classLoader = new ReloadingCapableClassLoader();
         
         conf.load(Commons.f_CONFIG);
         
-        commands.put(CommandEvent.CMD_ANY, new ArrayList<CommandListener>());
-        commands.put(CommandEvent.CMD_UNBOUND, new ArrayList<CommandListener>());
-        events.put(Event.class, new TreeSet<EventBind>());
+        events.put(Event.class, new ArrayList<EventBind>());
         streams.put("stdout", Commons.stdout);
         
-        loadModule("Core");
+        try{Signal.handle(new Signal("INT"), this);
+        }catch(IllegalArgumentException ex){Commons.log.log(Level.WARNING, "[INIT] Failed to register INT signal handler.", ex);}
+        try{Signal.handle(new Signal("TERM"), this);
+        }catch(IllegalArgumentException ex){Commons.log.log(Level.WARNING, "[INIT] Failed to register TERM signal handler.", ex);}
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            public void run() {if(!shutdown)shutdown();}
+        }));
+        
+        loadModule("core.Core");
+        
+        while(!shutdown){
+            try{Thread.sleep(1000);}catch(Exception ex){/* Here be dragons */}
+        }//KEEPALIVE TICK
+    }
+    
+    /**
+     * Handles SIGTERM and binds it to shutdown.
+     * @param sig 
+     */
+    public void handle(Signal sig){
+        if(sig.getName().equals("INT") || sig.getName().equals("TERM")){
+            Commons.log.log(Level.SEVERE, "[MAIN] Received SIGTERM!");
+            if(!shutdown)shutdown();
+        }else{
+            SignalHandler.SIG_DFL.handle(sig);
+        }
     }
     
     /**
      * Shuts everything down.
      */
     public synchronized void shutdown(){
+        if(shutdown)return;
+        shutdown = true;
         try{
             Commons.log.info("[MAIN] Shutting down...");
-            Commons.log.info("[MAIN] Shutting down modules.");
-            for(Module mod : modules.values()){
-                try{mod.shutdown();
+            event(new ShutdownEvent());
+            Commons.log.info("[MAIN] Turning off modules...");
+            for(Module mod : modules.values().toArray(new Module[modules.size()])){
+                try{unloadModule(mod);
                 }catch(Throwable t){
                     Commons.log.log(Level.WARNING, "[MAIN]"+mod+" Failed to shutdown cleanly!", t);
                 }
             }
-            Commons.log.info("[MAIN] Closing streams.");
-            for(Stream stream : streams.values()){
-                try{stream.close();
+            Commons.log.info("[MAIN] Closing streams...");
+            for(Stream stream : streams.values().toArray(new Stream[streams.size()])){
+                try{unregisterStream(stream);
                 }catch(Throwable t){
                     Commons.log.log(Level.WARNING, "[MAIN]"+stream+" Failed to close cleanly!", t);
                 }
             }
             Commons.log.info("[MAIN] Saving config.");
             conf.save(Commons.f_CONFIG);
+        }catch(Throwable t){
+            Commons.log.log(Level.SEVERE, "[MAIN] WTF!", t);
         }finally{
             Commons.log.info("[MAIN] Goodbye!");
             System.exit(0);
@@ -121,23 +152,36 @@ public class Kizai{
     }
     
     /**
-     * Unloads the specified Module by calling its shutdown function. Note that
-     * the EventListener and CommandListeners that have been registered by the
-     * Module need to be unloaded in the shutdown function of the Module to
-     * guarantee a proper unloading process.
+     * Unloads the specified Module.
      * @param module The Class name of the Module to unload.
      * @return Whether the unloading succeeded.
+     * @see Kizai#unloadModule(org.tymoonnext.bot.module.Module) 
      */
     public synchronized boolean unloadModule(String module){
-        Commons.log.info("[MAIN] Attempting to unload "+module);
         if(!modules.containsKey(module)){
             Commons.log.warning("[MAIN] Module not loaded.");
             return false;
         }
-        Module mod = modules.get(module);
+        return unloadModule(modules.get(module));
+    }
+    
+    /**
+     * Unloads the specified Module by calling its shutdown function. Note that
+     * the EventListener and CommandListeners that have been registered by the
+     * Module need to be unloaded in the shutdown function of the Module to
+     * guarantee a proper unloading process.
+     * @param mod The module instance to unload.
+     * @return Whether the unloading succeeded.
+     */
+    public synchronized boolean unloadModule(Module mod){
+        Commons.log.info("[MAIN] Attempting to unload "+mod);
         event(new ModuleUnloadEvent(Commons.stdout, mod));
         mod.shutdown();
-        modules.remove(module);
+        for(String key : modules.keySet().toArray(new String[modules.size()])){
+            if(modules.get(key) == mod){
+                modules.remove(key);
+            }
+        }
         return true;
     }
     
@@ -165,16 +209,45 @@ public class Kizai{
     }
     
     /**
-     * Bind the listener to the given command String. You can use the special
-     * types in the CommandEvent class to register for either unbound or any
-     * command.
+     * Removes the stream by its ID.
+     * @param id The ID of the stream to remove.
+     * @see Kizai#unregisterStream(org.tymoonnext.bot.stream.Stream) 
+     */
+    public synchronized void unregisterStream(String id){
+        unregisterStream(streams.get(id));
+    }
+    
+    /**
+     * Removes the Stream and calls its close function.
+     * @param stream The stream to unregister.
+     */
+    public synchronized void unregisterStream(Stream stream){
+        Commons.log.info("[MAIN] Unregistering stream "+stream);
+        stream.close();
+        streams.remove(stream);
+    }
+    
+    /**
+     * Bind the listener to the given command String. If the command is already
+     * registered for another listener, an IllegalArgumentException is thrown.
      * @param cmd The command to listen for.
      * @param m The listener.
      */
-    public synchronized void registerCommand(String cmd, CommandListener m){
-        Commons.log.info("[MAIN] "+m+" Registering command "+cmd);
-        if(!commands.containsKey(cmd))commands.put(cmd, new ArrayList<CommandListener>());
-        commands.get(cmd).add(m);
+    public synchronized void registerCommand(String cmd, CommandListener m){registerCommand(cmd, m, false);}
+    
+    /**
+     * Bind the listener to the given command String.
+     * @param cmd The command to listen for.
+     * @param m The listener.
+     * @param force Whether to override an existing listener.
+     */
+    public synchronized void registerCommand(String cmd, CommandListener m, boolean force){
+        if(commands.containsKey(cmd)){
+            if(!force)  throw new IllegalArgumentException(cmd+" is already used!");
+            else        Commons.log.warning("[MAIN]"+m+" is overriding "+commands.get(cmd)+".");
+        }
+        Commons.log.info("[MAIN]"+m+" Registering command "+cmd);
+        commands.put(cmd, m);
     }
     
     /**
@@ -190,17 +263,18 @@ public class Kizai{
      * within the listener.
      */
     public synchronized void bindEvent(Class<? extends Event> evt, EventListener m, String func, int priority) throws NoSuchMethodException{
-        Commons.log.info("[MAIN] "+m+" Binding event "+evt.getSimpleName()+" to function "+func);
-        if(!events.containsKey(evt))events.put(evt, new TreeSet<EventBind>());
+        Commons.log.info("[MAIN]"+m+" Binding event "+evt.getSimpleName()+" to function "+func);
+        if(!events.containsKey(evt))events.put(evt, new ArrayList<EventBind>());
         else{
             for(EventBind bind : events.get(evt)){
-                if(bind.getListener() == m)
-                    throw new IllegalArgumentException("Listener "+m+" is already bound to "+evt.getSimpleName()+".");
+                if(bind.getListener() == m && bind.getPriority() == priority)
+                    throw new IllegalArgumentException("Listener "+m+" is already bound to "+evt.getSimpleName()+" with priority "+priority+".");
             }
         }
         
         EventBind bind = new EventBind(m, evt, func, priority);
         events.get(evt).add(bind);
+        Collections.sort(events.get(evt));
     }
     
     /**
@@ -217,18 +291,13 @@ public class Kizai{
     public synchronized void bindEvent(Class<? extends Event> evt, EventListener m, String func) throws NoSuchMethodException{bindEvent(evt, m, func, 0);}
     
     /**
-     * Unregister the given stream.
-     * @param id The Stream to unregister.
-     */
-    public synchronized void unregisterStream(String id){streams.remove(id);}
-    
-    /**
      * Unregister a given listener from a specific command.
      * @param cmd The command to unregister from.
      * @param m The CommandListener to unbind.
      */
     public synchronized void unregisterCommand(String cmd, CommandListener m){
-        if(commands.containsKey(cmd))commands.get(cmd).remove(m);
+        Commons.log.info("[MAIN]"+m+" Unregistering command "+cmd);
+        commands.remove(cmd);
     }
     
     /**
@@ -240,6 +309,7 @@ public class Kizai{
         if(events.containsKey(evt)){
             for(EventBind bind : events.get(evt)){
                 if(bind.getListener() == m){
+                    Commons.log.info("[MAIN]"+m+" Unbinding event "+evt);
                     events.get(evt).remove(bind);
                     break;
                 }
@@ -252,8 +322,9 @@ public class Kizai{
      * @param m The CommandListener to unbind.
      */
     public synchronized void unregisterAllCommands(CommandListener m){
-        for(String cmd : commands.keySet()){
-            commands.get(cmd).remove(m);
+        for(String cmd : commands.keySet().toArray(new String[commands.size()])){
+            if(commands.get(cmd) == m)
+                commands.remove(cmd);
         }
     }
     
@@ -262,7 +333,7 @@ public class Kizai{
      * @param m The EventListener to unbind.
      */
     public synchronized void unbindAllEvents(EventListener m){
-        for(Class ev : events.keySet()){
+        for(Class ev : events.keySet().toArray(new Class[events.size()])){
             unbindEvent(ev, m);
         }
     }
@@ -272,11 +343,8 @@ public class Kizai{
      * registered a handle for it.
      * @param ev The CommandEvent to relay.
      */
-    public synchronized void command(CommandEvent ev){
+    private synchronized void command(CommandEvent ev){
         Commons.log.fine("[MAIN] Command "+ev);
-        for(CommandListener m : commands.get(CommandEvent.CMD_ANY)){
-            m.onCommand(ev);
-        }
         
         if(!commands.containsKey(ev.getCommand())){
             if(!ev.getCommand().equals(CommandEvent.CMD_UNBOUND)){
@@ -288,7 +356,7 @@ public class Kizai{
                                         ev.getUser(), ev.getChannel()));
             }
         }else{
-            for(CommandListener m : commands.get(ev.getCommand())){m.onCommand(ev);}
+            commands.get(ev.getCommand()).onCommand(ev);
         }
     }
     
@@ -296,24 +364,58 @@ public class Kizai{
      * Triggers an event and propagates it to any EventListener that is bound to
      * the Event's Class.
      * @param ev The Event to trigger.
+     * @see Kizai#event(org.tymoonnext.bot.event.Event, java.lang.Class) 
      */
-    public synchronized void event(Event ev){
+    public synchronized void event(Event ev){event(ev, EventListener.class);}
+    
+    /**
+     * Triggers an event and propagates it to any EventListener that is bound to
+     * the Event's Class and extends the given listenerType class.
+     * @param ev The Event to trigger.
+     * @param listenerType A class type for to limit the propagation for 
+     * specific listeners.
+     */
+    public synchronized void event(Event ev, Class<? extends EventListener> listenerType){
         Commons.log.fine("[MAIN] Event "+ev);
         for(Class<? extends Event> c : events.keySet()){
             if(c.isInstance(ev)){
                 for(EventBind bind : events.get(c)){
-                    if(!ev.isHalted())
-                        bind.invoke(ev);
+                    if(listenerType.isInstance(bind.getListener())){
+                        if(!ev.isHalted())
+                            bind.invoke(ev);
+                    }
                 }
             }
+        }
+    }
+    
+    /**
+     * Broadcast a message to all registered streams, on all destinations. Do 
+     * note that the handling of the destinations is stream dependant.
+     * @param message The message to broadcast.
+     * @see Kizai#broadcast(java.lang.String, java.lang.String) 
+     */
+    public synchronized void broadcast(String message){broadcast(message, "*");}
+    
+    /**
+     * Broadcast a message to all registered streams.
+     * @param message The message to broadcast.
+     * @param dest The destination to broadcast to. This is stream dependant.
+     * Generally, a destination of "*" should tell the stream to broadcast to
+     * any/all destinations it knows.
+     */
+    public synchronized void broadcast(String message, String dest){
+        Commons.log.fine("[MAIN] Broadcast '"+message+"' to "+dest);
+        for(Stream s : streams.values()){
+            s.send(message, dest);
         }
     }
     
     public synchronized Module getModule(String name){return modules.get(name);}
     public synchronized Stream getStream(String name){return streams.get(name);}
     public synchronized Configuration getConfig(){return conf;}
-    public synchronized CommandListener[] getCommandHandlers(String commandType){return commands.get(commandType).toArray(new CommandListener[commands.get(commandType).size()]);}
-    public synchronized CommandListener[] getRegisteredCommands(){return commands.keySet().toArray(new CommandListener[commands.size()]);}
+    public synchronized CommandListener getCommandListener(String commandType){return commands.get(commandType);}
+    public synchronized String[] getRegisteredCommands(){return commands.keySet().toArray(new String[commands.size()]);}
     public synchronized EventBind[] getEventBinds(Class<? extends Event> event){return events.get(event).toArray(new EventBind[events.get(event).size()]);}
     public synchronized Class[] getBoundEvents(){return events.keySet().toArray(new Class[events.size()]);}
 }

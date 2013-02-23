@@ -1,9 +1,11 @@
-package org.tymoonnext.bot.event;
+package org.tymoonnext.bot.event.core;
 
+import org.tymoonnext.bot.event.Event;
 import org.tymoonnext.bot.stream.Stream;
 
 /**
- * 
+ * CommandEvent used to exchange user-issued commands between streams and
+ * listeners.
  * @author Shinmera
  * @license GPLv3
  * @version 0.0.0
@@ -25,7 +27,7 @@ public class CommandEvent extends Event{
         this.user=user;
         this.channel=channel;
         this.args=args;
-        this.command=command.trim();
+        this.command=command.trim().toLowerCase();
     }
     public CommandEvent(String command, CommandEvent evt){
         this(evt.getStream(), command, evt.getArgs(), evt.getUser(), evt.getChannel());
