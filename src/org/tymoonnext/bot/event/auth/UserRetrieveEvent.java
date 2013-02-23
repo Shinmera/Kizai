@@ -11,12 +11,12 @@ import org.tymoonnext.bot.stream.Stream;
  * @license GPLv3
  * @version 0.0.0
  */
-public class RetrieveUserEvent extends Event{
+public class UserRetrieveEvent extends Event{
     private String ident;
     private User user;
     
-    public RetrieveUserEvent(String ident){this(Commons.stdout, ident);}
-    public RetrieveUserEvent(Stream origin, String ident){
+    public UserRetrieveEvent(String ident){this(Commons.stdout, ident);}
+    public UserRetrieveEvent(Stream origin, String ident){
         super(origin);
         this.ident=ident;
     }
