@@ -25,9 +25,37 @@ public class TreeAuthImplementor extends Module implements EventListener{
     public TreeAuthImplementor(Kizai bot){
         super(bot);
         try{bot.bindEvent(AuthEvent.class, this, "onAuth");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(AuthEvent.class, this, "onAuthFinal",Integer.MIN_VALUE);}catch(NoSuchMethodException ex){}
     }
     
     public void onAuth(AuthEvent evt){
+        String checkbranch = evt.getStream().getClass().getSimpleName()+"."+
+                             evt.getCommand().getChannel()+"."+
+                             evt.getCommand().getCommand();
+        checkbranch = checkbranch.trim().toLowerCase();
+        
+        //Get the User object from wherever
+        RetrieveUserEvent retrUser = new RetrieveUserEvent(evt.getStream(), evt.getCommand().getUser());
+        bot.event(retrUser);
+        User u = retrUser.getUser();
+        if(u == null)return;
+        
+        //Perform check
+        if(u.getConfig().contains("tree")){
+            DObject config = u.getConfig().get("tree");
+            if(config.contains("perms")){
+                String[] permtree = config.get("perms").toString().split("\n");
+                if(checkBranch(permtree, checkbranch)){
+                    Commons.log.info(toString()+" Granting permission for "+checkbranch);
+                    evt.setGranted(true);
+                }else{
+                    Commons.log.info(toString()+" Denying permission for "+checkbranch);
+                }
+            }
+        }
+    }
+    
+    public void onAuthFinal(AuthEvent evt){
         if(any == null && !checkedAny){
             RetrieveUserEvent retrUser = new RetrieveUserEvent(evt.getStream(), "any");
             bot.event(retrUser);
@@ -52,26 +80,6 @@ public class TreeAuthImplementor extends Module implements EventListener{
                     }else{
                         Commons.log.info(toString()+" Denying permission for "+checkbranch+" (any)");
                     }
-                }
-            }
-        }
-        
-        //Get the User object from wherever
-        RetrieveUserEvent retrUser = new RetrieveUserEvent(evt.getStream(), evt.getCommand().getUser());
-        bot.event(retrUser);
-        User u = retrUser.getUser();
-        if(u == null)return;
-        
-        //Perform check
-        if(u.getConfig().contains("tree")){
-            DObject config = u.getConfig().get("tree");
-            if(config.contains("perms")){
-                String[] permtree = config.get("perms").toString().split("\n");
-                if(checkBranch(permtree, checkbranch)){
-                    Commons.log.info(toString()+" Granting permission for "+checkbranch);
-                    evt.setGranted(true);
-                }else{
-                    Commons.log.info(toString()+" Denying permission for "+checkbranch);
                 }
             }
         }
