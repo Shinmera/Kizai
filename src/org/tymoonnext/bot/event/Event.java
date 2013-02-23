@@ -1,5 +1,6 @@
 package org.tymoonnext.bot.event;
 
+import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.stream.Stream;
 
 /**
@@ -13,7 +14,9 @@ public abstract class Event {
     protected boolean cancelled = false;
     protected boolean halted = false;
     
-    public Event(Stream origin){this.origin=origin;}
+    public Event(Stream origin){
+        this.origin=origin;
+    }
     
     public String toString(){
         return "<"+this.getClass().getSimpleName()+">";
