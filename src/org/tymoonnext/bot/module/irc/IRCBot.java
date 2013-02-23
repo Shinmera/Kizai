@@ -1,10 +1,11 @@
 package org.tymoonnext.bot.module.irc;
 
-import NexT.data.DObject;
+import java.io.File;
 import java.io.IOException;
 import org.jibble.pircbot.IrcException;
+import org.tymoonnext.bot.Commons;
+import org.tymoonnext.bot.Configuration;
 import org.tymoonnext.bot.Kizai;
-import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.EventListener;
 import org.tymoonnext.bot.event.IRCBot.MessageEvent;
 import org.tymoonnext.bot.event.core.CommandEvent;
@@ -17,28 +18,28 @@ import org.tymoonnext.bot.module.Module;
  * @license GPLv3
  * @version 0.0.0
  */
-public class IRCBot extends Module implements CommandListener,EventListener{
+public class IRCBot extends Module implements EventListener{
+    public static final File CONFIGFILE = new File(Commons.f_CONFIGDIR, "irc.cfg");
+    
     private IRC irc;
-    private DObject config;
+    private Configuration config;
     
     public IRCBot(Kizai bot) throws IOException, IrcException{
         super(bot);
-        config = bot.getConfig().get("IRCBot");
+        config = new Configuration();
+        config.load(CONFIGFILE);
         
-        irc = new IRC(bot, config);
+        irc = new IRC(bot, config.get());
         bot.registerStream("irc", irc);
         try{bot.bindEvent(MessageEvent.class, this, "onMessage");}catch(NoSuchMethodException ex){}
     }
 
     public void shutdown(){
         bot.unbindAllEvents(this);
-        bot.unregisterAllCommands(this);
+        config.save(CONFIGFILE);
     }
     
     public IRC getIRC(){return irc;}
-
-    public void onCommand(CommandEvent cmd){
-    }
     
     public void onMessage(MessageEvent ev){
         if(ev.message.startsWith(config.get("cmd").toString())){
