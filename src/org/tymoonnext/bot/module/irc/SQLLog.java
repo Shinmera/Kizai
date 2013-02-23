@@ -124,7 +124,7 @@ public class SQLLog extends Module implements EventListener, CommandListener{
     }
     
     public void onAction(ActionEvent ev){
-        insertUpdate(TYPE_ACTION, ev.target, ev.sender, ev.action);
+        insertUpdate(TYPE_ACTION, ev.recipient, ev.sender, ev.action);
     }
     
     public void onSend(SendEvent ev){
