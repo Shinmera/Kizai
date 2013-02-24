@@ -9,5 +9,15 @@ import org.tymoonnext.bot.module.irc.IRC;
  * @version 0.0.0
  */
 public class ConnectEvent extends IRCEvent{
-    public ConnectEvent(IRC bot){super(bot);}
+    public String host;
+    public String pw;
+    public int port;
+    
+    public ConnectEvent(IRC bot){this(bot, null, -1, null);}
+    public ConnectEvent(IRC bot, String host, int port, String pw){
+        super(bot);
+        this.host=host;
+        this.port=port;
+        this.pw=pw;
+    }
 }

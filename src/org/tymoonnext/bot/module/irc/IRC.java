@@ -76,14 +76,14 @@ public class IRC extends PircBot implements Stream{
     }
 
     protected void onConnect(){
-        DisconnectEvent evt = new DisconnectEvent(this);
+        ConnectEvent evt = new ConnectEvent(this, getServer(), getPort(), getPassword());
         bot.event(evt);
         if(!evt.isCancelled())
             super.onConnect();
     }
 
     protected void onDisconnect(){
-        ConnectEvent evt = new ConnectEvent(this);
+        DisconnectEvent evt = new DisconnectEvent(this, getServer(), getPort(), getPassword());
         bot.event(evt);
         if(!evt.isCancelled())
             super.onDisconnect();

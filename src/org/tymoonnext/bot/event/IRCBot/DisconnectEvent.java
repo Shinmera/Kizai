@@ -9,5 +9,15 @@ import org.tymoonnext.bot.module.irc.IRC;
  * @version 0.0.0
  */
 public class DisconnectEvent extends IRCEvent{
-    public DisconnectEvent(IRC bot){super(bot);}
+    public String host;
+    public String pw;
+    public int port;
+    
+    public DisconnectEvent(IRC bot){this(bot, null, -1, null);}
+    public DisconnectEvent(IRC bot, String host, int port, String pw){
+        super(bot);
+        this.host=host;
+        this.port=port;
+        this.pw=pw;
+    }
 }
