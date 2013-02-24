@@ -12,6 +12,7 @@ public class ServerResponseEvent extends IRCEvent{
     public int code;
     public String line;
     
+    public ServerResponseEvent(int code, String line){this(null, code, line);}
     public ServerResponseEvent(IRC bot, int code, String line){
         super(bot);
         this.line=line;

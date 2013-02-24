@@ -15,7 +15,7 @@ public class OpEvent extends IRCEvent{
     public String host;
     public String recipient;
     
-    public OpEvent(IRC bot, String sender, String channel, String recipient){this(bot, sender, channel, null, null, recipient);}
+    public OpEvent(String channel, String recipient){this(null, null, channel, null, null, recipient);}
     public OpEvent(IRC bot, String sender, String channel, String host, String login, String recipient){
         super(bot);
         this.channel=channel;

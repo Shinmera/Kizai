@@ -12,5 +12,6 @@ import org.tymoonnext.bot.module.irc.IRC;
 public class ChatRequestEvent extends IRCEvent{
     public DccChat chat;
     
+    public ChatRequestEvent(DccChat chat){this(null, chat);}
     public ChatRequestEvent(IRC bot, DccChat chat){super(bot);this.chat=chat;}
 }

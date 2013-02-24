@@ -13,6 +13,7 @@ public class UserListEvent extends IRCEvent{
     public String channel;
     public User[] users;
     
+    public UserListEvent(String channel){this(null, channel, null);}
     public UserListEvent(IRC bot, String channel, User[] users){
         super(bot);
         this.users=users;

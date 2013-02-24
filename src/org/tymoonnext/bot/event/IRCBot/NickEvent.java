@@ -14,7 +14,7 @@ public class NickEvent extends IRCEvent{
     public String host;
     public String newNick;
     
-    public NickEvent(IRC bot, String sender, String newNick){this(bot, sender, newNick, null, null);}
+    public NickEvent(String newNick){this(null, null, newNick, null, null);}
     public NickEvent(IRC bot, String sender, String newNick, String host, String login){
         super(bot);
         this.sender=sender;

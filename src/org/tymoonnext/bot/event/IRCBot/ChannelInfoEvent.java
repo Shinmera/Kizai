@@ -13,6 +13,7 @@ public class ChannelInfoEvent extends IRCEvent{
     public String channel;
     public int userCount;
     
+    public ChannelInfoEvent(String channel){this(null, channel, -1, null);}
     public ChannelInfoEvent(IRC bot, String channel, int userCount, String topic){
         super(bot);
         this.channel=channel;

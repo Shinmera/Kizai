@@ -37,7 +37,8 @@ public class ChannelChangeEvent extends IRCEvent{
     public int change;
     public String args;
     
-    public ChannelChangeEvent(IRC bot, String channel, int change){this(bot, channel, change, null, null, null);}
+    public ChannelChangeEvent(String channel, int change){this(channel, change, null);}
+    public ChannelChangeEvent(String channel, int change, String args){this(null, channel, change, args, null, null, null);}
     public ChannelChangeEvent(IRC bot, String channel, int change, String sender, String host, String login){this(bot, channel, change, null, sender, host, login);}
     public ChannelChangeEvent(IRC bot, String channel, int change, String args, String sender, String host, String login){
         super(bot);

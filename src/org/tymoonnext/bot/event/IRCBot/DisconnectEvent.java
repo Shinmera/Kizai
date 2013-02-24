@@ -13,7 +13,7 @@ public class DisconnectEvent extends IRCEvent{
     public String pw;
     public int port;
     
-    public DisconnectEvent(IRC bot){this(bot, null, -1, null);}
+    public DisconnectEvent(){this(null, null, -1, null);}
     public DisconnectEvent(IRC bot, String host, int port, String pw){
         super(bot);
         this.host=host;

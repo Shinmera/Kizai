@@ -1,6 +1,8 @@
 package org.tymoonnext.bot.module.irc;
 
+import NexT.data.ConfigLoader;
 import NexT.data.DObject;
+import NexT.data.required;
 import java.io.IOException;
 import java.util.HashMap;
 import org.jibble.pircbot.DccChat;
@@ -9,10 +11,8 @@ import org.jibble.pircbot.IrcException;
 import org.jibble.pircbot.PircBot;
 import org.jibble.pircbot.User;
 import org.tymoonnext.bot.Commons;
-import NexT.data.ConfigLoader;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.IRCBot.*;
-import NexT.data.required;
 import org.tymoonnext.bot.stream.Stream;
 
 /**

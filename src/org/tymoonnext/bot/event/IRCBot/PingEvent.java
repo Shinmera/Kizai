@@ -15,7 +15,7 @@ public class PingEvent extends IRCEvent{
     public String recipient;
     public String ping;
     
-    public PingEvent(IRC bot, String sender, String recipient, String ping){this(bot, sender, recipient, ping, null, null);}
+    public PingEvent(String recipient, String ping){this(null, null, recipient, ping, null, null);}
     public PingEvent(IRC bot, String sender, String recipient, String ping, String host, String login){
         super(bot);
         this.sender=sender;

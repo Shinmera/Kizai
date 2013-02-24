@@ -14,7 +14,7 @@ public class VersionEvent extends IRCEvent{
     public String host;
     public String recipient;
     
-    public VersionEvent(IRC bot, String sender, String recipient){this(bot, sender, recipient, null, null);}
+    public VersionEvent(String recipient){this(null, null, recipient, null, null);}
     public VersionEvent(IRC bot, String sender, String recipient, String host, String login){
         super(bot);
         this.sender=sender;

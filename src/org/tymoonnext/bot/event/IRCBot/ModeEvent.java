@@ -15,7 +15,7 @@ public class ModeEvent extends IRCEvent{
     public String host;
     public String mode;
     
-    public ModeEvent(IRC bot, String sender, String channel, String mode){this(bot, sender, channel, mode, null, null);}
+    public ModeEvent(String channel, String mode){this(null, null, channel, mode, null, null);}
     public ModeEvent(IRC bot, String sender, String channel, String mode, String host, String login){
         super(bot);
         this.channel=channel;

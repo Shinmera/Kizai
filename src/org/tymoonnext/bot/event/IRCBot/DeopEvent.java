@@ -15,7 +15,7 @@ public class DeopEvent extends IRCEvent{
     public String host;
     public String recipient;
     
-    public DeopEvent(IRC bot, String sender, String channel, String recipient){this(bot, sender, channel, null, null, recipient);}
+    public DeopEvent(String channel, String recipient){this(null, null, channel, null, null, recipient);}
     public DeopEvent(IRC bot, String sender, String channel, String host, String login, String recipient){
         super(bot);
         this.channel=channel;

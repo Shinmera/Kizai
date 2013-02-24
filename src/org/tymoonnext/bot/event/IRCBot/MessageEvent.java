@@ -15,7 +15,7 @@ public class MessageEvent extends IRCEvent{
     public String host;
     public String channel;
     
-    public MessageEvent(IRC bot, String sender, String message){this(bot, sender, message, null, null, null);}
+    public MessageEvent(String message, String channel){this(null, null, message, channel, null, null);}
     public MessageEvent(IRC bot, String sender, String message, String channel, String host, String login){
         super(bot);
         this.message=message;

@@ -15,7 +15,7 @@ public class DccChatRequestEvent extends IRCEvent{
     public long address;
     public int port;
     
-    public DccChatRequestEvent(IRC bot, String sender, long address, int port){this(bot, sender, null, null, address, port);}
+    public DccChatRequestEvent(String recipient, long address, int port){this(null, recipient, null, null, address, port);}
     public DccChatRequestEvent(IRC bot, String sender, String host, String login, long address, int port){
         super(bot);
         this.sender=sender;

@@ -14,7 +14,7 @@ public class FingerEvent extends IRCEvent{
     public String host;
     public String recipient;
     
-    public FingerEvent(IRC bot, String sender, String recipient){this(bot, sender, recipient, null, null);}
+    public FingerEvent(String recipient){this(null, null, recipient, null, null);}
     public FingerEvent(IRC bot, String sender, String recipient, String host, String login){
         super(bot);
         this.sender=sender;

@@ -11,5 +11,9 @@ import org.tymoonnext.bot.module.irc.IRC;
 public class ServerPingEvent extends IRCEvent{
     public String response;
     
-    public ServerPingEvent(IRC bot, String response){super(bot);this.response=response;}
+    public ServerPingEvent(){this(null, null);}
+    public ServerPingEvent(IRC bot, String response){
+        super(bot);
+        this.response=response;
+    }
 }

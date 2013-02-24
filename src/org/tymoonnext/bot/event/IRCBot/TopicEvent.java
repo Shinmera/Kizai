@@ -15,7 +15,7 @@ public class TopicEvent extends IRCEvent{
     public long date;
     public boolean changed;
     
-    public TopicEvent(IRC bot, String channel, String topic){this(bot, channel, topic, null, -1, false);}
+    public TopicEvent(String channel, String topic){this(null, channel, topic, null, System.currentTimeMillis(), true);}
     public TopicEvent(IRC bot, String channel, String topic, String sender, long date, boolean changed){
         super(bot);
         this.topic=topic;

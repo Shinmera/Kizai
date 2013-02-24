@@ -17,7 +17,7 @@ public class DccSendRequestEvent extends IRCEvent{
     public int port;
     public int size;
     
-    public DccSendRequestEvent(IRC bot, String sender, String file, long address, int port, int size){this(bot, sender, file, null, null, address, port, size);}
+    public DccSendRequestEvent(String file, long address, int port, int size){this(null, null, file, null, null, address, port, size);}
     public DccSendRequestEvent(IRC bot, String sender, String file, String host, String login, long address, int port, int size){
         super(bot);
         this.sender=sender;

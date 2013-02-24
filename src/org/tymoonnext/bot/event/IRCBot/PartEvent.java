@@ -14,7 +14,7 @@ public class PartEvent extends IRCEvent{
     public String login;
     public String host;
     
-    public PartEvent(IRC bot, String sender, String channel){this(bot, sender, channel, null, null);}
+    public PartEvent(String channel){this(null, null, channel, null, null);}
     public PartEvent(IRC bot, String sender, String channel, String host, String login){
         super(bot);
         this.channel=channel;

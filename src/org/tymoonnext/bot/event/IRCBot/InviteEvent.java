@@ -15,7 +15,7 @@ public class InviteEvent extends IRCEvent{
     public String recipient;
     public String channel;
     
-    public InviteEvent(IRC bot, String sender, String recipient, String channel){this(bot, sender, recipient, channel, null, null);}
+    public InviteEvent(String recipient, String channel){this(null, null, recipient, channel, null, null);}
     public InviteEvent(IRC bot, String sender, String recipient, String channel, String host, String login){
         super(bot);
         this.sender=sender;

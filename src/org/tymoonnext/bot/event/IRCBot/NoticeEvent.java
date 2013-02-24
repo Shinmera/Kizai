@@ -15,7 +15,7 @@ public class NoticeEvent extends IRCEvent{
     public String recipient;
     public String notice;
     
-    public NoticeEvent(IRC bot, String sender, String recipient, String notice){this(bot, sender, recipient, notice, null, null);}
+    public NoticeEvent(String recipient, String notice){this(null, null, recipient, notice, null, null);}
     public NoticeEvent(IRC bot, String sender, String recipient, String notice, String host, String login){
         super(bot);
         this.sender=sender;

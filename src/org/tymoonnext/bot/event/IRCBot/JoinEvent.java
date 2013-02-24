@@ -14,7 +14,7 @@ public class JoinEvent extends IRCEvent{
     public String login;
     public String host;
     
-    public JoinEvent(IRC bot, String sender, String channel){this(bot, sender, channel, null, null);}
+    public JoinEvent(String channel){this(null, null, channel, null, null);}
     public JoinEvent(IRC bot, String sender, String channel, String host, String login){
         super(bot);
         this.channel=channel;

@@ -15,7 +15,7 @@ public class ActionEvent extends IRCEvent{
     public String host;
     public String recipient;
     
-    public ActionEvent(IRC bot, String sender, String action, String recipient){this(bot, sender, action, recipient, null, null);}
+    public ActionEvent(String action, String recipient){this(null, null, action, recipient, null, null);}
     public ActionEvent(IRC bot, String sender, String action, String recipient, String host, String login){
         super(bot);
         this.action=action;

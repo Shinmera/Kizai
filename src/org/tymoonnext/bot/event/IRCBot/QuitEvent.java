@@ -14,7 +14,8 @@ public class QuitEvent extends IRCEvent{
     public String host;
     public String reason;
     
-    public QuitEvent(IRC bot, String sender){this(bot, sender, null, null, null);}
+    public QuitEvent(){this(null);}
+    public QuitEvent(String reason){this(null, null, reason, null, null);}
     public QuitEvent(IRC bot, String sender, String reason, String host, String login){
         super(bot);
         this.sender=sender;

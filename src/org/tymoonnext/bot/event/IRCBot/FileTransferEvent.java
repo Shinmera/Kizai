@@ -14,7 +14,8 @@ public class FileTransferEvent extends IRCEvent{
     public Exception exception;
     public boolean finished=false;
     
-    public FileTransferEvent(IRC bot, DccFileTransfer transfer){super(bot);this.transfer=transfer;}
+    public FileTransferEvent(DccFileTransfer transfer){this(null, transfer, null, false);}
+    public FileTransferEvent(IRC bot, DccFileTransfer transfer){this(bot, transfer, null, false);}
     public FileTransferEvent(IRC bot, DccFileTransfer transfer, Exception ex, boolean finished){
         super(bot);
         this.transfer=transfer;

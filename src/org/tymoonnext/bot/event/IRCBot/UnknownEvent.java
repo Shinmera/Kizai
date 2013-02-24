@@ -11,5 +11,6 @@ import org.tymoonnext.bot.module.irc.IRC;
 public class UnknownEvent extends IRCEvent{
     public String line;
     
+    public UnknownEvent(String line){this(null, line);}
     public UnknownEvent(IRC bot, String line){super(bot);this.line=line;}
 }

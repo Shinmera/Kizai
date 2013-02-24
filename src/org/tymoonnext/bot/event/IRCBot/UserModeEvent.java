@@ -15,7 +15,7 @@ public class UserModeEvent extends IRCEvent{
     public String host;
     public String mode;
     
-    public UserModeEvent(IRC bot, String sender, String recipient, String mode){this(bot, sender, recipient, mode, null, null);}
+    public UserModeEvent(String recipient, String mode){this(null, null, recipient, mode, null, null);}
     public UserModeEvent(IRC bot, String sender, String recipient, String mode, String host, String login){
         super(bot);
         this.recipient=recipient;

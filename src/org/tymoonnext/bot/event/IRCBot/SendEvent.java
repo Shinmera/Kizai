@@ -12,6 +12,7 @@ public class SendEvent extends IRCEvent{
     public String dest;
     public String message;
     
+    public SendEvent(String dest, String message){this(null, dest, message);}
     public SendEvent(IRC bot, String dest, String message){
         super(bot);
         this.dest=dest;
