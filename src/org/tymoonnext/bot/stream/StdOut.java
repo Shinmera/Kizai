@@ -13,5 +13,5 @@ public class StdOut implements Stream{
 
     public void close(){}
     
-    public String toString(){return "~IRC~";}
+    public String toString(){return "~StdOut~";}
 }
