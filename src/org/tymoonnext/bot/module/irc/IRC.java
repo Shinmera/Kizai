@@ -9,8 +9,10 @@ import org.jibble.pircbot.IrcException;
 import org.jibble.pircbot.PircBot;
 import org.jibble.pircbot.User;
 import org.tymoonnext.bot.Commons;
+import org.tymoonnext.bot.ConfigLoader;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.IRCBot.*;
+import org.tymoonnext.bot.meta.required;
 import org.tymoonnext.bot.stream.Stream;
 
 /**
@@ -21,23 +23,36 @@ import org.tymoonnext.bot.stream.Stream;
  * @todo Properly respect event cancelling
  */
 public class IRC extends PircBot implements Stream{
+    public class C extends ConfigLoader{
+        public String nick = "KizaiBot";
+        public String login = nick;
+        public long msgdelay = 1000L;
+        @required public String host;
+        public int port = 6667;
+        public String pass = null;
+        public DObject channels = new DObject();
+        public String connectcmd = null;
+    }
+    
+    private C config = new C();
     private Kizai bot;
     
-    public IRC(Kizai bot, DObject config) throws IOException, IrcException{
+    public IRC(Kizai bot, DObject conf) throws IOException, IrcException{
         this.bot = bot;
-        DObject server = config.get("server");
-        setLogin(config.get("login").toString());
-        setName(config.get("nick").toString());
+        config.load(conf);
+        setName(config.nick);
+        setLogin(config.login);
         setVersion(Commons.getVersionString());
-        setMessageDelay((Long)server.get("msgdelay").get());
+        setMessageDelay(config.msgdelay);
         setAutoNickChange(true);
-        connect(server.get("host").toString(), (int)(long)(Long)server.get("port").get(), server.get("pass").toString());
-
-        DObject channels = server.get("channels");
-        for(String channel : ((HashMap<String,DObject>)channels.get()).keySet()){
-            if((Boolean)channels.get(channel).get("autojoin").get()){
+        connect(config.host, config.port, config.pass);
+        for(String channel : ((HashMap<String,DObject>)config.channels.get()).keySet()){
+            if((Boolean)config.channels.get(channel).get("autojoin").get()){
                 joinChannel(channel);
             }
+        }
+        if(config.connectcmd != null){
+            this.sendRawLine(config.connectcmd);
         }
     }
     
