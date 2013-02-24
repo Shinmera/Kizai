@@ -9,14 +9,14 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import org.tymoonnext.bot.Commons;
-import org.tymoonnext.bot.ConfigLoader;
+import NexT.data.ConfigLoader;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.EventListener;
 import org.tymoonnext.bot.event.IRCBot.MessageEvent;
 import org.tymoonnext.bot.event.core.CommandEvent;
-import org.tymoonnext.bot.meta.noload;
-import org.tymoonnext.bot.meta.nosave;
+import NexT.data.noload;
+import NexT.data.nosave;
 import org.tymoonnext.bot.module.Module;
 
 /**

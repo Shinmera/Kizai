@@ -7,13 +7,13 @@ import java.io.File;
 import java.io.IOException;
 import org.jibble.pircbot.IrcException;
 import org.tymoonnext.bot.Commons;
-import org.tymoonnext.bot.ConfigLoader;
+import NexT.data.ConfigLoader;
 import org.tymoonnext.bot.Configuration;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.EventListener;
 import org.tymoonnext.bot.event.IRCBot.MessageEvent;
 import org.tymoonnext.bot.event.core.CommandEvent;
-import org.tymoonnext.bot.meta.required;
+import NexT.data.required;
 import org.tymoonnext.bot.module.Module;
 
 /**

@@ -5,7 +5,7 @@ import NexT.mysql.NSQLException;
 import NexT.mysql.SQLWrapper;
 import java.util.logging.Level;
 import org.tymoonnext.bot.Commons;
-import org.tymoonnext.bot.ConfigLoader;
+import NexT.data.ConfigLoader;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.EventListener;

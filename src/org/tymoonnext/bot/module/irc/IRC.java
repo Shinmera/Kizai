@@ -9,10 +9,10 @@ import org.jibble.pircbot.IrcException;
 import org.jibble.pircbot.PircBot;
 import org.jibble.pircbot.User;
 import org.tymoonnext.bot.Commons;
-import org.tymoonnext.bot.ConfigLoader;
+import NexT.data.ConfigLoader;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.IRCBot.*;
-import org.tymoonnext.bot.meta.required;
+import NexT.data.required;
 import org.tymoonnext.bot.stream.Stream;
 
 /**
