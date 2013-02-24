@@ -43,6 +43,7 @@ public class Commons {
     public static MessageDigest md;
     
     static{
+        NexT.Commons.log = log;
         try{ md = MessageDigest.getInstance("SHA-512");
             log.finer("+COMMONS+ Choosing SHA-512 as hashing algorithm.");
         }catch(NoSuchAlgorithmException ex){
