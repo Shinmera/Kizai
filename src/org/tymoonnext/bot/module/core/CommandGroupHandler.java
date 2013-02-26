@@ -1,11 +1,14 @@
-package org.tymoonnext.bot.module.group;
+package org.tymoonnext.bot.module.core;
 
-import java.util.HashMap;
+import java.util.TreeMap;
 import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
+import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.EventListener;
-import org.tymoonnext.bot.event.group.GroupRegisterEvent;
+import org.tymoonnext.bot.event.cmd.GroupRegisterEvent;
+import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.module.Module;
+import org.tymoonnext.bot.module.cmd.CommandGroup;
 
 /**
  * 
@@ -13,14 +16,16 @@ import org.tymoonnext.bot.module.Module;
  * @license GPLv3
  * @version 0.0.0
  */
-public class CommandGroupHandler extends Module implements EventListener{
-    private HashMap<String, CommandGroup> groups;
+public class CommandGroupHandler extends Module implements EventListener, CommandListener{
+    private TreeMap<String, CommandGroup> groups;
 
     public CommandGroupHandler(Kizai bot){
         super(bot);
         
-        groups = new HashMap<String, CommandGroup>();
+        groups = new TreeMap<String, CommandGroup>();
         
+        bot.registerCommand("help", this);
+        bot.registerCommand("commands", this);
         try{bot.bindEvent(GroupRegisterEvent.class, this, "onGroupRegister");}catch(NoSuchMethodException ex){}
     }
     
@@ -40,6 +45,10 @@ public class CommandGroupHandler extends Module implements EventListener{
         }else{
             groups.get(evt.getGroupName()).onGroupRegisterEvent(evt);
         }
+    }
+
+    public void onCommand(CommandEvent cmd){
+        
     }
 
 }

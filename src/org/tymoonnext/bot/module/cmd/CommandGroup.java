@@ -1,11 +1,12 @@
-package org.tymoonnext.bot.module.group;
+package org.tymoonnext.bot.module.cmd;
 
 import java.util.HashMap;
+import java.util.TreeMap;
 import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.core.CommandEvent;
-import org.tymoonnext.bot.event.group.GroupRegisterEvent;
+import org.tymoonnext.bot.event.cmd.GroupRegisterEvent;
 
 /**
  * 
@@ -15,11 +16,11 @@ import org.tymoonnext.bot.event.group.GroupRegisterEvent;
  */
 public class CommandGroup implements CommandListener{
     private String name;
-    private HashMap<String, CommandListener> commands;
+    private TreeMap<String, CommandListener> commands;
     
     public CommandGroup(Kizai bot, String group){
         name=group;
-        commands = new HashMap<String, CommandListener>();
+        commands = new TreeMap<String, CommandListener>();
         commands.put("help", this);
         
         bot.registerCommand(name, this);
@@ -60,5 +61,7 @@ public class CommandGroup implements CommandListener{
         }
     }
 
+    public String[] getCommands(){return commands.keySet().toArray(new String[commands.size()]);}
+    
     public String toString(){return "["+getClass().getSimpleName()+"|"+name+"]";}
 }

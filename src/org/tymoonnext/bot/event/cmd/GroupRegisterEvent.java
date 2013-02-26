@@ -1,4 +1,4 @@
-package org.tymoonnext.bot.event.group;
+package org.tymoonnext.bot.event.cmd;
 
 import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.event.CommandListener;
@@ -19,8 +19,8 @@ public class GroupRegisterEvent extends Event{
     public GroupRegisterEvent(String group, String subcmd, CommandListener listener){this(group, subcmd, listener, false);}
     public GroupRegisterEvent(String group, String subcmd, CommandListener listener, boolean force){
         super(Commons.stdout);
-        this.group=group;
-        this.subcmd=subcmd;
+        this.group=group.toLowerCase();
+        this.subcmd=subcmd.toLowerCase();
         this.listener=listener;
         this.force=force;
     }
