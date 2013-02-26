@@ -1,34 +1,3 @@
-/**
- * Sample argument structure:
- * CMD ARGS1 {ARGS2-1|ARGS2-2} [ARGS3] ARGS** ARGS4=XXX KWARGS**
- *      |         |               |      |        |        |
- *      +- Required, positional, any     |        |        |
- *                |               |      |        |        |
- *                +- Required, positional, choice |        |
- *                                |      |        |        |
- *                                +- Optional, positional, any
- *                                       |        |        |
- *                                       +- Optional, positional, any
- *                                                |        |
- *                                                +- Required, keyword, any 
- *                                                         |
- *                                                         +- Optional, keyword, any
- * KWARGS are never positional. They are not inside the positional sequence.
- * As such, the following two usages are recognized as the same:
- *   CMD ARGS1 ARGS3=VAL ARGS2
- *   CMD ARGS1 ARGS2 ARGS3=VAL
- * 
- * Defining an arguments list by the constructor can be done in the following
- * syntax:
- *   Named argument:    ARGSNAME
- *   Optional argument: ARGSNAME[]
- *   Dafulted argument: ARGSNAME[VALUE]
- *   Choice argument:   {CHOICE1|CHOICE2|..}
- *   Checked argument:  (INTEGER)
- *   All combined:      ARGSNAME[CHOICE1]{CHOICE1|CHOICE2|..}(INTEGER)
- * None of the names or values can contain {,},|,[ or ] names should match
- * [a-zA-Z0-9_-]. All values and names are automatically trimmed.
- */
 package org.tymoonnext.bot.module.cmd;
 
 import java.util.ArrayList;
@@ -38,7 +7,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 
+ * Defines a chain of arguments and handles the parsing of values to the
+ * arguments objects.
  * @author Shinmera
  * @license GPLv3
  * @version 0.0.0
@@ -56,43 +26,73 @@ public class ArgumentChain extends ArrayList<Argument>{
     
     public ArgumentChain(){}
     public ArgumentChain(String[] args){
-        int i=1;
-        for(String arg : args){
-            String name = null;
-            String defval = null;
-            String[] choices = null;
-            String check = "ANY";
-            ArgumentChecker checker;
-            
-            Matcher m = DEFINITION.matcher(arg);
-            if(!m.find()) throw new IllegalArgumentException("Input '"+arg+"' is not a valid definition!");
-            
-            String[] groups = {m.group(0), m.group(1), m.group(2), m.group(3)};
-            for(String grp : groups){
-                if((grp != null) && (!grp.isEmpty())){
-                    switch(grp.charAt(0)){
-                        case '[':defval=grp.substring(1,grp.length()-1);break;
-                        case '{':choices=grp.substring(1,grp.length()-1).split("\\|");break;
-                        case '(':check=grp.substring(1,grp.length()-1);break;
-                        default:name=grp;break;
-                    }
-                }
-            }
-            
-            if(check.equals("ANY"))         checker = ArgumentChecker.ANY;
-            else if(check.equals("NONE"))   checker = ArgumentChecker.NONE;
-            else if(check.equals("INTEGER"))checker = ArgumentChecker.INTEGER;
-            else if(check.equals("NUMERIC"))checker = ArgumentChecker.NUMERIC;
-            else if(check.equals("ALPHA"))  checker = ArgumentChecker.ALPHA;
-            else throw new IllegalArgumentException("Checker '"+check+"' not knoqn.");
-            
-            if((name==null) || (name.isEmpty()))name = "ARGS"+i;
-            
-            add(new Argument(name, defval, choices, checker));
-            i++;
-        }
+        for(String arg : args){add(arg);}
     }
     
+    /**
+     * Add a new argument using the string notation:
+     *   Named argument:    ARGSNAME
+     *   Optional argument: ARGSNAME[]
+     *   Dafulted argument: [DEFAULT]
+     *   Choice argument:   {CHOICE1|CHOICE2|..}
+     *   Checked argument:  (CHECKER)
+     *   All combined:      ARGSNAME[DEFAULT]{CHOICE1|CHOICE2|..}(CHECKER)
+     * Example:
+     *   channel[#opers]{#opers|#help|#bots}(CHANNEL)
+     * If no name is given, the name is automatically chosen by position in the
+     * argslist.
+     * 
+     * @param arg 
+     */
+    public void add(String arg){
+        String name = null;
+        String defval = null;
+        String[] choices = null;
+        String check = "ANY";
+        ArgumentChecker checker;
+
+        Matcher m = DEFINITION.matcher(arg);
+        if(!m.find()) throw new IllegalArgumentException("Input '"+arg+"' is not a valid definition!");
+
+        String[] groups = {m.group(0), m.group(1), m.group(2), m.group(3)};
+        for(String grp : groups){
+            if((grp != null) && (!grp.isEmpty())){
+                switch(grp.charAt(0)){
+                    case '[':defval=grp.substring(1,grp.length()-1);break;
+                    case '{':choices=grp.substring(1,grp.length()-1).split("\\|");break;
+                    case '(':check=grp.substring(1,grp.length()-1);break;
+                    default:name=grp;break;
+                }
+            }
+        }
+
+        if(check.equals("ANY"))         checker = ArgumentChecker.ANY;
+        else if(check.equals("NONE"))   checker = ArgumentChecker.NONE;
+        else if(check.equals("INTEGER"))checker = ArgumentChecker.INTEGER;
+        else if(check.equals("NUMERIC"))checker = ArgumentChecker.NUMERIC;
+        else if(check.equals("ALPHA"))  checker = ArgumentChecker.ALPHA;
+        else throw new IllegalArgumentException("Checker '"+check+"' not knoqn.");
+
+        if((name==null) || (name.isEmpty()))name = "ARGS"+size();
+
+        add(new Argument(name, defval, choices, checker));
+    }
+    
+    /**
+     * Parses a given argument string into the keys and values and pass them to
+     * the matching Argument containers. The syntax here is as follows:
+     * 
+     *   value value2 key=valueX value3="An \" encapsed string"
+     * 
+     * Keyword arguments are never positional. This means that they do not take
+     * up space in the positional order and as such can appear anywhere in no
+     * particular order. The example below is equivalent to the one above:
+     * 
+     *   key=valueX value value3="An \" enxapsed string" value2
+     * 
+     * @param argscall
+     * @throws ParseException 
+     */
     public void parse(String argscall) throws ParseException{
         argscall = argscall.trim();
         if(argscall.isEmpty())return;
@@ -147,6 +147,13 @@ public class ArgumentChain extends ArrayList<Argument>{
         }
     }
     
+    /**
+     * Finds the index of the next, non-escaped character in a string.
+     * @param s The string to search in.
+     * @param c The character to search for.
+     * @param start An offset in the string.
+     * @return The positon of the next match or -1 if not found.
+     */
     private int indexOfNextUnescapedChar(String s, char c, int start){
         int pos = 0;
         while(true){
@@ -158,6 +165,10 @@ public class ArgumentChain extends ArrayList<Argument>{
         return pos;
     }
     
+    /**
+     * Returns a neatly formatted representation of this chain.
+     * @return 
+     */
     public String toString(){
         StringBuilder s = new StringBuilder();
         

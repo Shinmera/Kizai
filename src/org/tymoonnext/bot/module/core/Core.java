@@ -11,8 +11,8 @@ import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.EventBind;
 import org.tymoonnext.bot.event.EventListener;
-import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.event.cmd.GroupRegisterEvent;
+import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.module.Module;
 
 /**
@@ -30,6 +30,7 @@ public class Core extends Module implements CommandListener,EventListener{
         
         //Core extensions
         bot.loadModule("core.CommandGroupHandler");
+        bot.loadModule("core.CommandHandler");
         
         bot.registerCommand(CommandEvent.CMD_UNBOUND, this);
         bot.registerCommand("shutdown", this);
