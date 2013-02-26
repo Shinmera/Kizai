@@ -12,6 +12,7 @@ import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.EventBind;
 import org.tymoonnext.bot.event.EventListener;
 import org.tymoonnext.bot.event.core.CommandEvent;
+import org.tymoonnext.bot.event.cmd.GroupRegisterEvent;
 import org.tymoonnext.bot.module.Module;
 
 /**
@@ -26,23 +27,25 @@ public class Core extends Module implements CommandListener,EventListener{
     public Core(Kizai bot){
         super(bot);
         Commons.log.info(toString()+" Init!");
+        
+        //Core extensions
+        bot.loadModule("core.CommandGroupHandler");
+        
         bot.registerCommand(CommandEvent.CMD_UNBOUND, this);
         bot.registerCommand("shutdown", this);
-        bot.registerCommand("config-save", this);
-        bot.registerCommand("config-load", this);
-        bot.registerCommand("module-load", this);
-        bot.registerCommand("module-reload", this);
-        bot.registerCommand("module-unload", this);
-        bot.registerCommand("bind-list", this);
-        bot.registerCommand("bind-add", this);
-        bot.registerCommand("bind-remove", this);
-        bot.registerCommand("command-list", this);
-        bot.registerCommand("command-add", this);
-        bot.registerCommand("command-remove", this);
+        bot.event(new GroupRegisterEvent("config", "save", this));
+        bot.event(new GroupRegisterEvent("config", "load", this));
+        bot.event(new GroupRegisterEvent("module", "load", this));
+        bot.event(new GroupRegisterEvent("module", "unload", this));
+        bot.event(new GroupRegisterEvent("module", "reload", this));
+        bot.event(new GroupRegisterEvent("bind", "list", this));
+        bot.event(new GroupRegisterEvent("bind", "add", this));
+        bot.event(new GroupRegisterEvent("bind", "remove", this));
+        bot.event(new GroupRegisterEvent("command", "list", this));
+        bot.event(new GroupRegisterEvent("command", "add", this));
+        bot.event(new GroupRegisterEvent("command", "remove", this));
         bot.registerCommand("info", this);
         try{bot.bindEvent(CommandEvent.class, this, "propagateCommandEvent");}catch(NoSuchMethodException ex){}
-        
-        bot.loadModule("group.CommandGroupHandler");
         
         Commons.log.info(toString()+" Autoloading modules...");
         HashMap<String,DObject> mods = (HashMap<String,DObject>)bot.getConfig().get("modules").get();
