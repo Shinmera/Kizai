@@ -29,8 +29,7 @@ public class Core extends Module implements CommandListener,EventListener{
         Commons.log.info(toString()+" Init!");
         
         //Core extensions
-        bot.loadModule("core.CommandGroupHandler");
-        bot.loadModule("core.CommandHandler");
+        bot.loadModule("core.CommandGroupModule");
         
         bot.registerCommand(CommandEvent.CMD_UNBOUND, this);
         bot.registerCommand("shutdown", this);
