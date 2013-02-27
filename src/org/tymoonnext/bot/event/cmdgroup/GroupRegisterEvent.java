@@ -1,4 +1,4 @@
-package org.tymoonnext.bot.event.cmd;
+package org.tymoonnext.bot.event.cmdgroup;
 
 import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.event.CommandListener;

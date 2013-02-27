@@ -5,28 +5,33 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.tymoonnext.bot.event.CommandListener;
 
 /**
- * Defines a chain of arguments and handles the parsing of values to the
- * arguments objects.
+ * 
  * @author Shinmera
  * @license GPLv3
  * @version 0.0.0
  */
-public class ArgumentChain extends ArrayList<Argument>{
+public class Command{
     private static final Pattern KEYWORD = Pattern.compile("^[a-zA-Z0-9_-]+=");
     private static final Pattern DEFINITION = Pattern.compile("^([a-zA-Z0-9-_]*)(\\[.*\\])?(\\{.*\\})?(\\([A-Z_]+\\))?");
     
-    public static void main(String[] nobodycares) throws ParseException{
-        String[] args = {"FIRST", "{ONE|TWO|THREE}", "THIRD[]", "FOURTH[4th]", "FIFTH[0](NUMERIC)"};
-        ArgumentChain chain = new ArgumentChain(args);
-        System.out.println(chain);
-        chain.parse("LOL TWO FIFTH=12.1");
-    }
+    private String name;
+    private String description;
+    private ArrayList<Argument> chain;
     
-    public ArgumentChain(){}
-    public ArgumentChain(String[] args){
-        for(String arg : args){add(arg);}
+    public Command(String name){this(name, null, null);}
+    public Command(String name, String[] args){this(name, args, null);}
+    public Command(String name, String desc){this(name, null, desc);}
+    public Command(String name, String[] args, String desc){
+        if(args!=null){
+            for(String arg: args){
+                add(arg);
+            }
+        }
+        this.name=name;
+        this.description=desc;
     }
     
     /**
@@ -44,7 +49,7 @@ public class ArgumentChain extends ArrayList<Argument>{
      * 
      * @param arg 
      */
-    public void add(String arg){
+    private void add(String arg){
         String name = null;
         String defval = null;
         String[] choices = null;
@@ -73,9 +78,9 @@ public class ArgumentChain extends ArrayList<Argument>{
         else if(check.equals("ALPHA"))  checker = ArgumentChecker.ALPHA;
         else throw new IllegalArgumentException("Checker '"+check+"' not knoqn.");
 
-        if((name==null) || (name.isEmpty()))name = "ARGS"+size();
+        if((name==null) || (name.isEmpty()))name = "ARGS"+chain.size();
 
-        add(new Argument(name, defval, choices, checker));
+        chain.add(new Argument(name, defval, choices, checker));
     }
     
     /**
@@ -95,54 +100,55 @@ public class ArgumentChain extends ArrayList<Argument>{
      */
     public void parse(String argscall) throws ParseException{
         argscall = argscall.trim();
-        if(argscall.isEmpty())return;
         
         LinkedList<String> args = new LinkedList<String>();
         HashMap<String, String> kwargs = new HashMap<String, String>();
         
-        int pointer=0, nextStringStart=0, nextStringEnd=0, nextSpace=0;
-        String token, key, val;
-        
-        while(nextSpace >= 0){            
-            //Find next token end point
-            nextStringStart = indexOfNextUnescapedChar(argscall, '"', pointer);            
-            if(nextStringStart < nextSpace && nextStringStart != -1){
-                nextStringEnd = indexOfNextUnescapedChar(argscall, '"', nextStringStart+1);
-                if(nextStringEnd == -1)
-                    throw new ParseException("Expected \" but reached end of string.");
-                nextSpace = argscall.indexOf(' ', nextStringEnd+1);
-            }else{
-                nextSpace = argscall.indexOf(' ', pointer);
+        if(!argscall.isEmpty()){
+            int pointer=0, nextStringStart=0, nextStringEnd=0, nextSpace=0;
+            String token, key, val;
+
+            while(nextSpace >= 0){            
+                //Find next token end point
+                nextStringStart = indexOfNextUnescapedChar(argscall, '"', pointer);            
+                if(nextStringStart < nextSpace && nextStringStart != -1){
+                    nextStringEnd = indexOfNextUnescapedChar(argscall, '"', nextStringStart+1);
+                    if(nextStringEnd == -1)
+                        throw new ParseException("Expected \" but reached end of string.");
+                    nextSpace = argscall.indexOf(' ', nextStringEnd+1);
+                }else{
+                    nextSpace = argscall.indexOf(' ', pointer);
+                }
+
+                //Extract token
+                if(nextSpace == -1)token = argscall.substring(pointer);
+                else               token = argscall.substring(pointer, nextSpace);            
+                token = token.trim();
+
+                //See if it's a keyword match or not
+                if(KEYWORD.matcher(token).find()){
+                    key = token.substring(0, token.indexOf('='));
+                    val = token.substring(token.indexOf('=')+1);
+                }else{
+                    key = null;
+                    val = token;
+                }
+
+                //Remove string indicators
+                if(val.startsWith("\"") && val.endsWith("\"")){
+                    val = val.substring(1, val.length()-1);
+                }
+
+                //Save to queue or dict
+                if(key == null) args.add(val);
+                else            kwargs.put(key, val);
+
+                //Advance pointer
+                pointer = nextSpace+1;
             }
-            
-            //Extract token
-            if(nextSpace == -1)token = argscall.substring(pointer);
-            else               token = argscall.substring(pointer, nextSpace);            
-            token = token.trim();
-            
-            //See if it's a keyword match or not
-            if(KEYWORD.matcher(token).find()){
-                key = token.substring(0, token.indexOf('='));
-                val = token.substring(token.indexOf('=')+1);
-            }else{
-                key = null;
-                val = token;
-            }
-            
-            //Remove string indicators
-            if(val.startsWith("\"") && val.endsWith("\"")){
-                val = val.substring(1, val.length()-1);
-            }
-            
-            //Save to queue or dict
-            if(key == null) args.add(val);
-            else            kwargs.put(key, val);
-            
-            //Advance pointer
-            pointer = nextSpace+1;
         }
         
-        for(Argument arg : this){
+        for(Argument arg : chain){
             arg.parse(args, kwargs);
         }
     }
@@ -166,15 +172,22 @@ public class ArgumentChain extends ArrayList<Argument>{
     }
     
     /**
-     * Returns a neatly formatted representation of this chain.
+     * Returns a neatly formatted representation of this command
      * @return 
      */
-    public String toString(){
+    public String toDescriptiveString(){
         StringBuilder s = new StringBuilder();
-        
-        for(Argument arg : this){
-            s.append(arg.toDescriptiveString()).append(" ");
+        s.append(name);
+        for(Argument arg : chain){
+            s.append(" ").append(arg.toDescriptiveString());
         }
         return s.toString();
+    }
+    
+    public String getName(){return name;}
+    public String getDescription(){return description;}
+    public Argument[] getArguments(){return chain.toArray(new Argument[chain.size()]);}
+    public String toString(){
+        return "{"+this.getClass().getSimpleName()+"|"+name+"}";
     }
 }

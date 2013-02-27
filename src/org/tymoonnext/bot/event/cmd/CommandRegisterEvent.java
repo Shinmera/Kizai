@@ -1,8 +1,9 @@
 package org.tymoonnext.bot.event.cmd;
 
 import org.tymoonnext.bot.Commons;
+import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.Event;
-import org.tymoonnext.bot.module.cmd.ArgumentChain;
+import org.tymoonnext.bot.module.cmd.Command;
 
 /**
  * 
@@ -11,20 +12,19 @@ import org.tymoonnext.bot.module.cmd.ArgumentChain;
  * @version 0.0.0
  */
 public class CommandRegisterEvent extends Event{
-    private String command;
-    private ArgumentChain args;
-    private String help;
+    private Command command;
+    private CommandListener listener;
+    private boolean force = false;
     
-    public CommandRegisterEvent(String command){this(command, null, null);}
-    public CommandRegisterEvent(String command, String help){this(command, help, null);}
-    public CommandRegisterEvent(String command, ArgumentChain args){this(command, null, args);}
-    public CommandRegisterEvent(String command, String help, ArgumentChain args){
+    public CommandRegisterEvent(Command command, CommandListener listener){this(command, listener, false);}
+    public CommandRegisterEvent(Command command, CommandListener listener, boolean force){
         super(Commons.stdout);
-        this.help=help;
-        this.args=args;
+        this.command=command;
+        this.listener=listener;
+        this.force=force;
     }
     
-    public String getCommand(){return command;}
-    public ArgumentChain getArgs(){return args;}
-    public String getHelp(){return help;}
+    public Command getCommand(){return command;}
+    public CommandListener getListener(){return listener;}
+    public boolean isForced(){return force;}
 }

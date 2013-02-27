@@ -11,7 +11,7 @@ import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.EventBind;
 import org.tymoonnext.bot.event.EventListener;
-import org.tymoonnext.bot.event.cmd.GroupRegisterEvent;
+import org.tymoonnext.bot.event.cmdgroup.GroupRegisterEvent;
 import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.module.Module;
 

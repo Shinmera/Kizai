@@ -5,10 +5,10 @@ import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.EventListener;
-import org.tymoonnext.bot.event.cmd.GroupRegisterEvent;
+import org.tymoonnext.bot.event.cmdgroup.GroupRegisterEvent;
 import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.module.Module;
-import org.tymoonnext.bot.module.cmd.CommandGroup;
+import org.tymoonnext.bot.module.cmdgroup.CommandGroup;
 
 /**
  * 
@@ -16,10 +16,10 @@ import org.tymoonnext.bot.module.cmd.CommandGroup;
  * @license GPLv3
  * @version 0.0.0
  */
-public class CommandGroupHandler extends Module implements EventListener, CommandListener{
+public class CommandGroupModule extends Module implements EventListener, CommandListener{
     private TreeMap<String, CommandGroup> groups;
 
-    public CommandGroupHandler(Kizai bot){
+    public CommandGroupModule(Kizai bot){
         super(bot);
         
         groups = new TreeMap<String, CommandGroup>();

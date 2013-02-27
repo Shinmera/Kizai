@@ -1,12 +1,11 @@
-package org.tymoonnext.bot.module.cmd;
+package org.tymoonnext.bot.module.cmdgroup;
 
-import java.util.HashMap;
 import java.util.TreeMap;
 import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.CommandListener;
+import org.tymoonnext.bot.event.cmdgroup.GroupRegisterEvent;
 import org.tymoonnext.bot.event.core.CommandEvent;
-import org.tymoonnext.bot.event.cmd.GroupRegisterEvent;
 
 /**
  * 
@@ -48,7 +47,7 @@ public class CommandGroup implements CommandListener{
             Commons.log.info(toString()+evt.getListener()+" Registering sub-command "+evt.getSubCommand());
             if(commands.containsKey(evt.getSubCommand())){
                 if(!evt.isForced()) throw new IllegalArgumentException(evt.getSubCommand()+" is already used!");
-                else                Commons.log.warning("[MAIN]"+evt.getListener()+" is overriding "+commands.get(evt.getSubCommand())+".");
+                else                Commons.log.warning(toString()+evt.getListener()+" is overriding "+commands.get(evt.getSubCommand())+".");
             }
             commands.put(evt.getSubCommand(), evt.getListener());
         }
