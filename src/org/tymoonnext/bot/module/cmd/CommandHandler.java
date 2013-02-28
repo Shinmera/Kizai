@@ -2,12 +2,10 @@ package org.tymoonnext.bot.module.cmd;
 
 import java.util.HashMap;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.tymoonnext.bot.Commons;
-import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.EventListener;
-import org.tymoonnext.bot.event.cmd.CommandEventExtra;
+import org.tymoonnext.bot.event.cmd.CommandInstanceEvent;
 import org.tymoonnext.bot.event.cmd.CommandRegisterEvent;
 import org.tymoonnext.bot.event.core.CommandEvent;
 
@@ -18,10 +16,12 @@ import org.tymoonnext.bot.event.core.CommandEvent;
  * @version 0.0.0
  */
 public class CommandHandler implements EventListener, CommandListener{
+    private String name;
     private HashMap<String, Command> commands;
     private HashMap<String, CommandListener> listeners;
     
-    public CommandHandler(Kizai bot){
+    public CommandHandler(String ident){
+        this.name=ident;
         commands = new HashMap<String, Command>();
         listeners = new HashMap<String, CommandListener>();
     }
@@ -40,8 +40,8 @@ public class CommandHandler implements EventListener, CommandListener{
         if(commands.containsKey(cmd.getCommand())){
             Command command = commands.get(cmd.getCommand());
             try{
-                command.parse(cmd.getArgs());
-                CommandEventExtra cmde = new CommandEventExtra(cmd, command.getArguments());
+                CommandInstance instance = new CommandInstance(commands.get(cmd.getCommand()), cmd.getArgs());
+                CommandInstanceEvent cmde = new CommandInstanceEvent(cmd, instance);
                 listeners.get(cmd.getCommand()).onCommand(cmde);
             }catch(ParseException ex){
                 Commons.log.log(Level.INFO, toString()+command+" Failed to parse.", ex);
@@ -49,4 +49,6 @@ public class CommandHandler implements EventListener, CommandListener{
             }
         }
     }
+    
+    public String toString(){return "["+getClass().getSimpleName()+"|"+name+"]";}
 }

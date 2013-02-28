@@ -3,6 +3,8 @@ package org.tymoonnext.bot.module.cmd;
 import NexT.util.StringUtils;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 
@@ -11,6 +13,8 @@ import java.util.LinkedList;
  * @version 0.0.0
  */
 public class Argument {
+    private static final Pattern DEFINITION = Pattern.compile("^([a-zA-Z0-9-_]*)(\\[.*\\])?(\\{.*\\})?(\\([A-Z_]+\\))?");
+    
     private String name;
     private String[] choices;
     private ArgumentChecker check;
@@ -34,6 +38,64 @@ public class Argument {
         this.check=(check==null)? ArgumentChecker.ANY : check;
     }
     
+    
+    /**
+     * Add a new argument using the string notation:
+     *   Named argument:    ARGSNAME
+     *   Optional argument: ARGSNAME[]
+     *   Dafulted argument: [DEFAULT]
+     *   Choice argument:   {CHOICE1|CHOICE2|..}
+     *   Checked argument:  (CHECKER)
+     *   All combined:      ARGSNAME[DEFAULT]{CHOICE1|CHOICE2|..}(CHECKER)
+     * Example:
+     *   channel[#opers]{#opers|#help|#bots}(CHANNEL)
+     * If no name is given, the name is automatically set to "ARG".
+     * 
+     * @param arg 
+     */
+    public static Argument generate(String arg){
+        String name = null;
+        String defval = null;
+        String[] choices = null;
+        String check = "ANY";
+        ArgumentChecker checker;
+
+        Matcher m = DEFINITION.matcher(arg);
+        if(!m.find()) throw new IllegalArgumentException("Input '"+arg+"' is not a valid definition!");
+
+        String[] groups = {m.group(0), m.group(1), m.group(2), m.group(3)};
+        for(String grp : groups){
+            if((grp != null) && (!grp.isEmpty())){
+                switch(grp.charAt(0)){
+                    case '[':defval=grp.substring(1,grp.length()-1);break;
+                    case '{':choices=grp.substring(1,grp.length()-1).split("\\|");break;
+                    case '(':check=grp.substring(1,grp.length()-1);break;
+                    default:name=grp;break;
+                }
+            }
+        }
+
+        if(check.equals("ANY"))         checker = ArgumentChecker.ANY;
+        else if(check.equals("NONE"))   checker = ArgumentChecker.NONE;
+        else if(check.equals("INTEGER"))checker = ArgumentChecker.INTEGER;
+        else if(check.equals("NUMERIC"))checker = ArgumentChecker.NUMERIC;
+        else if(check.equals("ALPHA"))  checker = ArgumentChecker.ALPHA;
+        else throw new IllegalArgumentException("Checker '"+check+"' not knoqn.");
+
+        if((name==null) || (name.isEmpty()))name = "ARGS";
+        return new Argument(name, defval, choices, checker);
+    }
+    
+    /**
+     * Attempt to filter out the correct value for this argument. If any of the
+     * checks fail (requirement, validity), a ParseException is thrown.
+     * 
+     * @param args A list of positional arguments. If this argument is retrieved
+     * from the list, the element is removed from the list.
+     * @param kwargs A map of keyword arguments. If this argument is retrieved
+     * from the map, the element is removed from the map.
+     * @throws ParseException 
+     */
     public void parse(LinkedList<String> args, HashMap<String,String> kwargs) throws ParseException{
         value = defval;
         
@@ -80,6 +142,24 @@ public class Argument {
         if(!check.isValid(value)) 
             throw new ParseException("Value '"+value+"' is not applicable for '"+name+"'.");
     }
+    
+    public void setName(String name){this.name=name;}
+    /**
+     * Sets whether the argument is optional or not. Note that this will
+     * inevitably change the default value to either an empty string or null,
+     * depending on the optionality ("" means optional, null means not).
+     * @param optional 
+     */
+    public void setOptional(boolean optional){defval = (optional)? "" : null ;}
+    /**
+     * Sets the default value. Note that this also influences the optionality of
+     * this argument (null means required, any string means optional).
+     * @param defval 
+     */
+    public void setDefault(String defval){this.defval=defval;}
+    public void setChoices(String[] chocies){this.choices=choices;}
+    public void setChecker(ArgumentChecker check){this.check=check;}
+    public void setValue(String value){this.value=value;}
     
     public String getName(){return name;}
     public boolean isOptional(){return (defval != null);}
