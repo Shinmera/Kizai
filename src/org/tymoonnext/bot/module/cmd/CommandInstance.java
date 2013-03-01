@@ -69,8 +69,6 @@ public class CommandInstance {
                 nextSpace = argscall.indexOf(' ', pointer);
                 nextStringStart = indexOfNextUnescapedChar(argscall, '"', pointer);
                 
-                System.out.println(">> "+nextSpace+" > "+nextStringStart);
-                
                 if(nextStringStart < nextSpace && nextStringStart != -1){
                     nextStringEnd = indexOfNextUnescapedChar(argscall, '"', nextStringStart+1);
                     if(nextStringEnd == -1)

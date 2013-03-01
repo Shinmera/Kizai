@@ -44,7 +44,7 @@ public class CommandHandler implements EventListener, CommandListener{
                 CommandInstanceEvent cmde = new CommandInstanceEvent(cmd, instance);
                 listeners.get(cmd.getCommand()).onCommand(cmde);
             }catch(ParseException ex){
-                Commons.log.log(Level.INFO, toString()+command+" Failed to parse.", ex);
+                Commons.log.info(toString()+command+" Failed to parse: "+ex.getMessage());
                 cmd.getStream().send("Usage: "+command.toDescriptiveString(), cmd.getChannel());
             }
         }

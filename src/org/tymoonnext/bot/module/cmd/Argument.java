@@ -64,7 +64,7 @@ public class Argument {
         Matcher m = DEFINITION.matcher(arg);
         if(!m.find()) throw new IllegalArgumentException("Input '"+arg+"' is not a valid definition!");
 
-        String[] groups = {m.group(0), m.group(1), m.group(2), m.group(3)};
+        String[] groups = {m.group(1), m.group(2), m.group(3), m.group(4)};
         for(String grp : groups){
             if((grp != null) && (!grp.isEmpty())){
                 switch(grp.charAt(0)){
@@ -75,13 +75,13 @@ public class Argument {
                 }
             }
         }
-
+        
         if(check.equals("ANY"))         checker = ArgumentChecker.ANY;
         else if(check.equals("NONE"))   checker = ArgumentChecker.NONE;
         else if(check.equals("INTEGER"))checker = ArgumentChecker.INTEGER;
         else if(check.equals("NUMERIC"))checker = ArgumentChecker.NUMERIC;
         else if(check.equals("ALPHA"))  checker = ArgumentChecker.ALPHA;
-        else throw new IllegalArgumentException("Checker '"+check+"' not knoqn.");
+        else throw new IllegalArgumentException("Checker '"+check+"' not known.");
 
         if((name==null) || (name.isEmpty()))name = "ARGS";
         return new Argument(name, defval, choices, checker);
