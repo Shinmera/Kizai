@@ -15,6 +15,7 @@ public class CommandInstanceEvent extends CommandEvent{
 
     public CommandInstanceEvent(CommandEvent base, CommandInstance instance){
         super(base.getStream(), base.getCommand(), base.getArgs(), base.getUser(), base.getChannel());
+        this.instance = instance;
     }
     
     public CommandInstance get(){return instance;}

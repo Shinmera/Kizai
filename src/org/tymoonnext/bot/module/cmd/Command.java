@@ -19,6 +19,7 @@ public class Command{
     public Command(String name, String[] args, String desc){
         this.name=name;
         this.description=desc;
+        this.chain = new ArrayList<Argument>();
         if(args!=null){
             for(String arg: args){
                 add(arg);
@@ -40,12 +41,14 @@ public class Command{
      * argslist.
      * 
      * @param arg 
+     * @return The generated Argument
      */
-    private void add(String arg){
+    private Argument add(String arg){
         Argument a = Argument.generate(arg);
         if(a.getName().equals("ARG"))
             a.setName("ARG"+chain.size());
         chain.add(a);
+        return a;
     }
     
     /**
