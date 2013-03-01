@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 public class CommandInstance {
     private static final Pattern KEYWORD = Pattern.compile("^[a-zA-Z0-9_-]+=");
     
+    private Command base;
     private String name;
     private String description;
     private Argument[] chain;
@@ -21,6 +22,7 @@ public class CommandInstance {
     private HashMap<String, String> akargs;
     
     public CommandInstance(Command base){
+        this.base = base;
         this.name = base.getName();
         this.description = base.getDescription();
         this.chain = base.getArguments();
@@ -64,14 +66,17 @@ public class CommandInstance {
 
             while(nextSpace >= 0){            
                 //Find next token end point
-                nextStringStart = indexOfNextUnescapedChar(argscall, '"', pointer);            
+                nextSpace = argscall.indexOf(' ', pointer);
+                nextStringStart = indexOfNextUnescapedChar(argscall, '"', pointer);
+                
+                System.out.println(">> "+nextSpace+" > "+nextStringStart);
+                
                 if(nextStringStart < nextSpace && nextStringStart != -1){
                     nextStringEnd = indexOfNextUnescapedChar(argscall, '"', nextStringStart+1);
+                    System.out.println(">>> "+nextStringStart+" > "+nextStringEnd);
                     if(nextStringEnd == -1)
                         throw new ParseException("Expected \" but reached end of string.");
                     nextSpace = argscall.indexOf(' ', nextStringEnd+1);
-                }else{
-                    nextSpace = argscall.indexOf(' ', pointer);
                 }
 
                 //Extract token
@@ -90,7 +95,7 @@ public class CommandInstance {
 
                 //Remove string indicators
                 if(val.startsWith("\"") && val.endsWith("\"")){
-                    val = val.substring(1, val.length()-1);
+                    val = val.substring(1, val.length()-1).replaceAll("\\\\\"", "\"");
                 }
 
                 //Save to queue or dict
@@ -121,17 +126,18 @@ public class CommandInstance {
         int pos = 0;
         while(true){
             pos = s.indexOf(c, start+pos);
-            if(pos == -1)break;
-            if(s.charAt(pos-1) != '\\')break;
+            if(pos <= 0)break;
+            if((pos > start) && (s.charAt(pos-1) != '\\'))break;
             else pos++;
         }
         return pos;
     }
     
+    public Command getBase(){return base;}
     public String getName(){return name;}
     public String getDescription(){return description;}
     public Argument[] getArgs(){return chain;}
-    public String[] getAddPArgs(){return apargs;}
+    public String[] getAddPargs(){return apargs;}
     public HashMap<String,String> getAddKargs(){return akargs;}
     
     /**
