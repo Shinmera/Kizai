@@ -34,6 +34,7 @@ public class Argument {
     public Argument(String name, String defval, String[] choices, ArgumentChecker check){
         this.name=name;
         this.defval=defval;
+        this.value=defval;
         this.choices=choices;
         this.check=(check==null)? ArgumentChecker.ANY : check;
     }

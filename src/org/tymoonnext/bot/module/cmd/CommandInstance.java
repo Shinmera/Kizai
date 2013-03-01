@@ -73,7 +73,6 @@ public class CommandInstance {
                 
                 if(nextStringStart < nextSpace && nextStringStart != -1){
                     nextStringEnd = indexOfNextUnescapedChar(argscall, '"', nextStringStart+1);
-                    System.out.println(">>> "+nextStringStart+" > "+nextStringEnd);
                     if(nextStringEnd == -1)
                         throw new ParseException("Expected \" but reached end of string.");
                     nextSpace = argscall.indexOf(' ', nextStringEnd+1);
