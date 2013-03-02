@@ -14,6 +14,7 @@ public class ConnectEvent extends IRCEvent{
     public int port;
     
     public ConnectEvent(){this(null, null, -1, null);}
+    public ConnectEvent(String host, int port, String pw){this(null, host, port, pw);}
     public ConnectEvent(IRC bot, String host, int port, String pw){
         super(bot);
         this.host=host;

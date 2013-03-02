@@ -6,11 +6,12 @@ import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.EventListener;
 import org.tymoonnext.bot.event.IRCBot.*;
-import org.tymoonnext.bot.event.cmdgroup.GroupRegisterEvent;
+import org.tymoonnext.bot.event.cmd.CommandInstanceEvent;
 import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.event.core.ModuleLoadEvent;
 import org.tymoonnext.bot.event.core.ModuleUnloadEvent;
 import org.tymoonnext.bot.module.Module;
+import org.tymoonnext.bot.module.core.CommandModule;
 
 /**
  * 
@@ -24,13 +25,12 @@ public class Essentials extends Module implements CommandListener, EventListener
     public Essentials(Kizai bot){
         super(bot);
         
-        bot.event(new GroupRegisterEvent("irc", "join", this));
-        bot.event(new GroupRegisterEvent("irc", "part", this));
-        bot.event(new GroupRegisterEvent("irc", "say", this));
-        bot.event(new GroupRegisterEvent("irc", "msg", this));
-        bot.event(new GroupRegisterEvent("irc", "send", this));
-        bot.event(new GroupRegisterEvent("irc", "quit", this));
-        bot.event(new GroupRegisterEvent("irc", "connect", this));
+        CommandModule.register(bot, "irc", "join",      "channel".split(" "),               "Let the bot join an irc channel.", this);
+        CommandModule.register(bot, "irc", "part",      "channel".split(" "),               "Let the bot part an irc channel.", this);
+        CommandModule.register(bot, "irc", "msg",       "channel message".split(" "),       "Let the bot send a message to a user or channel.", this);
+        CommandModule.register(bot, "irc", "quit",      "message[]".split(" "),             "Make the bot quit.", this);
+        CommandModule.register(bot, "irc", "connect",   "host[] port[6666](INTEGER) pass[]".split(" "), "(Re)connect the bot.", this);
+        CommandModule.register(bot, "irc", "raw",       "line".split(" "),                  "Send a raw line over the bot.", this);
         try{bot.bindEvent(ModuleLoadEvent.class, this, "onModuleLoad");}catch(NoSuchMethodException ex){}
         try{bot.bindEvent(ModuleUnloadEvent.class, this, "onModuleUnload");}catch(NoSuchMethodException ex){}
     }
@@ -58,42 +58,28 @@ public class Essentials extends Module implements CommandListener, EventListener
     public void onCommand(CommandEvent cmd){
         if(ircbot == null)ircbot = bot.getModule("irc.IRCBot");
         if(ircbot != null){
-            this.invoke("on"+StringUtils.firstToUpper(cmd.getCommand()), cmd);
+            this.invoke("on"+StringUtils.firstToUpper(cmd.getCommand().split(" ")[1]), cmd);
         }else{
             Commons.log.warning(toString()+" Skipping command "+cmd.getCommand()+"; IRCBot not available.");
         }
     }
 
-    public void onJoin(CommandEvent evt){
-        if((evt.getArgs() == null) || (evt.getArgs().isEmpty())){
-            evt.getStream().send("No channel specified. Usage: irc join #channel", evt.getChannel());
-            return;
-        }
+    public void onJoin(CommandInstanceEvent evt){
         JoinEvent join = new JoinEvent(evt.getArgs());
         ircbot.invoke("onJoin", join);
     }
 
-    public void onPart(CommandEvent evt){
-        if(((evt.getArgs() == null) || (evt.getArgs().isEmpty())) && (evt.getChannel() != null)){
-            evt.getStream().send("No channel specified. Usage: irc part #channel", evt.getChannel());
-            return;
-        }
-        String channel = "";
-        if((evt.getArgs() == null) || (evt.getArgs().isEmpty())) channel = evt.getChannel();
-        else                                                     channel = evt.getArgs();
+    public void onPart(CommandInstanceEvent evt){
+        String channel;
+        if(evt.get().getValue("channel").isEmpty()) channel = evt.getChannel();
+        else                                        channel = evt.getArgs();
         PartEvent part = new PartEvent(channel);
         ircbot.invoke("onPart", part);
     }
-
-    public void onSay(CommandEvent evt){onSend(evt);}
-    public void onMsg(CommandEvent evt){onSend(evt);}
-    public void onSend(CommandEvent evt){
-        if((evt.getArgs() == null) || (evt.getArgs().isEmpty()) || (!evt.getArgs().contains(" "))){
-            evt.getStream().send("Not enough arguments. Usage: irc msg destination message*", evt.getChannel());
-            return;
-        }
-        String dest = evt.getArgs().substring(0, evt.getArgs().indexOf(' '));
-        String text = evt.getArgs().substring(evt.getArgs().indexOf(' ')+1);
+    
+    public void onMsg(CommandInstanceEvent evt){
+        String dest = evt.get().getValue("channel");
+        String text = evt.get().getValue("message")+" "+StringUtils.implode(evt.get().getAddPargs(), " ");
         if(dest.startsWith("#")){
             MessageEvent msg = new MessageEvent(text, dest);
             ircbot.invoke("onMessage", msg);
@@ -103,13 +89,18 @@ public class Essentials extends Module implements CommandListener, EventListener
         }
     }
     
-    public void onQuit(CommandEvent evt){
-        QuitEvent quit = new QuitEvent(null, null, evt.getArgs(), null, null);
-        ircbot.invoke("onQuit", quit);
+    public void onRaw(CommandInstanceEvent evt){
+        ircbot.invoke("onUnknown", new UnknownEvent(evt.getArgs()));
     }
     
-    public void onConnect(CommandEvent evt){
-        ConnectEvent connect = new ConnectEvent();
+    public void onQuit(CommandInstanceEvent evt){
+        ircbot.invoke("onQuit", new QuitEvent(evt.getArgs()));
+    }
+    
+    public void onConnect(CommandInstanceEvent evt){
+        ConnectEvent connect = new ConnectEvent(evt.get().getValue("host"),
+                                                Integer.parseInt(evt.get().getValue("port")),
+                                                evt.get().getValue("pw"));
         ircbot.invoke("onConnect", connect);
     }
 }
