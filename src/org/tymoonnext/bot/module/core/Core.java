@@ -19,6 +19,7 @@ import org.tymoonnext.bot.event.cmd.CommandInstanceEvent;
 import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.module.Module;
 import org.tymoonnext.bot.module.cmd.CommandInstance;
+import org.tymoonnext.bot.stream.Stream;
 
 /**
  * Core module that provides essential Kizai functionality. Also handles
@@ -46,11 +47,17 @@ public class Core extends Module implements CommandListener,EventListener{
         CommandModule.register(bot, "bind", "list",     "event[] module[]".split(" "),                  "List all binds specific to a module or event.", this);
         CommandModule.register(bot, "bind", "add",      "event module function priority[0](INTEGER)".split(" "),"Bind a new event to a module.", this);
         CommandModule.register(bot, "bind", "remove",   "event module".split(" "),                      "Unbind a module from an event.", this);
+        CommandModule.register(bot, "bind", "invoke",   "event".split(" "),                             "Attempt to invoke an event. Note that you need to add all required "+
+                                                                                                        "event arguments into the command, to satisfy the constructor. Also "+
+                                                                                                        "note that this may still fail spectacularly if a constructor argument "+
+                                                                                                        "Expects anything other than primitve types or strings. Core will try "+
+                                                                                                        "its best to parse your arguments into the required values.", this);
         CommandModule.register(bot, "command", "list",  "module[]".split(" "),                          "List all commands specific to a module.", this);
         CommandModule.register(bot, "command", "add",   "cmd module".split(" "),                        "Register a new command for a module.", this);
         CommandModule.register(bot, "command", "remove","cmd".split(" "),                               "Unregister a command from a module.", this);
         CommandModule.register(bot, "stream", "list",   null,                                           "List all available streams.", this);
         CommandModule.register(bot, "stream", "close",  "stream".split(" "),                            "Close an internal stream.", this);
+        CommandModule.register(bot, "stream", "remove", "stream".split(" "),                            "Remove an internal stream.", this);
         CommandModule.register(bot, "stream", "send",   "stream channel message".split(" "),            "Send a custom message through a stream.", this);
         CommandModule.register(bot, "stream", "broadcast","message".split(" "),                         "Broadcast a custom message through all streams (and potentially channels).", this);
         
@@ -193,6 +200,15 @@ public class Core extends Module implements CommandListener,EventListener{
                 }
             }
             
+            //@TODO: Add Event commands group for invocation and listing (Add Reflections lib)
+        }else if(i.getName().equals("bind invoke")){
+            try{
+                Class event = Class.forName(i.getValue("event"));
+                //STUB
+            }catch(ClassNotFoundException ex){
+                cmd.getStream().send(toString()+" Event '"+i.getValue("event")+"' not found.", cmd.getChannel());
+            }
+            
         }else if(i.getName().equals("command add")){            
             if(bot.getModule(i.getValue("module")) == null){
                 cmd.getStream().send(toString()+" Module '"+i.getValue("module")+"' not found.", cmd.getChannel());
@@ -231,9 +247,9 @@ public class Core extends Module implements CommandListener,EventListener{
                 cmd.getStream().send(toString()+" No such stream '"+i.getValue("stream")+"'.", cmd.getChannel());
                 return;
             }
-            bot.getStream(i.getValue("stream")).send(StringUtils.implode(i.getAddPargs(), " "), i.getValue("channel"));
+            bot.getStream(i.getValue("stream")).send(i.getValue("message")+StringUtils.implode(i.getAddPargs(), " "), i.getValue("channel"));
             
-        }else if(i.getName().equals("stream send")){
+        }else if(i.getName().equals("stream broadcast")){
             bot.broadcast(cmd.getArgs());
             
         }else if(i.getName().equals("stream close")){
@@ -241,9 +257,20 @@ public class Core extends Module implements CommandListener,EventListener{
                 cmd.getStream().send(toString()+" No such stream '"+i.getValue("stream")+"'.", cmd.getChannel());
                 return;
             }
+            bot.getStream(i.getValue("stream")).close();
+            
+        }else if(i.getName().equals("stream remove")){
+            if(bot.getStream(i.getValue("stream")) == null){
+                cmd.getStream().send(toString()+" No such stream '"+i.getValue("stream")+"'.", cmd.getChannel());
+                return;
+            }
             bot.unregisterStream(i.getValue("stream"));
             
         }else if(i.getName().equals("stream list")){
+            cmd.getStream().send(toString()+" Stream listing: ", cmd.getChannel());
+            for(Stream s : bot.getStreams()){
+                cmd.getStream().send(" * "+s.getID()+" ("+((s.isClosed())? "closed" : "open")+")", cmd.getChannel());
+            }
             
         }else if(i.getName().equals("info")){
             cmd.getStream().send(Commons.getVersionString(), cmd.getChannel());
