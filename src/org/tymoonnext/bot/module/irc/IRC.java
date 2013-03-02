@@ -432,5 +432,10 @@ public class IRC extends PircBot implements Stream{
             super.onUnknown(evt.line);
     }
     
+    public boolean isClosed(){
+        return isConnected();
+    }
+    
     public String toString(){return "~IRC~";}
+    public String getID(){return "irc";}
 }

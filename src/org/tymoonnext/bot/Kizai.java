@@ -204,9 +204,9 @@ public class Kizai implements SignalHandler{
      * @param id The identifier of the Stream.
      * @param stream The Stream itself.
      */
-    public synchronized void registerStream(String id, Stream stream){
-        Commons.log.info("[MAIN] Registering stream "+id);
-        streams.put(id, stream);
+    public synchronized void registerStream(Stream stream){
+        Commons.log.info("[MAIN] Registering stream "+stream);
+        streams.put(stream.getID(), stream);
     }
     
     /**

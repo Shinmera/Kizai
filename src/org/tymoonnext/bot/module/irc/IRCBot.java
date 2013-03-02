@@ -38,7 +38,7 @@ public class IRCBot extends Module implements EventListener{
         config.load(DParse.parse(CONFIGFILE));
         
         irc = new IRC(bot, config.server);
-        bot.registerStream("irc", irc);
+        bot.registerStream(irc);
         try{bot.bindEvent(MessageEvent.class, this, "onMessage");}catch(NoSuchMethodException ex){}
     }
 

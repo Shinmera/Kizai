@@ -7,11 +7,18 @@ package org.tymoonnext.bot.stream;
  * @version 0.0.0
  */
 public class StdOut implements Stream{
+    private boolean closed=false;
+    
+    public boolean isClosed(){return closed;}
+    
     public void send(String msg, String dst){
-        System.out.println(dst+"> "+msg);
+        if(!closed)
+            System.out.println(dst+"> "+msg);
     }
 
-    public void close(){}
+    public void close(){closed=true;}
     
     public String toString(){return "~StdOut~";}
+    
+    public String getID(){return "stdout";}
 }
