@@ -1,6 +1,7 @@
 package org.tymoonnext.bot.module.core;
 
 import NexT.data.DObject;
+import NexT.util.StringUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -48,6 +49,10 @@ public class Core extends Module implements CommandListener,EventListener{
         CommandModule.register(bot, "command", "list",  "module[]".split(" "),                          "List all commands specific to a module.", this);
         CommandModule.register(bot, "command", "add",   "cmd module".split(" "),                        "Register a new command for a module.", this);
         CommandModule.register(bot, "command", "remove","cmd".split(" "),                               "Unregister a command from a module.", this);
+        CommandModule.register(bot, "stream", "list",   null,                                           "List all available streams.", this);
+        CommandModule.register(bot, "stream", "close",  "stream".split(" "),                            "Close an internal stream.", this);
+        CommandModule.register(bot, "stream", "send",   "stream channel message".split(" "),            "Send a custom message through a stream.", this);
+        CommandModule.register(bot, "stream", "broadcast","message".split(" "),                         "Broadcast a custom message through all streams (and potentially channels).", this);
         
         Commons.log.info(toString()+" Autoloading modules...");
         HashMap<String,DObject> mods = (HashMap<String,DObject>)bot.getConfig().get("modules").get();
@@ -220,6 +225,25 @@ public class Core extends Module implements CommandListener,EventListener{
                     cmd.getStream().send(" * "+com+" "+lst, cmd.getChannel());
                 }
             }
+            
+        }else if(i.getName().equals("stream send")){
+            if(bot.getStream(i.getValue("stream")) == null){
+                cmd.getStream().send(toString()+" No such stream '"+i.getValue("stream")+"'.", cmd.getChannel());
+                return;
+            }
+            bot.getStream(i.getValue("stream")).send(StringUtils.implode(i.getAddPargs(), " "), i.getValue("channel"));
+            
+        }else if(i.getName().equals("stream send")){
+            bot.broadcast(cmd.getArgs());
+            
+        }else if(i.getName().equals("stream close")){
+            if(bot.getStream(i.getValue("stream")) == null){
+                cmd.getStream().send(toString()+" No such stream '"+i.getValue("stream")+"'.", cmd.getChannel());
+                return;
+            }
+            bot.unregisterStream(i.getValue("stream"));
+            
+        }else if(i.getName().equals("stream list")){
             
         }else if(i.getName().equals("info")){
             cmd.getStream().send(Commons.getVersionString(), cmd.getChannel());
