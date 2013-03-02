@@ -36,20 +36,18 @@ public class Core extends Module implements CommandListener,EventListener{
         bot.loadModule("core.CommandGroupModule");
         bot.loadModule("core.CommandModule");
         
-        /*
         bot.registerCommand(CommandEvent.CMD_UNBOUND, this);
-        bot.event(new GroupRegisterEvent("command", "list", this));
-        bot.event(new GroupRegisterEvent("command", "add", this));
-        bot.event(new GroupRegisterEvent("command", "remove", this));
-        */
         try{bot.bindEvent(CommandEvent.class, this, "propagateCommandEvent");}catch(NoSuchMethodException ex){}
         CommandModule.register(bot, "info",             null,                                           "Show some information about the bot.", this);
         CommandModule.register(bot, "shutdown",         "delay[0](INTEGER)".split(" "),                 "Safely shut down the bot.", this);
         CommandModule.register(bot, "config",           "todo{save|load}".split(" "),                   "Save or load the configuration.", this);
         CommandModule.register(bot, "module",           "todo{load|unload|reload} class".split(" "),    "Load a module.", this);
+        CommandModule.register(bot, "bind", "list",     "event[] module[]".split(" "),                  "List all binds specific to a module or event.", this);
         CommandModule.register(bot, "bind", "add",      "event module function priority[0](INTEGER)".split(" "),"Bind a new event to a module.", this);
         CommandModule.register(bot, "bind", "remove",   "event module".split(" "),                      "Unbind a module from an event.", this);
-        CommandModule.register(bot, "bind", "list",     "event[] module[]".split(" "),                  "List all binds specific to a module or event.", this);
+        CommandModule.register(bot, "command", "list",  "module[]".split(" "),                          "List all commands specific to a module.", this);
+        CommandModule.register(bot, "command", "add",   "cmd module".split(" "),                        "Register a new command for a module.", this);
+        CommandModule.register(bot, "command", "remove","cmd".split(" "),                               "Unregister a command from a module.", this);
         
         Commons.log.info(toString()+" Autoloading modules...");
         HashMap<String,DObject> mods = (HashMap<String,DObject>)bot.getConfig().get("modules").get();
@@ -88,6 +86,12 @@ public class Core extends Module implements CommandListener,EventListener{
     }
 
     public void onCommand(CommandEvent cmd){
+        if(!(cmd instanceof CommandInstanceEvent)){
+            if(cmd.getCommand().equals(CommandEvent.CMD_UNBOUND))
+                cmd.getStream().send(toString()+" Unbound command: "+cmd.getArgs(), cmd.getChannel());
+            return;
+        }
+        
         CommandInstance i = ((CommandInstanceEvent)cmd).get();
         if(i.getName().equals("shutdown")){
             new Timer().schedule(new TimerTask(){
@@ -125,13 +129,6 @@ public class Core extends Module implements CommandListener,EventListener{
                 else                                cmd.getStream().send(toString()+" Failed to reload module!", cmd.getChannel());
             }
             
-        }else if(i.getName().equals("module")){
-            cmd.getStream().send(toString()+" Binds (Event Priority Listener:Function)", cmd.getChannel());
-            for(Class c : bot.getBoundEvents()){
-                for(EventBind bind : bot.getEventBinds(c)){
-                    cmd.getStream().send("> "+c.getSimpleName()+" "+bind.getPriority()+" "+bind.getListener().getClass().getSimpleName()+":"+bind.getMethod().getName(), cmd.getChannel());
-                }
-            }
         }else if(i.getName().equals("bind add")){            
             if(bot.getModule(i.getValue("module")) == null){
                 cmd.getStream().send(toString()+" Module '"+i.getValue("module")+"' not found.", cmd.getChannel());
@@ -175,7 +172,7 @@ public class Core extends Module implements CommandListener,EventListener{
             }catch(NullPointerException ex){
                 cmd.getStream().send(toString()+" Warning: Module '"+i.getValue("module")+"' not found. Defaulting to any.", cmd.getChannel());
             }try{
-                if(!i.getValue("module").isEmpty())module = Class.forName(i.getValue("event"));
+                if(!i.getValue("module").isEmpty())event = Class.forName(i.getValue("event"));
             }catch(ClassNotFoundException ex){
                 cmd.getStream().send(toString()+" Warning: Event '"+i.getValue("event")+"' not found. Defaulting to any.", cmd.getChannel());
             }
@@ -184,17 +181,48 @@ public class Core extends Module implements CommandListener,EventListener{
             for(Class<? extends Event> c : bot.getBoundEvents()){
                 if(event.isAssignableFrom(c)){
                     for(EventBind b : bot.getEventBinds(c)){
-                        if(b.getListener().getClass().isAssignableFrom(module)){
-                            cmd.getStream().send("* "+event.getSimpleName()+" "+b.getPriority()+" "+b.getListener()+":"+b.getMethod().getName(), cmd.getChannel());
+                        if(module.isAssignableFrom(b.getListener().getClass())){
+                            cmd.getStream().send(" * "+event.getSimpleName()+" "+b.getPriority()+" "+b.getListener()+":"+b.getMethod().getName(), cmd.getChannel());
                         }
                     }
                 }
             }
             
+        }else if(i.getName().equals("command add")){            
+            if(bot.getModule(i.getValue("module")) == null){
+                cmd.getStream().send(toString()+" Module '"+i.getValue("module")+"' not found.", cmd.getChannel());
+                return;
+            }
+            if(!(bot.getModule(i.getValue("module")) instanceof CommandListener)){
+                cmd.getStream().send(toString()+" Module '"+i.getValue("module")+"' is not a command listener.", cmd.getChannel());
+                return;
+            }
+            
+            bot.registerCommand(i.getValue("cmd"), (CommandListener)bot.getModule(i.getValue("module")));
+            cmd.getStream().send(toString()+" Command "+i.getValue("cmd")+" registered for "+i.getValue("module")+".", cmd.getChannel());
+            
+        }else if(i.getName().equals("command remove")){
+            bot.unregisterCommand(i.getValue("cmd"));
+            cmd.getStream().send(toString()+" Command "+i.getValue("cmd")+" removed.", cmd.getChannel());
+            
+        }else if(i.getName().equals("command list")){
+            Class module = Object.class;
+            try{
+                if(!i.getValue("module").isEmpty())module = bot.getModule(i.getValue("module")).getClass();
+            }catch(NullPointerException ex){
+                cmd.getStream().send(toString()+" Warning: Module '"+i.getValue("module")+"' not found. Defaulting to any.", cmd.getChannel());
+            }
+            
+            cmd.getStream().send(toString()+" Command listing: ", cmd.getChannel());
+            for(String com : bot.getRegisteredCommands()){
+                CommandListener lst = bot.getCommandListener(com);
+                if(module.isAssignableFrom(lst.getClass())){
+                    cmd.getStream().send(" * "+com+" "+lst, cmd.getChannel());
+                }
+            }
+            
         }else if(i.getName().equals("info")){
             cmd.getStream().send(Commons.getVersionString(), cmd.getChannel());
-        }else if(cmd.getCommand().equals(CommandEvent.CMD_UNBOUND)){
-            cmd.getStream().send(toString()+" Unbound command: "+cmd.getArgs(), cmd.getChannel());
         }
     }
 
