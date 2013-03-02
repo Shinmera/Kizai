@@ -1,6 +1,5 @@
 package org.tymoonnext.bot.module.core;
 
-import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.cmd.CommandRegisterEvent;
@@ -9,7 +8,6 @@ import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.module.Module;
 import org.tymoonnext.bot.module.cmd.Command;
 import org.tymoonnext.bot.module.cmd.CommandHandler;
-
 
 /**
  * 
@@ -44,7 +42,6 @@ public class CommandModule extends Module{
     public static void register(Kizai bot, String cmd, String[] args, String help, CommandListener listener){
         bot.event(new CommandRegisterEvent(new Command(cmd, args, help), listener));
     }
-    
     
     /**
      * Register a new-style command for a specific listener and group. This
