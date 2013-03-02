@@ -18,6 +18,7 @@ import org.tymoonnext.bot.event.core.CommandEvent;
 import NexT.data.noload;
 import NexT.data.nosave;
 import org.tymoonnext.bot.module.Module;
+import org.tymoonnext.bot.module.core.CommandModule;
 
 /**
  * 
@@ -39,10 +40,10 @@ public class Essentials extends Module implements CommandListener, EventListener
     
     public Essentials(Kizai bot){
         super(bot);
-        bot.registerCommand("date", this);
-        bot.registerCommand("time", this);
-        bot.registerCommand("uptime", this);
-        bot.registerCommand("google", this);
+        CommandModule.register(bot, "date", null,   "Show the current date.", this);
+        CommandModule.register(bot, "time", null,   "Show the current local bot time.", this);
+        CommandModule.register(bot, "uptime", null, "Show how long the bot has been running for.", this);
+        CommandModule.register(bot, "google", "query".split(" "), "Perform a google query and retrieve the first result url.", this);
         try{bot.bindEvent(MessageEvent.class, this, "onMessage"); }catch(NoSuchMethodException ex){}
         config.load(bot.getConfig().get("modules").get("misc.Essentials"));
         dateFormat = new SimpleDateFormat(config.dateFormat);
