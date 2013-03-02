@@ -49,8 +49,8 @@ public class CommandModule extends Module{
     /**
      * Register a new-style command for a specific listener and group. This
      * function is simply a shortcut to make it look neater in-code. All it does
-     * is construct a Command, CommandHandler and GroupRegisterEvent instance
-     * and send that through the bot.
+     * is construct a Command, CommandRegisterEvent and GroupRegisterEvent
+     * instance and send that through the bot.
      * 
      * @param bot The Kizai main instance.
      * @param group The command group to be included in.
@@ -60,13 +60,12 @@ public class CommandModule extends Module{
      * @param listener The listener for this command.
      */
     public static void register(Kizai bot, String group, String cmd, String[] args, String help, CommandListener listener){
-        //This is unoptimized garbage and should probably be remade some time.
-        //Right now I don't give enough of a shit and just want to get it to work though.
-        //Yes, yes I know, sad onion and all. Here, have a @TODO.
-        CommandHandler handler = new CommandHandler(group+" "+cmd);
-        handler.onCommandRegister(new CommandRegisterEvent(new Command(group+" "+cmd, args, help), listener));
-        bot.event(new GroupRegisterEvent(group, cmd, handler));
+        CommandModule.register(bot, group+" "+cmd, args, help, listener);
+        //Pipe the CommandGroup to our CommandHandler
+        bot.event(new GroupRegisterEvent(group, cmd, (CommandListener)((CommandModule)bot.getModule("core.CommandModule")).getHandler()));
     }
+    
+    public CommandHandler getHandler(){return handler;}
     
     @Override
     public void shutdown(){
