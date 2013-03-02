@@ -419,4 +419,5 @@ public class Kizai implements SignalHandler{
     public synchronized String[] getRegisteredCommands(){return commands.keySet().toArray(new String[commands.size()]);}
     public synchronized EventBind[] getEventBinds(Class<? extends Event> event){return events.get(event).toArray(new EventBind[events.get(event).size()]);}
     public synchronized Class[] getBoundEvents(){return events.keySet().toArray(new Class[events.size()]);}
+    public synchronized Stream[] getStreams(){return streams.values().toArray(new Stream[streams.size()]);}
 }
