@@ -34,15 +34,16 @@ public class CommandGroup implements CommandListener{
                 onHelp(cmd);
             }else{ 
                 String[] args = cmd.getArgs().split(" ");
-                if(!commands.containsKey(args[0])){
-                    cmd.getStream().send("No command called '"+args[0]+"' known. Try '"+name+" help' for a list of available commands.", cmd.getChannel());
+                String actCommand = args[0].toLowerCase();
+                if(!commands.containsKey(actCommand)){
+                    cmd.getStream().send("No command called '"+actCommand+"' known. Try '"+name+" help' for a list of available commands.", cmd.getChannel());
                 }else{
                     CommandEvent fin = new CommandEvent(cmd.getStream(), 
-                                                        cmd.getCommand()+" "+args[0], 
-                                                        cmd.getArgs().substring(args[0].length()).trim(), 
+                                                        cmd.getCommand()+" "+actCommand, 
+                                                        cmd.getArgs().substring(actCommand.length()).trim(), 
                                                         cmd.getUser(), 
                                                         cmd.getChannel());
-                    commands.get(args[0]).onCommand(fin);
+                    commands.get(actCommand).onCommand(fin);
                 }
             }
         }
