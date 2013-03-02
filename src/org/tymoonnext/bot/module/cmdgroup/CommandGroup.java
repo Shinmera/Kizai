@@ -1,5 +1,6 @@
 package org.tymoonnext.bot.module.cmdgroup;
 
+import NexT.util.StringUtils;
 import java.util.TreeMap;
 import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
@@ -35,8 +36,12 @@ public class CommandGroup implements CommandListener{
                 if(!commands.containsKey(args[0])){
                     cmd.getStream().send("No command called '"+args[0]+"' known. Try '"+name+" help' for a list of available commands.", cmd.getChannel());
                 }else{
-                    CommandEvent fin = new CommandEvent(cmd.getStream(), args[0], cmd.getArgs().substring(args[0].length()).trim(), cmd.getUser(), cmd.getChannel());
-                    commands.get(cmd.getCommand()).onCommand(fin);
+                    CommandEvent fin = new CommandEvent(cmd.getStream(), 
+                                                        cmd.getCommand()+" "+args[0], 
+                                                        cmd.getArgs().substring(args[0].length()).trim(), 
+                                                        cmd.getUser(), 
+                                                        cmd.getChannel());
+                    commands.get(args[0]).onCommand(fin);
                 }
             }
         }
