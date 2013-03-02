@@ -107,6 +107,7 @@ public class UserDB extends Module implements EventListener{
     
     public void onAuth(AuthEvent evt){
         if(users.containsKey(evt.getCommand().getUser().toLowerCase())){
+            Commons.log.finer(toString()+" Received auth event: "+evt);
             User user = users.get(evt.getCommand().getUser().toLowerCase());
             UserVerifyEvent uevt = new UserVerifyEvent(evt.getStream(), user);
             bot.event(uevt, SessionImplementor.class);
@@ -121,6 +122,7 @@ public class UserDB extends Module implements EventListener{
     }
     
     public void onUser(UserRetrieveEvent evt){
+        Commons.log.finer(toString()+" Modifying UserRetrieveEvent: "+evt);
         if(users.containsKey(evt.getIdent().toLowerCase()))evt.setUser(users.get(evt.getIdent().toLowerCase()));
         if(userIDs.containsKey(evt.getIdent()))evt.setUser(userIDs.get(evt.getIdent()));
     }

@@ -29,6 +29,7 @@ public class TreeAuthImplementor extends Module implements EventListener{
     }
     
     public void onAuth(AuthEvent evt){
+        Commons.log.finer(toString()+" Checking event "+evt);
         String checkbranch = evt.getStream().getClass().getSimpleName()+"."+
                              evt.getCommand().getChannel()+"."+
                              evt.getCommand().getCommand();
@@ -46,10 +47,10 @@ public class TreeAuthImplementor extends Module implements EventListener{
             if(config.contains("perms")){
                 String[] permtree = config.get("perms").toString().split("\n");
                 if(checkBranch(permtree, checkbranch)){
-                    Commons.log.info(toString()+" Granting permission for "+checkbranch);
+                    Commons.log.fine(toString()+" Granting permission for "+checkbranch);
                     evt.setGranted(true);
                 }else{
-                    Commons.log.info(toString()+" Denying permission for "+checkbranch);
+                    Commons.log.fine(toString()+" Denying permission for "+checkbranch);
                 }
             }
         }
@@ -75,7 +76,7 @@ public class TreeAuthImplementor extends Module implements EventListener{
                 if(config.contains("perms")){
                     String[] permtree = config.get("perms").toString().split("\n");
                     if(checkBranch(permtree, checkbranch)){
-                        Commons.log.info(toString()+" Granting permission for "+checkbranch+" (any)");
+                        Commons.log.fine(toString()+" Granting permission for "+checkbranch+" (any)");
                         evt.setGranted(true);
                     }
                 }
@@ -84,6 +85,7 @@ public class TreeAuthImplementor extends Module implements EventListener{
     }
     
     public boolean checkBranch(String tree[], String branch){
+        Commons.log.finest(toString()+" Traversing "+branch);
         String[] leaves = branch.trim().toLowerCase().split("\\.");
         
         for(String _branch : tree){
