@@ -296,8 +296,8 @@ public class Kizai implements SignalHandler{
      * @param cmd The command to unregister from.
      * @param m The CommandListener to unbind.
      */
-    public synchronized void unregisterCommand(String cmd, CommandListener m){
-        Commons.log.info("[MAIN]"+m+" Unregistering command "+cmd);
+    public synchronized void unregisterCommand(String cmd){
+        Commons.log.info("[MAIN]"+commands.get(cmd) +" Unregistering command "+cmd);
         commands.remove(cmd);
     }
     
