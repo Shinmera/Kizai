@@ -63,6 +63,7 @@ public class Kizai implements SignalHandler{
         
         loadModule("core.Core");
         
+        Commons.log.info("[INIT] Finished in "+((System.currentTimeMillis()-Commons.STARTUP_TIME)/1000.0)+"s");
         while(!shutdown){
             try{Thread.sleep(1000);}catch(Exception ex){/* Here be dragons */}
         }//KEEPALIVE TICK
