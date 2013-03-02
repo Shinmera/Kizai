@@ -7,6 +7,7 @@ import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.cmdgroup.GroupRegisterEvent;
 import org.tymoonnext.bot.event.core.CommandEvent;
+import org.tymoonnext.bot.module.cmd.CommandHandler;
 
 /**
  * 
@@ -29,7 +30,7 @@ public class CommandGroup implements CommandListener{
     public void onCommand(CommandEvent cmd){
         if(cmd.getCommand().equals(name)){
             Commons.log.fine(toString()+" Received group command ("+cmd.getArgs()+")");
-            if((cmd.getArgs() == null) || (cmd.getArgs().trim().isEmpty()) || (cmd.getArgs().equalsIgnoreCase("help"))){
+            if((cmd.getArgs() == null) || (cmd.getArgs().trim().isEmpty()) || (cmd.getArgs().toLowerCase().startsWith("help"))){
                 onHelp(cmd);
             }else{ 
                 String[] args = cmd.getArgs().split(" ");
@@ -59,9 +60,30 @@ public class CommandGroup implements CommandListener{
     }
     
     public void onHelp(CommandEvent evt){
-        evt.getStream().send("The following commands are available in this group:", evt.getChannel());
-        for(String s : commands.keySet()){
-            evt.getStream().send(" * "+name+" "+s, evt.getChannel());
+        if(evt.getArgs().toLowerCase().startsWith("help ")){
+            String cmd = evt.getArgs().split(" ")[1];
+            if(commands.containsKey(cmd)){
+                if(commands.get(cmd) instanceof CommandHandler){
+                    CommandHandler handler = ((CommandHandler)commands.get(cmd));
+                    evt.getStream().send("Help for '"+name+" "+cmd+"':", evt.getChannel());
+                    evt.getStream().send(" Usage: "+handler.getCommand(name+" "+cmd).toDescriptiveString(), evt.getChannel());
+                    evt.getStream().send(" Description: "+handler.getCommand(name+" "+cmd).getDescription(), evt.getChannel());
+                }else{
+                    evt.getStream().send("No additional help recorded.", evt.getChannel());
+                }
+            }else{
+                evt.getStream().send("No such command '"+cmd+"'.", evt.getChannel());
+            }
+        }else{
+            evt.getStream().send("The following commands are available in this group:", evt.getChannel());
+            for(String s : commands.keySet()){
+                if(commands.get(s) instanceof CommandHandler){
+                    evt.getStream().send(" * "+((CommandHandler)commands.get(s)).getCommand(name+" "+s).toDescriptiveString(), evt.getChannel());
+                }else{
+                    evt.getStream().send(" * "+name+" "+s, evt.getChannel());
+                }
+            }
+            evt.getStream().send("More specific help for each command may be available with: "+name+" help commandname", evt.getChannel());
         }
     }
 
