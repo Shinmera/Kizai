@@ -3,6 +3,7 @@ package org.tymoonnext.bot.module.cmd;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.regex.Pattern;
+import org.tymoonnext.bot.Commons;
 
 /**
  * 
@@ -55,6 +56,7 @@ public class CommandInstance {
      * @throws ParseException 
      */
     public void parse(String argscall) throws ParseException{
+        Commons.log.fine(toString()+" Parsing '"+argscall+"'");
         argscall = argscall.trim();
         
         LinkedList<String> args = new LinkedList<String>();
@@ -171,4 +173,6 @@ public class CommandInstance {
     public int argsSize(){return chain.length;}
     public int addKargsSize(){return akargs.size();}
     public int addPargsSize(){return apargs.length;}
+    
+    public String toString(){return "{"+getClass().getSimpleName()+"|"+name+"}";}
 }

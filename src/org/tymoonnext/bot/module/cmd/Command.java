@@ -42,6 +42,7 @@ public class Command{
      * 
      * @param arg 
      * @return The generated Argument
+     * @see Argument#generate(java.lang.String) 
      */
     private Argument add(String arg){
         Argument a = Argument.generate(arg);
@@ -67,10 +68,8 @@ public class Command{
     public String getName(){return name;}
     public String getDescription(){return description;}
     public Argument[] getArguments(){return chain.toArray(new Argument[chain.size()]);}
-    public String toString(){
-        return "{"+this.getClass().getSimpleName()+"|"+name+"}";
-    }
-    
     public CommandInstance getInstance(){return new CommandInstance(this);}
     public CommandInstance getInstance(String args) throws ParseException{return new CommandInstance(this, args);}
+    
+    public String toString(){return "{"+this.getClass().getSimpleName()+"|"+name+"}";}
 }

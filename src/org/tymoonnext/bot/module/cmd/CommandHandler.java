@@ -1,7 +1,6 @@
 package org.tymoonnext.bot.module.cmd;
 
 import java.util.HashMap;
-import java.util.logging.Level;
 import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.EventListener;
@@ -38,6 +37,7 @@ public class CommandHandler implements EventListener, CommandListener{
 
     public void onCommand(CommandEvent cmd){
         if(commands.containsKey(cmd.getCommand())){
+            Commons.log.fine(toString()+" Received event: "+cmd);
             Command command = commands.get(cmd.getCommand());
             try{
                 CommandInstance instance = new CommandInstance(commands.get(cmd.getCommand()), cmd.getArgs());

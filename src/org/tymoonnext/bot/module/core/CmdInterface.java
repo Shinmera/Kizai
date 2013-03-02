@@ -29,6 +29,7 @@ public class CmdInterface extends ThreadedModule{
         while(in==null){try{Thread.sleep(5);}catch(Exception ex){}}
         while(true){
             String command = in.nextLine();
+            Commons.log.fine(toString()+" Received line: "+command);
             if(command.contains(" "))
                 bot.event(new CommandEvent(Commons.stdout,
                                             command.substring(0,command.indexOf(' ')),
