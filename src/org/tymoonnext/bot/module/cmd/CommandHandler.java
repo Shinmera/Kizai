@@ -50,5 +50,11 @@ public class CommandHandler implements EventListener, CommandListener{
         }
     }
     
+    public Command[] getCommands(){return commands.values().toArray(new Command[commands.size()]);}
+    public CommandListener[] getListeners(){return listeners.values().toArray(new CommandListener[commands.size()]);}
+    
+    public Command getCommand(String cmd){return commands.get(cmd);}
+    public CommandListener getListener(String cmd){return listeners.get(cmd);}
+    
     public String toString(){return "["+getClass().getSimpleName()+"|"+name+"]";}
 }
