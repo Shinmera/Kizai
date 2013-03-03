@@ -194,7 +194,7 @@ public class Core extends Module implements CommandListener,EventListener{
                 if(event.isAssignableFrom(c)){
                     for(EventBind b : bot.getEventBinds(c)){
                         if(module.isAssignableFrom(b.getListener().getClass())){
-                            cmd.getStream().send(" * "+event.getSimpleName()+" "+b.getPriority()+" "+b.getListener()+":"+b.getMethod().getName(), cmd.getChannel());
+                            cmd.getStream().send(" * "+c.getSimpleName()+" "+b.getPriority()+" "+b.getListener()+":"+b.getMethod().getName(), cmd.getChannel());
                         }
                     }
                 }
