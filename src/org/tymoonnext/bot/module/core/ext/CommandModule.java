@@ -1,4 +1,4 @@
-package org.tymoonnext.bot.module.core;
+package org.tymoonnext.bot.module.core.ext;
 
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.CommandListener;
@@ -57,7 +57,7 @@ public class CommandModule extends Module{
     public static void register(Kizai bot, String group, String cmd, String[] args, String help, CommandListener listener){
         CommandModule.register(bot, group+" "+cmd, args, help, listener);
         //Pipe the CommandGroup to our CommandHandler
-        bot.event(new GroupRegisterEvent(group, cmd, (CommandListener)((CommandModule)bot.getModule("core.CommandModule")).getHandler()));
+        bot.event(new GroupRegisterEvent(group, cmd, (CommandListener)((CommandModule)bot.getModule("core.ext.CommandModule")).getHandler()));
     }
     
     public CommandHandler getHandler(){return handler;}

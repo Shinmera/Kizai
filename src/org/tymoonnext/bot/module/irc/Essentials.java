@@ -11,7 +11,7 @@ import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.event.core.ModuleLoadEvent;
 import org.tymoonnext.bot.event.core.ModuleUnloadEvent;
 import org.tymoonnext.bot.module.Module;
-import org.tymoonnext.bot.module.core.CommandModule;
+import org.tymoonnext.bot.module.core.ext.CommandModule;
 
 /**
  * 

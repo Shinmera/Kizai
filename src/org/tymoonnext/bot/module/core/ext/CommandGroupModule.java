@@ -1,4 +1,4 @@
-package org.tymoonnext.bot.module.core;
+package org.tymoonnext.bot.module.core.ext;
 
 import java.util.TreeMap;
 import org.tymoonnext.bot.Commons;
