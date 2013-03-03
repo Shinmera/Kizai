@@ -2,6 +2,7 @@ package org.tymoonnext.bot.module.cmd;
 
 import java.util.HashMap;
 import org.tymoonnext.bot.Commons;
+import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.EventListener;
 import org.tymoonnext.bot.event.cmd.CommandInstanceEvent;
@@ -15,11 +16,13 @@ import org.tymoonnext.bot.event.core.CommandEvent;
  * @version 0.0.0
  */
 public class CommandHandler implements EventListener, CommandListener{
+    private Kizai bot;
     private String name;
     private HashMap<String, Command> commands;
     private HashMap<String, CommandListener> listeners;
     
-    public CommandHandler(String ident){
+    public CommandHandler(Kizai bot, String ident){
+        this.bot=bot;
         this.name=ident;
         commands = new HashMap<String, Command>();
         listeners = new HashMap<String, CommandListener>();
@@ -33,6 +36,7 @@ public class CommandHandler implements EventListener, CommandListener{
         }
         commands.put(evt.getCommand().getName(), evt.getCommand());
         listeners.put(evt.getCommand().getName(), evt.getListener());
+        bot.registerCommand(evt.getCommand().getName(), this);
     }
 
     public void onCommand(CommandEvent cmd){

@@ -4,7 +4,6 @@ import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.cmd.CommandRegisterEvent;
 import org.tymoonnext.bot.event.cmdgroup.GroupRegisterEvent;
-import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.module.Module;
 import org.tymoonnext.bot.module.cmd.Command;
 import org.tymoonnext.bot.module.cmd.CommandHandler;
@@ -21,10 +20,9 @@ public class CommandModule extends Module{
     public CommandModule(Kizai bot){
         super(bot);
         
-        handler = new CommandHandler("Core");
+        handler = new CommandHandler(bot, "Core");
         
         try{bot.bindEvent(CommandRegisterEvent.class, handler, "onCommandRegister");}catch(NoSuchMethodException ex){}
-        try{bot.bindEvent(CommandEvent.class, handler, "onCommand");}catch(NoSuchMethodException ex){}
     }
     
     /**
