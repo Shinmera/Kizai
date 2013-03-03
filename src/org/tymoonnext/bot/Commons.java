@@ -7,9 +7,17 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.reflections.Reflections;
+import org.reflections.scanners.ResourcesScanner;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
 import org.tymoonnext.bot.stream.StdOut;
 import org.tymoonnext.bot.stream.Stream;
 
@@ -36,8 +44,11 @@ public class Commons {
     
     public static final Logger log = NLogger.get("kizai", LOGLEVEL, LOGLEVEL_FILE);
     public static final Stream stdout = new StdOut();
+    public static final Reflections reflections;
+    private static final List<ClassLoader> classLoadersList = new LinkedList<ClassLoader>();
     
     public static final String MODULE_PACKAGE = "org.tymoonnext.bot.module.";
+    public static final String EVENT_PACKAGE = "org.tymoonnext.bot.event.";
     public static final long STARTUP_TIME = System.currentTimeMillis();
     
     public static MessageDigest md;
@@ -65,6 +76,16 @@ public class Commons {
                 }
             }
         }
+        classLoadersList.add(ClasspathHelper.contextClassLoader());
+        classLoadersList.add(ClasspathHelper.staticClassLoader());
+        reflections = getPackageReflections(Commons.class.getPackage().getName());
+    }
+    
+    public static Reflections getPackageReflections(String pkg){
+        return new Reflections(new ConfigurationBuilder()
+            .setScanners(new SubTypesScanner(false /* don't exclude Object.class */), new ResourcesScanner())
+            .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[0])))
+            .filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix(pkg))));
     }
     
     /**
