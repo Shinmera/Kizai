@@ -5,6 +5,7 @@ import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.auth.UserVerifyEvent;
 import org.tymoonnext.bot.event.core.CommandEvent;
+import org.tymoonnext.bot.meta.Info;
 import org.tymoonnext.bot.module.ThreadedModule;
 import org.tymoonnext.bot.module.auth.SessionImplementor;
 
@@ -14,6 +15,8 @@ import org.tymoonnext.bot.module.auth.SessionImplementor;
  * @license GPLv3
  * @version 0.0.0
  */
+
+@Info("Simple module allowing you to execute commands through the command line.")
 public class CmdInterface extends ThreadedModule{
     private Scanner in;
     private StdSessionImplementor sessions;

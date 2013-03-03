@@ -17,6 +17,7 @@ import org.tymoonnext.bot.event.IRCBot.MessageEvent;
 import org.tymoonnext.bot.event.core.CommandEvent;
 import NexT.data.noload;
 import NexT.data.nosave;
+import org.tymoonnext.bot.meta.Info;
 import org.tymoonnext.bot.module.Module;
 import org.tymoonnext.bot.module.core.ext.CommandModule;
 
@@ -26,6 +27,8 @@ import org.tymoonnext.bot.module.core.ext.CommandModule;
  * @license GPLv3
  * @version 0.0.0
  */
+
+@Info("General module that provides a few essential commands.")
 public class Essentials extends Module implements CommandListener, EventListener{
     private class C extends ConfigLoader{
         @nosave @noload public String googleUrl = "http://www.google.com/search?btnI&q=";

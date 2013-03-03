@@ -7,6 +7,7 @@ import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.EventListener;
 import org.tymoonnext.bot.event.cmdgroup.GroupRegisterEvent;
 import org.tymoonnext.bot.event.core.CommandEvent;
+import org.tymoonnext.bot.meta.Info;
 import org.tymoonnext.bot.module.Module;
 import org.tymoonnext.bot.module.cmdgroup.CommandGroup;
 
@@ -16,6 +17,8 @@ import org.tymoonnext.bot.module.cmdgroup.CommandGroup;
  * @license GPLv3
  * @version 0.0.0
  */
+
+@Info("Handles command grouping by splitting commands into main- and sub-commands before propagating them.")
 public class CommandGroupModule extends Module implements EventListener, CommandListener{
     private TreeMap<String, CommandGroup> groups;
 

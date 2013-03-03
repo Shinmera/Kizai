@@ -13,6 +13,7 @@ import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.EventListener;
 import org.tymoonnext.bot.event.IRCBot.*;
 import org.tymoonnext.bot.event.core.CommandEvent;
+import org.tymoonnext.bot.meta.Info;
 import org.tymoonnext.bot.module.Module;
 
 /**
@@ -22,6 +23,8 @@ import org.tymoonnext.bot.module.Module;
  * @version 0.0.0
  * @see org.tymoonnext.bot.module.irc.IRC
  */
+
+@Info("Main module that provides the IRC stream.")
 public class IRCBot extends Module implements EventListener{
     public static final File CONFIGFILE = new File(Commons.f_CONFIGDIR, "irc.cfg");
     

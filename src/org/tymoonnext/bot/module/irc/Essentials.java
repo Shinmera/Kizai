@@ -10,6 +10,7 @@ import org.tymoonnext.bot.event.cmd.CommandInstanceEvent;
 import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.event.core.ModuleLoadEvent;
 import org.tymoonnext.bot.event.core.ModuleUnloadEvent;
+import org.tymoonnext.bot.meta.Info;
 import org.tymoonnext.bot.module.Module;
 import org.tymoonnext.bot.module.core.ext.CommandModule;
 
@@ -19,6 +20,8 @@ import org.tymoonnext.bot.module.core.ext.CommandModule;
  * @license GPLv3
  * @version 0.0.0
  */
+
+@Info("This module provides some essential IRC functionality to make it usable in an IRC environment.")
 public class Essentials extends Module implements CommandListener, EventListener{   
     private Module ircbot;
     

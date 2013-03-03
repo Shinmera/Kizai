@@ -5,6 +5,7 @@ import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.EventListener;
 import org.tymoonnext.bot.event.auth.AuthEvent;
 import org.tymoonnext.bot.event.core.CommandEvent;
+import org.tymoonnext.bot.meta.Info;
 import org.tymoonnext.bot.module.Module;
 
 /**
@@ -14,6 +15,8 @@ import org.tymoonnext.bot.module.Module;
  * @license GPLv3
  * @version 0.0.0
  */
+
+@Info("Very simple authentication Module that issues AuthEvents on CommandEvents and halts their execution in case no authentication succeeds.")
 public class Auth extends Module implements EventListener{
     
     public Auth(Kizai bot){

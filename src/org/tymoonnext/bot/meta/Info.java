@@ -12,8 +12,8 @@ import java.lang.annotation.Target;
  * @license GPLv3
  * @version 0.0.0
  */
-@Target(ElementType.FIELD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Info{
-    String txt();
+    String value();
 }

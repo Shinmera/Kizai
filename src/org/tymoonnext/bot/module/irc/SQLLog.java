@@ -20,6 +20,7 @@ import org.tymoonnext.bot.event.IRCBot.QuitEvent;
 import org.tymoonnext.bot.event.IRCBot.SendEvent;
 import org.tymoonnext.bot.event.IRCBot.TopicEvent;
 import org.tymoonnext.bot.event.core.CommandEvent;
+import org.tymoonnext.bot.meta.Info;
 import org.tymoonnext.bot.module.Module;
 
 /**
@@ -28,6 +29,8 @@ import org.tymoonnext.bot.module.Module;
  * @license GPLv3
  * @version 0.0.0
  */
+
+@Info("IRC logging module that writes all IRC messages to a remote SQL server.")
 public class SQLLog extends Module implements EventListener, CommandListener{
     public static final char TYPE_MESSAGE= 'm';
     public static final char TYPE_TOPIC  = 't';

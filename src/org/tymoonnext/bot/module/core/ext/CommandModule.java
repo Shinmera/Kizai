@@ -4,6 +4,7 @@ import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.cmd.CommandRegisterEvent;
 import org.tymoonnext.bot.event.cmdgroup.GroupRegisterEvent;
+import org.tymoonnext.bot.meta.Info;
 import org.tymoonnext.bot.module.Module;
 import org.tymoonnext.bot.module.cmd.Command;
 import org.tymoonnext.bot.module.cmd.CommandHandler;
@@ -14,6 +15,8 @@ import org.tymoonnext.bot.module.cmd.CommandHandler;
  * @license GPLv3
  * @version 0.0.0
  */
+
+@Info("Handles complex command and argument parsing to streamline the way commands are issued and handled.")
 public class CommandModule extends Module{
     private CommandHandler handler;
 

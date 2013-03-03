@@ -35,6 +35,8 @@ import org.tymoonnext.bot.stream.Stream;
  * @license GPLv3
  * @version 1.3.1
  */
+
+@Info("Handles command propagation, initial module loading and most of the base Kizai commands.")
 public class Core extends Module implements CommandListener,EventListener{
     
     public Core(Kizai bot){
@@ -184,7 +186,7 @@ public class Core extends Module implements CommandListener,EventListener{
                 
                 cmd.getStream().send(toString()+" Information about "+i.getValue("module")+":", cmd.getChannel());
                 if(module.getAnnotation(Info.class) != null){
-                    cmd.getStream().send(((Info)module.getAnnotation(Info.class)).txt(), cmd.getChannel());
+                    cmd.getStream().send("  "+((Info)module.getAnnotation(Info.class)).value(), cmd.getChannel());
                 }
                 cmd.getStream().send("  This module is currently "+((bot.getModule(i.getValue("module"))==null)? "unloaded" : "loaded")+".", cmd.getChannel());
             }catch(ClassNotFoundException ex){
@@ -220,7 +222,7 @@ public class Core extends Module implements CommandListener,EventListener{
                 
                 cmd.getStream().send(toString()+" Information about "+i.getValue("event")+":", cmd.getChannel());
                 if(event.getAnnotation(Info.class) != null){
-                    cmd.getStream().send(((Info)event.getAnnotation(Info.class)).txt(), cmd.getChannel());
+                    cmd.getStream().send("  "+((Info)event.getAnnotation(Info.class)).value(), cmd.getChannel());
                 }
                 for(Constructor constructor : event.getConstructors()){
                     StringBuilder args = new StringBuilder();int j=0;

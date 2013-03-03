@@ -6,13 +6,11 @@ import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.logging.Level;
 import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
-import org.tymoonnext.bot.event.EventListener;
-import org.tymoonnext.bot.event.core.ModuleLoadEvent;
+import org.tymoonnext.bot.meta.Info;
 import org.tymoonnext.bot.module.TimedModule;
 
 /**
@@ -23,6 +21,8 @@ import org.tymoonnext.bot.module.TimedModule;
  * @todo Very static, should be extended for general purpose usage.
  * @todo remove IRC deps.
  */
+
+@Info("Simple module that fetches the latest Stevenchan posts from the RSS feed.")
 public class NewestPosts extends TimedModule{
     private String lastTitle = "";
     

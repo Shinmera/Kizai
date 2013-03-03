@@ -3,6 +3,7 @@ package org.tymoonnext.bot.module.irc;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.EventListener;
 import org.tymoonnext.bot.event.IRCBot.MessageEvent;
+import org.tymoonnext.bot.meta.Info;
 import org.tymoonnext.bot.module.Module;
 
 /**
@@ -11,6 +12,8 @@ import org.tymoonnext.bot.module.Module;
  * @license GPLv3
  * @version 0.0.0
  */
+
+@Info("Very simple IRC module that performs a replace on all messages of the pattern s/search/replace/g.")
 public class Replace extends Module implements EventListener{
     private String previous = "";
     private String previousUser = "";

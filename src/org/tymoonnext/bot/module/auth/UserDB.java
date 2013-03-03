@@ -13,6 +13,7 @@ import org.tymoonnext.bot.event.auth.AuthEvent;
 import org.tymoonnext.bot.event.auth.UserRegisterEvent;
 import org.tymoonnext.bot.event.auth.UserRetrieveEvent;
 import org.tymoonnext.bot.event.auth.UserVerifyEvent;
+import org.tymoonnext.bot.meta.Info;
 import org.tymoonnext.bot.module.Module;
 
 /**
@@ -22,6 +23,8 @@ import org.tymoonnext.bot.module.Module;
  * @license GPLv3
  * @version 0.0.0
  */
+
+@Info("User database for the Auth system. Contains and manages user configurations and propagates AuthEvents to UserVerifyEvents.")
 public class UserDB extends Module implements EventListener{
     public static final File CONFIGDIR = new File(Commons.f_CONFIGDIR, "users");
     private HashMap<String, User> users;

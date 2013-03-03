@@ -17,6 +17,7 @@ import org.tymoonnext.bot.event.auth.UserRegisterEvent;
 import org.tymoonnext.bot.event.auth.UserRetrieveEvent;
 import org.tymoonnext.bot.event.auth.UserVerifyEvent;
 import org.tymoonnext.bot.event.core.CommandEvent;
+import org.tymoonnext.bot.meta.Info;
 import org.tymoonnext.bot.module.auth.SessionImplementor;
 import org.tymoonnext.bot.module.auth.User;
 import org.tymoonnext.bot.stream.Stream;
@@ -27,6 +28,8 @@ import org.tymoonnext.bot.stream.Stream;
  * @license GPLv3
  * @version 0.0.0
  */
+
+@Info("Auth user session implementation that authenticates through NickServ.")
 public class NickServSessionImplementor extends SessionImplementor implements CommandListener{
     private HashMap<String, User> pendingStatus;
     private HashSet<User> identified;
