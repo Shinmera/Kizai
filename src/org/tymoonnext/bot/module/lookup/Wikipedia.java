@@ -8,18 +8,18 @@ import java.util.regex.Pattern;
  * @author Mithent
  */
 public class Wikipedia extends MediaWiki {
-    public Wikipedia()
-    {
-        super.apiURL = "http://en.wikipedia.org/w/api.php";
+    //Patterns are slow to compile and should generally be static final.
+    private static final Pattern linkRegex = Pattern.compile("<a.*?>(.*)</a>");
+    
+    public Wikipedia(){
+        super("http://en.wikipedia.org/w/api.php");
     }
     
     @Override
-    protected String getDefinitionForTerm(String page) throws ConnectionException, NoMatchException
-    {
+    protected String getDefinitionForTerm(String page) throws ConnectionException, NoMatchException{
         String text = super.getDefinitionForTerm(page);
         
-        if (text.contains("REDIRECT"))
-        {
+        if (text.contains("REDIRECT")){
             return handleRedirect(text, page);
         }
         
@@ -27,27 +27,28 @@ public class Wikipedia extends MediaWiki {
     }
 
     private String handleRedirect(String text, String page) throws ConnectionException, NoMatchException{
-        Pattern linkRegex = Pattern.compile("<a.*?>(.*)</a>");
+        //Original code; Please remove after the adaptation is understood and accepted.
+        //Pattern linkRegex = Pattern.compile("<a.*?>(.*)</a>");
+        
         Matcher linkRegexMatcher = linkRegex.matcher(text);
-        if (linkRegexMatcher.find())
-        {
-            String redirectTo = replaceSpacesWithUnderscores(linkRegexMatcher.group(1));
+        if (linkRegexMatcher.find()){
+            //String redirectTo = replaceSpacesWithUnderscores(linkRegexMatcher.group(1));
+            String redirectTo = linkRegexMatcher.group(1).replace(' ', '_');
             return getDefinitionForTerm(redirectTo);
-        }
-        else
-        {
-            return "The page " + page + " seems to redirect somewhere else, but I couldn't find where.";
+        }else{
+            //Change to ParseException or whatever later, as mentioned in the
+            //other comment in MediaWiki.
+            throw new NoMatchException("The page " + page + " seems to redirect somewhere else, but I couldn't find where.");
         }
     }
 
-    private String getDescription(String text, String page){
+    private String getDescription(String text, String page) throws NoMatchException{
         text = text.replace("\n", "").replace("\r", "");
 
         String description = null;
         int startAt = 0;
         
-        do
-        {
+        do{
             int nextParagraphStarts = text.indexOf("<p>", startAt);
             int nextParagraphEnds = text.indexOf("</p>", startAt);
             
@@ -57,34 +58,29 @@ public class Wikipedia extends MediaWiki {
             description = getPlaintext(nextParagraph);
             
             startAt = nextParagraphEnds + 4;
-        }
-        while (description.length() < page.length());
+        }while (description.length() < page.length());
         
-        if (description != null)
-        {
+        if (description != null){
             return page + ": " + description;
-        }
-        else
-        {
-            return "I couldn't find a good description for " + page + ".";
+        }else{
+            //Change to ParseException or whatever later, as mentioned in the
+            //other comment in MediaWiki.
+            throw new NoMatchException("I couldn't find a good description for " + page + ".");
         }
         
     }
     
-    private String getPlaintext(String text)
-    {   
+    private String getPlaintext(String text){   
         text = removeSuperscriptText(text);
         text = removeErrors(text);
         return stripTags(text);
     }
     
-    private String removeSuperscriptText(String html)
-    {
+    private String removeSuperscriptText(String html){
         return html.replaceAll("<sup.*?>.*?</sup>", "");
     }
     
-    private String removeErrors(String html)
-    {
+    private String removeErrors(String html){
         return html.replaceAll("<strong class=\"error\">.*?</strong>", "");
     }
 }
