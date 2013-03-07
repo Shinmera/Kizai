@@ -35,6 +35,7 @@ public class VisualModules extends JPanel implements EventListener{
         
         modules.addAll(Arrays.asList(bot.getModules()));
         list = new JList(modules);
+        list.setFont(VisualBase.F_MONOSPACED);
         
         JScrollPane scroll = new JScrollPane(list);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -54,5 +55,5 @@ public class VisualModules extends JPanel implements EventListener{
         list.setListData(modules);
     }
     
-    public String toString(){return "[Visual]";}
+    public String toString(){return "[Visual|Modules]";}
 }
