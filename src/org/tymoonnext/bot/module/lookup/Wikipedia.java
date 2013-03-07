@@ -2,13 +2,13 @@ package org.tymoonnext.bot.module.lookup;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.tymoonnext.bot.module.cmd.ParseException;
 
 /**
  * Looks up definitions from Wikipedia
  * @author Mithent
  */
 public class Wikipedia extends MediaWiki {
-    //Patterns are slow to compile and should generally be static final.
     private static final Pattern linkRegex = Pattern.compile("<a.*?>(.*)</a>");
     
     public Wikipedia(){
@@ -16,7 +16,7 @@ public class Wikipedia extends MediaWiki {
     }
     
     @Override
-    protected String getDefinitionForTerm(String page) throws ConnectionException, NoMatchException{
+    protected String getDefinitionForTerm(String page) throws ConnectionException, NoMatchException, ParseException{
         String text = super.getDefinitionForTerm(page);
         
         if (text.contains("REDIRECT")){
@@ -26,23 +26,18 @@ public class Wikipedia extends MediaWiki {
         return getDescription(text, page);
     }
 
-    private String handleRedirect(String text, String page) throws ConnectionException, NoMatchException{
-        //Original code; Please remove after the adaptation is understood and accepted.
-        //Pattern linkRegex = Pattern.compile("<a.*?>(.*)</a>");
+    private String handleRedirect(String text, String page) throws ConnectionException, NoMatchException, ParseException{
         
         Matcher linkRegexMatcher = linkRegex.matcher(text);
         if (linkRegexMatcher.find()){
-            //String redirectTo = replaceSpacesWithUnderscores(linkRegexMatcher.group(1));
             String redirectTo = linkRegexMatcher.group(1).replace(' ', '_');
             return getDefinitionForTerm(redirectTo);
         }else{
-            //Change to ParseException or whatever later, as mentioned in the
-            //other comment in MediaWiki.
-            throw new NoMatchException("The page " + page + " seems to redirect somewhere else, but I couldn't find where.");
+            throw new ParseException("The page " + page + " seems to redirect somewhere else, but I couldn't find where.");
         }
     }
 
-    private String getDescription(String text, String page) throws NoMatchException{
+    private String getDescription(String text, String page) throws NoMatchException, ParseException{
         text = text.replace("\n", "").replace("\r", "");
 
         String description = null;
@@ -63,9 +58,7 @@ public class Wikipedia extends MediaWiki {
         if (description != null){
             return page + ": " + description;
         }else{
-            //Change to ParseException or whatever later, as mentioned in the
-            //other comment in MediaWiki.
-            throw new NoMatchException("I couldn't find a good description for " + page + ".");
+            throw new ParseException("I couldn't find a good description for " + page + ".");
         }
         
     }
