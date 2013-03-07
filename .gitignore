@@ -3,3 +3,4 @@ build/
 run/modules/
 nbproject/private/private.properties
 run/config/users/
+/dist/
