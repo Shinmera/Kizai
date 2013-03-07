@@ -7,6 +7,7 @@ import org.tymoonnext.bot.event.auth.UserVerifyEvent;
 import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.meta.Info;
 import org.tymoonnext.bot.module.ThreadedModule;
+import org.tymoonnext.bot.module.auth.AllowAllSessionImplementor;
 import org.tymoonnext.bot.module.auth.SessionImplementor;
 
 /**
@@ -19,12 +20,11 @@ import org.tymoonnext.bot.module.auth.SessionImplementor;
 @Info("Simple module allowing you to execute commands through the command line.")
 public class CmdInterface extends ThreadedModule{
     private Scanner in;
-    private StdSessionImplementor sessions;
     
     public CmdInterface(Kizai bot){
         super(bot);
         in = new Scanner(System.in);
-        sessions = new StdSessionImplementor(bot);
+        new AllowAllSessionImplementor(bot, Commons.stdout);
     }
 
     @Override
@@ -44,16 +44,5 @@ public class CmdInterface extends ThreadedModule{
                                             null,
                                             System.getProperty("user.name")));
         }
-    }
-
-    class StdSessionImplementor extends SessionImplementor{
-        public StdSessionImplementor(Kizai bot){
-            super(bot);
-        }
-        
-        public void onUserVerify(UserVerifyEvent evt) {
-            if(evt.getStream() == Commons.stdout)evt.getUser().activateSession();
-        }
-        
     }
 }
