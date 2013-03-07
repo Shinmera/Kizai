@@ -412,13 +412,131 @@ public class Kizai implements SignalHandler{
         }
     }
     
+    /**
+     * Returns the Module associated with this name.
+     * @param name
+     * @return 
+     */
     public synchronized Module getModule(String name){return modules.get(name);}
-    public synchronized Stream getStream(String name){return streams.get(name);}
+    
+    /**
+     * Returns the Stream associated with this ID.
+     * @param name
+     * @return 
+     * @see Stream#getID() 
+     */
+    public synchronized Stream getStream(String id){return streams.get(id);}
+    
+    /**
+     * Returns the internal Configuration class.
+     * @return 
+     */
     public synchronized Configuration getConfig(){return conf;}
+    
+    /**
+     * Returns the CommandListener associated with this command.
+     * @param commandType
+     * @return 
+     */
     public synchronized CommandListener getCommandListener(String commandType){return commands.get(commandType);}
+    
+    /**
+     * Returns all registered commands.
+     * @return 
+     */
     public synchronized String[] getRegisteredCommands(){return commands.keySet().toArray(new String[commands.size()]);}
+    
+    /**
+     * Returns all the event binds bound to this specific event class.
+     * Note that more listeners than this might receive calls from the specified
+     * event class, as superclasses are not respected in this function.
+     * @param event
+     * @return 
+     * @see Kizai#getAllEventBinds(java.lang.Class) 
+     */
     public synchronized EventBind[] getEventBinds(Class<? extends Event> event){return events.get(event).toArray(new EventBind[events.get(event).size()]);}
+    
+    /**
+     * Returns all the event binds bound to this event class and its
+     * superclasses.
+     * @param event
+     * @return 
+     * @see Kizai#getEventBinds(java.lang.Class) 
+     */
+    public synchronized EventBind[] getAllEventBinds(Class<? extends Event> event){
+        ArrayList<EventBind> list = new ArrayList<EventBind>();
+        for(Class<? extends Event> c : events.keySet()){
+            if(c.isAssignableFrom(event))list.addAll(events.get(c));
+        }
+        return list.toArray(new EventBind[events.get(event).size()]);
+    }
+    
+    /**
+     * Returns all bound events.
+     * @return 
+     */
     public synchronized Class[] getBoundEvents(){return events.keySet().toArray(new Class[events.size()]);}
+    
+    /**
+     * Returns all registered streams.
+     * @return 
+     */
     public synchronized Stream[] getStreams(){return streams.values().toArray(new Stream[streams.size()]);}
+    
+    /**
+     * Returns all loaded modules.
+     * @return 
+     */
     public synchronized Module[] getModules(){return modules.values().toArray(new Module[modules.size()]);}
+    
+    /**
+     * Returns whether a module with that name is registered.
+     * @param module
+     * @return 
+     */
+    public synchronized boolean hasModule(String module){return modules.containsKey(module);}
+    
+    /**
+     * Returns whether a stream with that name is registered.
+     * @param stream
+     * @return 
+     */
+    public synchronized boolean hasStream(String stream){return streams.containsKey(stream);}
+    
+    /**
+     * Returns whether a given command is registered.
+     * @param command
+     * @return 
+     */
+    public synchronized boolean isRegistered(String command){return commands.containsKey(command);}
+    
+    /**
+     * Returns true if anything binds to this event or a superclass of this
+     * event. Note that this is almost guaranteed to be always true, as there's
+     * modules that bind to the general Event class.
+     * @param evt The event to search for.
+     * @return 
+     * @see Kizai#isBound(java.lang.Class) 
+     */
+    public synchronized boolean isAnyBound(Class<? extends Event> evt){
+        for(Class<? extends Event> c : events.keySet()){
+            if(c.isAssignableFrom(evt))return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Returns true if anything binds to this specific event. Note that this
+     * excludes superclasses.
+     * @param evt
+     * @return
+     * @see Kizai#isAnyBound(java.lang.Class) 
+     */
+    public synchronized boolean isBound(Class<? extends Event> evt){return events.containsKey(evt);}
+    
+    /**
+     * Returns true if the bot is currently shutting down.
+     * @return 
+     */
+    public synchronized boolean isShuttingDown(){return shutdown;}
 }
