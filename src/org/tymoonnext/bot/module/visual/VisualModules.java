@@ -1,11 +1,11 @@
 package org.tymoonnext.bot.module.visual;
 
 import java.awt.BorderLayout;
-import java.util.ArrayList;
+import java.awt.Component;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -14,6 +14,7 @@ import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.EventListener;
 import org.tymoonnext.bot.event.core.ModuleLoadEvent;
 import org.tymoonnext.bot.event.core.ModuleUnloadEvent;
+import org.tymoonnext.bot.meta.Info;
 import org.tymoonnext.bot.module.Module;
 
 /**
@@ -23,10 +24,12 @@ import org.tymoonnext.bot.module.Module;
  * @version 0.0.0
  */
 public class VisualModules extends JPanel implements EventListener{
+    private Kizai bot;
     private Vector<Module> modules;
     private JList list;
     
     public VisualModules(Kizai bot){
+        this.bot=bot;
         modules = new Vector<Module>();
         setLayout(new BorderLayout());
         
@@ -36,6 +39,7 @@ public class VisualModules extends JPanel implements EventListener{
         modules.addAll(Arrays.asList(bot.getModules()));
         list = new JList(modules);
         list.setFont(VisualBase.F_MONOSPACED);
+        list.setCellRenderer(new ModuleCellRenderer());
         
         JScrollPane scroll = new JScrollPane(list);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -43,6 +47,7 @@ public class VisualModules extends JPanel implements EventListener{
         
         add(new JLabel("Loaded Modules: "), BorderLayout.NORTH);
         add(scroll, BorderLayout.CENTER);
+        
     }
     
     public void onModuleLoad(ModuleLoadEvent evt){
@@ -56,4 +61,17 @@ public class VisualModules extends JPanel implements EventListener{
     }
     
     public String toString(){return "[Visual|Modules]";}
+    
+    class ModuleCellRenderer extends DefaultListCellRenderer {
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            Module m = (Module)value;
+            String text = "<html><b>"+m+"</b> <i>"+m.getClass().getPackage().getName()+"</i>";
+            if(m.getClass().getAnnotation(Info.class) != null){
+                text+="<br>"+m.getClass().getAnnotation(Info.class).value();
+            }
+            label.setToolTipText(text);
+            return label;
+        }
+    }
 }
