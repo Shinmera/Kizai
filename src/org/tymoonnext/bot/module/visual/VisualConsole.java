@@ -19,11 +19,9 @@ import javax.swing.table.DefaultTableModel;
 import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.CommandListener;
-import org.tymoonnext.bot.event.auth.UserVerifyEvent;
 import org.tymoonnext.bot.event.cmd.CommandInstanceEvent;
 import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.module.auth.AllowAllSessionImplementor;
-import org.tymoonnext.bot.module.auth.SessionImplementor;
 import org.tymoonnext.bot.module.cmd.CommandInstance;
 import org.tymoonnext.bot.module.core.ext.CommandModule;
 import org.tymoonnext.bot.stream.Stream;
@@ -71,10 +69,8 @@ public class VisualConsole extends JPanel implements Stream, ActionListener, Com
             private int max;
             public void adjustmentValueChanged(AdjustmentEvent e) {
                 if(e.getAdjustable().getMaximum() > max){
-                    if(e.getAdjustable().getValue()+e.getAdjustable().getVisibleAmount() >= max){
-                        max = e.getAdjustable().getMaximum();
-                        e.getAdjustable().setValue(max);
-                    }
+                    max = e.getAdjustable().getMaximum();
+                    e.getAdjustable().setValue(max);
                 }
             }
         });
