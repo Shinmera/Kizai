@@ -192,6 +192,16 @@ public class Kizai implements SignalHandler{
      * @param module The Class name of the Module to reload.
      * @return Whether the loading succeeded.
      */
+    public synchronized boolean reloadModule(Module mod){
+        return reloadModule(mod.getClass().getName().replace(Commons.MODULE_PACKAGE, ""));
+    }
+    
+    /**
+     * Unloads the specified Module, reloads its class file and loads the Module
+     * anew.
+     * @param module The Class name of the Module to reload.
+     * @return Whether the loading succeeded.
+     */
     public synchronized boolean reloadModule(String module){
         Commons.log.info("[MAIN] Attempting to reload "+module);        
         unloadModule(module);
