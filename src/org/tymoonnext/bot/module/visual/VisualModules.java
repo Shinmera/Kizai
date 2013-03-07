@@ -14,6 +14,7 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -79,10 +80,13 @@ public class VisualModules extends JPanel implements EventListener, MouseListene
             
             ModuleMenuActionListener lst = new ModuleMenuActionListener(bot, m);
             JPopupMenu menu = new JPopupMenu(m.toString());
+            JMenuItem i_info = new JMenuItem("Information");
             JMenuItem i_reload = new JMenuItem("Reload Module");
             JMenuItem i_unload = new JMenuItem("Unload Module");
             i_reload.addActionListener(lst);
             i_unload.addActionListener(lst);
+            i_info.addActionListener(lst);
+            menu.add(i_info);
             menu.add(i_reload);
             menu.add(i_unload);
             menu.setVisible(true);
@@ -125,7 +129,17 @@ class ModuleMenuActionListener implements ActionListener{
     }
     
     public void actionPerformed(ActionEvent e){
-        if(e.getActionCommand().equals("Reload Module")){
+        if(e.getActionCommand().equals("Information")){
+            if(m.getClass().getAnnotation(Info.class) != null){
+                JOptionPane.showMessageDialog(null, 
+                                              "<html>"+m+"<br><br>"+m.getClass().getAnnotation(Info.class).value()+"</html>",
+                                              "Information About "+m,
+                                              JOptionPane.INFORMATION_MESSAGE);
+            }else{
+                JOptionPane.showMessageDialog(null, "No additional information specified.", "Module Info?",
+                                              JOptionPane.QUESTION_MESSAGE);
+            }
+        }if(e.getActionCommand().equals("Reload Module")){
             bot.reloadModule(m);
         }else if(e.getActionCommand().equals("Unload Module")){
             bot.unloadModule(m);
