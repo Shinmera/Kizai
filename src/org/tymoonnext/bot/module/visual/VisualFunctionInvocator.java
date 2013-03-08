@@ -40,10 +40,11 @@ public class VisualFunctionInvocator extends JDialog implements ActionListener, 
     private JButton buttonInvoke;
     
     public VisualFunctionInvocator(Frame owner, Object target){
-        super(owner);
+        super(owner, "Method Invocator - "+target, ModalityType.APPLICATION_MODAL);
         this.target = target;
+        
+        if(owner!=null)setLocation(owner.getLocation().x+10, owner.getLocation().y+10);
         setPreferredSize(new Dimension(300,400));
-        setTitle("Method Invocator - "+target);
         methodMap = new HashMap<String,Method>();
         valueList = new VisualObjectConstructor[0];
         GridBagConstraints c = new GridBagConstraints();
@@ -126,7 +127,7 @@ public class VisualFunctionInvocator extends JDialog implements ActionListener, 
             for(int i=0;i<params.length;i++){
                 //Fuck the douchebag who thought it was a good idea to make ifs non-short-circuiting.
                 String name = null; if(names != null)name = (i<names.length) ? names[i] : null;
-                valueList[i] = new VisualObjectConstructor(null, params[i], name);
+                valueList[i] = new VisualObjectConstructor(this, params[i], name);
             }
             argumentList.setListData(valueList);
             
@@ -173,7 +174,7 @@ public class VisualFunctionInvocator extends JDialog implements ActionListener, 
             e.consume();
             if(argumentList.getSelectedValue() != null){
                 ((VisualObjectConstructor)argumentList.getSelectedValue()).setVisible(true);
-                repaint();
+                argumentList.repaint();
             }
         }
     }

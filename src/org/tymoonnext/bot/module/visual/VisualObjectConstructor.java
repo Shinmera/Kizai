@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -47,18 +48,18 @@ public class VisualObjectConstructor<T extends Object> extends JDialog implement
     private JTextField primitiveInput;
     private boolean isPrimitive = false;
     
-    public VisualObjectConstructor(Frame owner, Class<T> objectClass){this(owner, objectClass, null);}
-    public VisualObjectConstructor(Frame owner, Class<T> objectClass, String name){
-        super(owner);
+    public VisualObjectConstructor(Window owner, Class<T> objectClass){this(owner, objectClass, null);}
+    public VisualObjectConstructor(Window owner, Class<T> objectClass, String name){
+        super(owner, "Object Constructor - "+objectClass.getSimpleName(), ModalityType.APPLICATION_MODAL);
         this.object=objectClass;
         this.name = name;
         
-        setTitle("Object Constructor - "+objectClass.getSimpleName());
+        if(owner!=null)setLocation(owner.getLocation().x+10, owner.getLocation().y+10);
         constructorMap = new HashMap<String,Constructor>();
         valueList = new VisualObjectConstructor[0];
         
         JPanel inner = new JPanel();
-        buttonCreate = new JButton("Invoke");
+        buttonCreate = new JButton("Construct");
         buttonCreate.addActionListener(this);
         inner.setBorder(new EmptyBorder(5,5,5,5));
         
@@ -128,7 +129,7 @@ public class VisualObjectConstructor<T extends Object> extends JDialog implement
             if(constructorMap.size() > 0)
                 constructorList.setSelectedIndex(0);
         }else{
-            setPreferredSize(new Dimension(300,20));
+            setPreferredSize(new Dimension(300,30));
             inner.setLayout(new BorderLayout());
             primitiveInput = new JTextField();
             primitiveInput.setPreferredSize(new Dimension(100000,100000));
@@ -154,7 +155,7 @@ public class VisualObjectConstructor<T extends Object> extends JDialog implement
             
             for(int i=0;i<params.length;i++){
                 String name = null; if(names != null)name = (i<names.length) ? names[i] : null;
-                valueList[i] = new VisualObjectConstructor(null, params[i], name);
+                valueList[i] = new VisualObjectConstructor(this, params[i], name);
             }
             argumentList.setListData(valueList);
             
@@ -206,7 +207,7 @@ public class VisualObjectConstructor<T extends Object> extends JDialog implement
             e.consume();
             if(argumentList.getSelectedValue() != null){
                 ((VisualObjectConstructor)argumentList.getSelectedValue()).setVisible(true);
-                repaint();
+                argumentList.repaint();
             }
         }
     }

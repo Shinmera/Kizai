@@ -109,6 +109,7 @@ public class Kizai implements SignalHandler{
             conf.save(Commons.f_CONFIG);
         }catch(Throwable t){
             Commons.log.log(Level.SEVERE, "[MAIN] WTF!", t);
+            System.exit(2);
         }finally{
             Commons.log.info("[MAIN] Goodbye!");
             System.exit(0);
