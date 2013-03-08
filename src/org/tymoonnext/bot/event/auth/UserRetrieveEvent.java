@@ -2,6 +2,7 @@ package org.tymoonnext.bot.event.auth;
 
 import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.event.Event;
+import org.tymoonnext.bot.meta.Arguments;
 import org.tymoonnext.bot.module.auth.User;
 import org.tymoonnext.bot.stream.Stream;
 
@@ -15,7 +16,10 @@ public class UserRetrieveEvent extends Event{
     private String ident;
     private User user;
     
+    @Arguments({"ident"})
     public UserRetrieveEvent(String ident){this(Commons.stdout, ident);}
+    
+    @Arguments({"origin", "ident"})
     public UserRetrieveEvent(Stream origin, String ident){
         super(origin);
         this.ident=ident;

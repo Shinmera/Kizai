@@ -3,6 +3,7 @@ package org.tymoonnext.bot.event.cmdgroup;
 import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.Event;
+import org.tymoonnext.bot.meta.Arguments;
 
 /**
  * 
@@ -16,7 +17,10 @@ public class GroupRegisterEvent extends Event{
     private CommandListener listener;
     private boolean force;
     
+    @Arguments({"group", "subcmd", "listener"})
     public GroupRegisterEvent(String group, String subcmd, CommandListener listener){this(group, subcmd, listener, false);}
+    
+    @Arguments({"group", "subcmd", "listener", "force"})
     public GroupRegisterEvent(String group, String subcmd, CommandListener listener, boolean force){
         super(Commons.stdout);
         this.group=group.toLowerCase();

@@ -2,6 +2,7 @@ package org.tymoonnext.bot.event.auth;
 
 import org.tymoonnext.bot.event.Event;
 import org.tymoonnext.bot.event.core.CommandEvent;
+import org.tymoonnext.bot.meta.Arguments;
 import org.tymoonnext.bot.stream.Stream;
 
 /**
@@ -16,6 +17,7 @@ public class AuthEvent extends Event{
     private CommandEvent cmd;
     private boolean granted = false;
     
+    @Arguments({"origin", "cmd"})
     public AuthEvent(Stream origin, CommandEvent cmd){
         super(origin);
         this.cmd = cmd;

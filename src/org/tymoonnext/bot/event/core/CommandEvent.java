@@ -1,6 +1,7 @@
 package org.tymoonnext.bot.event.core;
 
 import org.tymoonnext.bot.event.Event;
+import org.tymoonnext.bot.meta.Arguments;
 import org.tymoonnext.bot.stream.Stream;
 
 /**
@@ -19,9 +20,16 @@ public class CommandEvent extends Event{
     private String command;
     private String args;
     
+    @Arguments({"origin", "command"})
     public CommandEvent(Stream origin, String command){this(origin, command, (String)null);}
+    
+    @Arguments({"origin", "command", "args"})
     public CommandEvent(Stream origin, String command, String args){this(origin, command, args, null);}
+    
+    @Arguments({"origin", "command", "args", "user"})
     public CommandEvent(Stream origin, String command, String args, String user){this(origin, command, args, user, user);}
+    
+    @Arguments({"origin", "command", "args", "user", "channel"})
     public CommandEvent(Stream origin, String command, String args, String user, String channel){
         super(origin);
         this.user=user;
@@ -29,6 +37,8 @@ public class CommandEvent extends Event{
         this.args=args;
         this.command=command.trim().toLowerCase();
     }
+    
+    @Arguments({"command", "evt"})
     public CommandEvent(String command, CommandEvent evt){
         this(evt.getStream(), command, evt.getArgs(), evt.getUser(), evt.getChannel());
     }
