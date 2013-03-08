@@ -83,12 +83,17 @@ public class VisualModules extends JPanel implements EventListener, MouseListene
             JMenuItem i_info = new JMenuItem("Information");
             JMenuItem i_reload = new JMenuItem("Reload Module");
             JMenuItem i_unload = new JMenuItem("Unload Module");
+            JMenuItem i_invoke = new JMenuItem("Invoke Method");
             i_reload.addActionListener(lst);
             i_unload.addActionListener(lst);
             i_info.addActionListener(lst);
+            i_invoke.addActionListener(lst);
             menu.add(i_info);
+            menu.addSeparator();
             menu.add(i_reload);
             menu.add(i_unload);
+            menu.addSeparator();
+            menu.add(i_invoke);
             menu.setVisible(true);
             Border titleUnderline = BorderFactory.createMatteBorder(1, 0, 0, 0, menu.getForeground());
             TitledBorder labelBorder = BorderFactory.createTitledBorder(titleUnderline, menu.getLabel(),
@@ -139,10 +144,12 @@ class ModuleMenuActionListener implements ActionListener{
                 JOptionPane.showMessageDialog(null, "No additional information specified.", "Module Info?",
                                               JOptionPane.QUESTION_MESSAGE);
             }
-        }if(e.getActionCommand().equals("Reload Module")){
+        }else if(e.getActionCommand().equals("Reload Module")){
             bot.reloadModule(m);
         }else if(e.getActionCommand().equals("Unload Module")){
             bot.unloadModule(m);
+        }else if(e.getActionCommand().equals("Invoke Method")){
+            new VisualFunctionInvocator(null, m).setVisible(true);
         }
     }
     
