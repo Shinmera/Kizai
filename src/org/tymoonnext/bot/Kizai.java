@@ -388,7 +388,7 @@ public class Kizai implements SignalHandler{
      * specific listeners.
      */
     public synchronized void event(Event ev, Class<? extends EventListener> listenerType){
-        Commons.log.fine("[MAIN] Event "+ev);
+        Commons.log.finest("[MAIN] Event "+ev);
         for(Class<? extends Event> c : events.keySet()){
             if(c.isInstance(ev)){
                 for(EventBind bind : events.get(c)){
