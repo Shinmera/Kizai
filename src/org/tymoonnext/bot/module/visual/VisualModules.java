@@ -149,7 +149,7 @@ class ModuleMenuActionListener implements ActionListener{
         }else if(e.getActionCommand().equals("Unload Module")){
             bot.unloadModule(m);
         }else if(e.getActionCommand().equals("Invoke Method")){
-            new VisualFunctionInvocator(null, m).setVisible(true);
+            new VisualConstructor(null, m).setVisible(true);
         }
     }
     
