@@ -2,19 +2,25 @@ package org.tymoonnext.bot.module.auth;
 
 import NexT.data.DObject;
 import NexT.data.DParse;
+import NexT.util.StringUtils;
 import NexT.util.Toolkit;
 import java.io.File;
 import java.util.HashMap;
 import java.util.logging.Level;
 import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
+import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.EventListener;
 import org.tymoonnext.bot.event.auth.AuthEvent;
 import org.tymoonnext.bot.event.auth.UserRegisterEvent;
 import org.tymoonnext.bot.event.auth.UserRetrieveEvent;
 import org.tymoonnext.bot.event.auth.UserVerifyEvent;
+import org.tymoonnext.bot.event.cmd.CommandInstanceEvent;
+import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.meta.Info;
 import org.tymoonnext.bot.module.Module;
+import org.tymoonnext.bot.module.cmd.CommandInstance;
+import org.tymoonnext.bot.module.core.ext.CommandModule;
 
 /**
  * User database for the Auth system. Contains and manages user configurations
@@ -25,7 +31,7 @@ import org.tymoonnext.bot.module.Module;
  */
 
 @Info("User database for the Auth system. Contains and manages user configurations and propagates AuthEvents to UserVerifyEvents.")
-public class UserDB extends Module implements EventListener{
+public class UserDB extends Module implements CommandListener, EventListener{
     public static final File CONFIGDIR = new File(Commons.f_CONFIGDIR, "users");
     private HashMap<String, User> users;
     private HashMap<String, User> userIDs;
@@ -38,7 +44,11 @@ public class UserDB extends Module implements EventListener{
         try{bot.bindEvent(AuthEvent.class, this, "onAuth", Integer.MIN_VALUE+2);}catch(NoSuchMethodException ex){}
         try{bot.bindEvent(UserRetrieveEvent.class, this, "onUser");}catch(NoSuchMethodException ex){}
         try{bot.bindEvent(UserRegisterEvent.class, this, "onUserRegister");}catch(NoSuchMethodException ex){}
-        
+        CommandModule.register(bot, "userdb", "list",       null,               "List all known users.", this);
+        CommandModule.register(bot, "userdb", "info",       "name".split(" "),  "Retrieve user information.", this);
+        CommandModule.register(bot, "userdb", "register",   "name".split(" "),  "Register a new user.", this);
+        CommandModule.register(bot, "userdb", "load",       null,               "Load the userdb storage from disk.", this);
+        CommandModule.register(bot, "userdb", "offload",    null,               "Offload the userdb storage to disk.", this);
         load();
     }
     
@@ -132,5 +142,46 @@ public class UserDB extends Module implements EventListener{
     
     public void onUserRegister(UserRegisterEvent evt){
         register(evt.getUser());
+    }
+
+    public void onCommand(CommandEvent cmd){
+        CommandInstance i = ((CommandInstanceEvent)cmd).get();
+        if(cmd.getCommand().equals("userdb list")){
+            cmd.getStream().send(toString()+" Registered users listing:", cmd.getChannel());
+            for(User u : users.values()){
+                cmd.getStream().send(" * "+u.getUID()+" "+u.getName(), cmd.getChannel());
+            }
+            
+        }else if(cmd.getCommand().equals("userdb info")){
+            if(users.containsKey(i.getValue("name").toLowerCase())){
+                User u = users.get(i.getValue("name").toLowerCase());
+                cmd.getStream().send(toString()+" Information for '"+u.getName()+"':", cmd.getChannel());
+                cmd.getStream().send("UID: "+u.getUID(), cmd.getChannel());
+                cmd.getStream().send("Last login: "+StringUtils.toHumanTime(u.getLastLoginTime()), cmd.getChannel());
+                cmd.getStream().send("Session timeout: "+StringUtils.toHumanTime(u.getSessionTimeout(), "HH:mm:ss"), cmd.getChannel());
+                cmd.getStream().send("Logged in: "+((u.isLoggedIn())? "Yes" : "No"), cmd.getChannel());
+            }else{
+                cmd.getStream().send(toString()+" No such user '"+i.getValue("name")+"'.", cmd.getChannel());
+            }
+            
+        }else if(cmd.getCommand().equals("userdb register")){
+            if(users.containsKey(i.getValue("name").toLowerCase())){
+                cmd.getStream().send(toString()+" User '"+i.getValue("name")+"' already exists.", cmd.getChannel());
+            }else{
+                DObject settings = new DObject(new HashMap<String,DObject>());
+                settings.set("name", i.getValue("name").toLowerCase());
+                User u = new User(settings);
+                register(u);
+                cmd.getStream().send(toString()+" User '"+i.getValue("name")+"' created with UID "+u.getUID()+".", cmd.getChannel());
+            }
+            
+        }else if(cmd.getCommand().equals("userdb load")){
+            cmd.getStream().send(toString()+" Loading userdb...", cmd.getChannel());
+            load();
+            
+        }else if(cmd.getCommand().equals("userdb offload")){
+            cmd.getStream().send(toString()+" Offloading userdb...", cmd.getChannel());
+            offload();
+        }
     }
 }
