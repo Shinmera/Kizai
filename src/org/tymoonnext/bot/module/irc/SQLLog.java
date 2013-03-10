@@ -6,19 +6,11 @@ import NexT.mysql.SQLWrapper;
 import java.util.logging.Level;
 import org.tymoonnext.bot.Commons;
 import NexT.data.ConfigLoader;
+import NexT.data.required;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.EventListener;
-import org.tymoonnext.bot.event.IRCBot.ActionEvent;
-import org.tymoonnext.bot.event.IRCBot.JoinEvent;
-import org.tymoonnext.bot.event.IRCBot.KickEvent;
-import org.tymoonnext.bot.event.IRCBot.MessageEvent;
-import org.tymoonnext.bot.event.IRCBot.ModeEvent;
-import org.tymoonnext.bot.event.IRCBot.NickEvent;
-import org.tymoonnext.bot.event.IRCBot.PartEvent;
-import org.tymoonnext.bot.event.IRCBot.QuitEvent;
-import org.tymoonnext.bot.event.IRCBot.SendEvent;
-import org.tymoonnext.bot.event.IRCBot.TopicEvent;
+import org.tymoonnext.bot.event.IRCBot.*;
 import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.meta.Info;
 import org.tymoonnext.bot.module.Module;
@@ -44,7 +36,7 @@ public class SQLLog extends Module implements EventListener, CommandListener{
     public static final char TYPE_SEND   = 's';
     
     class C extends ConfigLoader{
-        public String host, db, user, pw, table;
+        @required public String host, db, user, pw, table;
         public Integer port = 3306;
     };
     private C conf = new C();
@@ -68,13 +60,11 @@ public class SQLLog extends Module implements EventListener, CommandListener{
         wrapper = new SQLWrapper(conf.user, conf.pw, conf.db, conf.host, conf.port);
     }
 
-    @Override
     public void shutdown(){
-        throw new UnsupportedOperationException("Not supported yet.");
+        bot.unbindAllEvents(this);
     }
 
     public void onCommand(CommandEvent cmd){
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public void insertUpdate(char type, String channel, String sender, String message){
@@ -87,6 +77,7 @@ public class SQLLog extends Module implements EventListener, CommandListener{
             model.set("text", message);
             model.set("time", timestamp);
             model.insert();
+            Commons.log.log(Level.FINE, toString()+" Logging #"+channel+" "+sender+" "+type+": "+message);
         }catch(NSQLException ex){
             Commons.log.log(Level.WARNING, toString()+" Failed to log entry.", ex);
         }
@@ -97,14 +88,16 @@ public class SQLLog extends Module implements EventListener, CommandListener{
     }
     
     public void onTopic(TopicEvent ev){
-        insertUpdate(TYPE_TOPIC, ev.channel, ev.sender, ev.topic);
+        String sender = ev.sender;
+        if(sender.contains("!"))sender = sender.substring(0, sender.indexOf('!'));
+        insertUpdate(TYPE_TOPIC, ev.channel, sender, ev.topic);
     }
     
     public void onMode(ModeEvent ev){
         insertUpdate(TYPE_MODE, ev.channel, ev.sender, ev.mode);
     }
     
-    public void onNickChange(NickEvent ev){
+    public void onNick(NickEvent ev){
         for(String channel : ev.getIRC().getChannels())
             insertUpdate(TYPE_NICK, channel, ev.sender, ev.newNick);
     }
