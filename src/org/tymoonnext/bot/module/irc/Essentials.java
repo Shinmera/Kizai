@@ -30,7 +30,10 @@ public class Essentials extends Module implements CommandListener, EventListener
         
         CommandModule.register(bot, "irc", "join",      "channel".split(" "),               "Let the bot join an irc channel.", this);
         CommandModule.register(bot, "irc", "part",      "channel".split(" "),               "Let the bot part an irc channel.", this);
-        CommandModule.register(bot, "irc", "msg",       "channel message".split(" "),       "Let the bot send a message to a user or channel.", this);
+        CommandModule.register(bot, "irc", "msg",       "channel message".split(" "),       "Send a message to a user or channel.", this);
+        CommandModule.register(bot, "irc", "mode",      "mode target".split(" "),           "Change the mode on a channel or user.", this);
+        CommandModule.register(bot, "irc", "nick",      "newnick".split(" "),               "Change the bot's nickname.", this);
+        CommandModule.register(bot, "irc", "topic",     "channel topic".split(" "),         "Set a channel's topic.", this);
         CommandModule.register(bot, "irc", "quit",      "message[]".split(" "),             "Make the bot quit.", this);
         CommandModule.register(bot, "irc", "connect",   "host[] port[6666](INTEGER) pass[]".split(" "), "(Re)connect the bot.", this);
         CommandModule.register(bot, "irc", "raw",       "line".split(" "),                  "Send a raw line over the bot.", this);
@@ -105,5 +108,17 @@ public class Essentials extends Module implements CommandListener, EventListener
                                                 Integer.parseInt(evt.get().getValue("port")),
                                                 evt.get().getValue("pw"));
         ircbot.invoke("onConnect", connect);
+    }
+    
+    public void onMode(CommandInstanceEvent evt){
+        ircbot.invoke("onMode", new ModeEvent(evt.get().getValue("channel"), evt.get().getValue("mode")));
+    }
+    
+    public void onNick(CommandInstanceEvent evt){
+        ircbot.invoke("onNick", new NickEvent(evt.get().getValue("newnick")));
+    }
+    
+    public void onTopic(CommandInstanceEvent evt){
+        ircbot.invoke("onTopic", new TopicEvent(evt.get().getValue("channel"), evt.getArgs().substring(evt.getArgs().indexOf(" ")+1)));
     }
 }
