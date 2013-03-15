@@ -42,7 +42,40 @@ public class IRCBot extends Module implements EventListener{
         
         irc = new IRC(bot, config.server);
         bot.registerStream(irc);
-        try{bot.bindEvent(MessageEvent.class, this, "onMessage");}catch(NoSuchMethodException ex){}
+        
+        try{bot.bindEvent(ActionEvent.class,            this, "onAction");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(ChannelChangeEvent.class,     this, "onChannelChange");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(ChannelInfoEvent.class,       this, "onChannelInfo");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(ChatRequestEvent.class,       this, "onChatRequest");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(ConnectEvent.class,           this, "onConnect");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(DccChatRequestEvent.class,    this, "onDccChatRequest");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(DccSendRequestEvent.class,    this, "onDccSendRequest");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(DeopEvent.class,              this, "onDeop");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(DisconnectEvent.class,        this, "onDisconnect");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(FileTransferEvent.class,      this, "onFileTransfer");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(FingerEvent.class,            this, "onFinger");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(IRCEvent.class,               this, "onIRC");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(InviteEvent.class,            this, "onInvite");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(JoinEvent.class,              this, "onJoin");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(KickEvent.class,              this, "onKick");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(MessageEvent.class,           this, "onMessage");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(ModeEvent.class,              this, "onMode");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(NickEvent.class,              this, "onNick");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(NoticeEvent.class,            this, "onNotice");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(OpEvent.class,                this, "onOp");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(PartEvent.class,              this, "onPart");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(PingEvent.class,              this, "onPing");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(PrivateMessageEvent.class,    this, "onPrivateMessage");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(QuitEvent.class,              this, "onQuit");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(SendEvent.class,              this, "onSend");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(ServerPingEvent.class,        this, "onServerPing");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(ServerResponseEvent.class,    this, "onServerResponse");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(TimeEvent.class,              this, "onTime");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(TopicEvent.class,             this, "onTopic");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(UnknownEvent.class,           this, "onUnknown");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(UserListEvent.class,          this, "onUserList");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(UserModeEvent.class,          this, "onUserMode");}catch(NoSuchMethodException ex){}
+        try{bot.bindEvent(VersionEvent.class,           this, "onVersion");}catch(NoSuchMethodException ex){}
     }
 
     public void shutdown(){
@@ -53,74 +86,78 @@ public class IRCBot extends Module implements EventListener{
     public IRC getIRC(){return irc;}
     
     public void onAction(ActionEvent evt){
-        irc.sendAction(evt.recipient, evt.action);
+        if(evt.getIRC() == null)
+            irc.sendAction(evt.recipient, evt.action);
     }
     
     public void onChannelChange(ChannelChangeEvent evt){
-        switch(evt.change){
-            case ChannelChangeEvent.TYPE_REMOVE_BAN:
-                irc.sendRawLineViaQueue("/mode -b "+evt.channel+" "+evt.args);
-                break;
-            case ChannelChangeEvent.TYPE_REMOVE_INVITE_ONLY:
-                irc.sendRawLineViaQueue("/mode -i "+evt.channel);
-                break;
-            case ChannelChangeEvent.TYPE_REMOVE_KEY:
-                irc.sendRawLineViaQueue("/mode -k "+evt.channel+" "+evt.args);
-                break;
-            case ChannelChangeEvent.TYPE_REMOVE_LIMIT:
-                irc.sendRawLineViaQueue("/mode -l "+evt.channel);
-                break;
-            case ChannelChangeEvent.TYPE_REMOVE_MODERATED:
-                irc.sendRawLineViaQueue("/mode -m "+evt.channel);
-                break;
-            case ChannelChangeEvent.TYPE_REMOVE_NO_EXTERNAL_MESSAGES:
-                irc.sendRawLineViaQueue("/mode -n "+evt.channel);
-                break;
-            case ChannelChangeEvent.TYPE_REMOVE_PRIVATE:
-                irc.sendRawLineViaQueue("/mode  -p "+evt.channel);
-                break;
-            case ChannelChangeEvent.TYPE_REMOVE_SECRET:
-                irc.sendRawLineViaQueue("/mode  -s "+evt.channel);
-                break;
-            case ChannelChangeEvent.TYPE_REMOVE_TOPIC_PROTECTION:
-                irc.sendRawLineViaQueue("/mode  -t "+evt.channel);
-                break;
-            case ChannelChangeEvent.TYPE_REMOVE_VOICE:
-                irc.sendRawLineViaQueue("/mode -v "+evt.channel+" "+evt.args);
-                break;
-            case ChannelChangeEvent.TYPE_SET_BAN:
-                irc.sendRawLineViaQueue("/mode +b "+evt.channel+" "+evt.args);
-                break;
-            case ChannelChangeEvent.TYPE_SET_INVITE_ONLY:
-                irc.sendRawLineViaQueue("/mode +i "+evt.channel);
-                break;
-            case ChannelChangeEvent.TYPE_SET_KEY:
-                irc.sendRawLineViaQueue("/mode +k "+evt.channel+" "+evt.args);
-                break;
-            case ChannelChangeEvent.TYPE_SET_LIMIT:
-                irc.sendRawLineViaQueue("/mode +l "+evt.channel);
-                break;
-            case ChannelChangeEvent.TYPE_SET_MODERATED:
-                irc.sendRawLineViaQueue("/mode +m "+evt.channel);
-                break;
-            case ChannelChangeEvent.TYPE_SET_NO_EXTERNAL_MESSAGES:
-                irc.sendRawLineViaQueue("/mode +n "+evt.channel);
-                break;
-            case ChannelChangeEvent.TYPE_SET_PRIVATE:
-                irc.sendRawLineViaQueue("/mode +p "+evt.channel);
-                break;
-            case ChannelChangeEvent.TYPE_SET_SECRET:
-                irc.sendRawLineViaQueue("/mode +s "+evt.channel);
-                break;
-            case ChannelChangeEvent.TYPE_SET_TOPIC_PROTECTION:
-                irc.sendRawLineViaQueue("/mode +t "+evt.channel);
-                break;
-            case ChannelChangeEvent.TYPE_SET_VOICE:
-                irc.sendRawLineViaQueue("/mode +v "+evt.channel+" "+evt.args);
-                break;
-            default:
-                //NOOP.
-                break;
+        if(evt.getIRC() == null){
+            switch(evt.change){
+                case ChannelChangeEvent.TYPE_REMOVE_BAN:
+                    irc.sendRawLineViaQueue("/mode -b "+evt.channel+" "+evt.args);
+                    break;
+                case ChannelChangeEvent.TYPE_REMOVE_INVITE_ONLY:
+                    irc.sendRawLineViaQueue("/mode -i "+evt.channel);
+                    break;
+                case ChannelChangeEvent.TYPE_REMOVE_KEY:
+                    irc.sendRawLineViaQueue("/mode -k "+evt.channel+" "+evt.args);
+                    break;
+                case ChannelChangeEvent.TYPE_REMOVE_LIMIT:
+                    irc.sendRawLineViaQueue("/mode -l "+evt.channel);
+                    break;
+                case ChannelChangeEvent.TYPE_REMOVE_MODERATED:
+                    irc.sendRawLineViaQueue("/mode -m "+evt.channel);
+                    break;
+                case ChannelChangeEvent.TYPE_REMOVE_NO_EXTERNAL_MESSAGES:
+                    irc.sendRawLineViaQueue("/mode -n "+evt.channel);
+                    break;
+                case ChannelChangeEvent.TYPE_REMOVE_PRIVATE:
+                    irc.sendRawLineViaQueue("/mode  -p "+evt.channel);
+                    break;
+                case ChannelChangeEvent.TYPE_REMOVE_SECRET:
+                    irc.sendRawLineViaQueue("/mode  -s "+evt.channel);
+                    break;
+                case ChannelChangeEvent.TYPE_REMOVE_TOPIC_PROTECTION:
+                    irc.sendRawLineViaQueue("/mode  -t "+evt.channel);
+                    break;
+                case ChannelChangeEvent.TYPE_REMOVE_VOICE:
+                    irc.sendRawLineViaQueue("/mode -v "+evt.channel+" "+evt.args);
+                    break;
+                case ChannelChangeEvent.TYPE_SET_BAN:
+                    irc.sendRawLineViaQueue("/mode +b "+evt.channel+" "+evt.args);
+                    break;
+                case ChannelChangeEvent.TYPE_SET_INVITE_ONLY:
+                    irc.sendRawLineViaQueue("/mode +i "+evt.channel);
+                    break;
+                case ChannelChangeEvent.TYPE_SET_KEY:
+                    irc.sendRawLineViaQueue("/mode +k "+evt.channel+" "+evt.args);
+                    break;
+                case ChannelChangeEvent.TYPE_SET_LIMIT:
+                    irc.sendRawLineViaQueue("/mode +l "+evt.channel);
+                    break;
+                case ChannelChangeEvent.TYPE_SET_MODERATED:
+                    irc.sendRawLineViaQueue("/mode +m "+evt.channel);
+                    break;
+                case ChannelChangeEvent.TYPE_SET_NO_EXTERNAL_MESSAGES:
+                    irc.sendRawLineViaQueue("/mode +n "+evt.channel);
+                    break;
+                case ChannelChangeEvent.TYPE_SET_PRIVATE:
+                    irc.sendRawLineViaQueue("/mode +p "+evt.channel);
+                    break;
+                case ChannelChangeEvent.TYPE_SET_SECRET:
+                    irc.sendRawLineViaQueue("/mode +s "+evt.channel);
+                    break;
+                case ChannelChangeEvent.TYPE_SET_TOPIC_PROTECTION:
+                    irc.sendRawLineViaQueue("/mode +t "+evt.channel);
+                    break;
+                case ChannelChangeEvent.TYPE_SET_VOICE:
+                    irc.sendRawLineViaQueue("/mode +v "+evt.channel+" "+evt.args);
+                    break;
+                default:
+                    Commons.log.severe(toString()+" Received unknown ChannelChangeEvent type: "+evt);
+                    //NOOP.
+                    break;
+            }
         }
     }
     
@@ -133,10 +170,12 @@ public class IRCBot extends Module implements EventListener{
     }
     
     public void onConnect(ConnectEvent evt) throws IOException, IrcException{
-        if(evt.host == null)    irc.reconnect();
-        else if(evt.port < 0)   irc.connect(evt.host);
-        else if(evt.pw == null) irc.connect(evt.host, evt.port);
-        else                    irc.connect(evt.host, evt.port, evt.pw);
+        if(evt.getIRC() == null){
+            if(evt.host == null)    irc.reconnect();
+            else if(evt.port < 0)   irc.connect(evt.host);
+            else if(evt.pw == null) irc.connect(evt.host, evt.port);
+            else                    irc.connect(evt.host, evt.port, evt.pw);
+        }
     }
     
     public void onDccChatRequest(DccChatRequestEvent evt){
@@ -148,11 +187,13 @@ public class IRCBot extends Module implements EventListener{
     }
     
     public void onDeop(DeopEvent evt){
-        irc.deOp(evt.channel, evt.recipient);
+        if(evt.getIRC() == null)
+            irc.deOp(evt.channel, evt.recipient);
     }
     
     public void onDisconnect(DisconnectEvent evt){
-        irc.disconnect();
+        if(evt.getIRC() == null)
+            irc.disconnect();
     }
     
     public void onFileTransfer(FileTransferEvent evt){
@@ -160,7 +201,8 @@ public class IRCBot extends Module implements EventListener{
     }
     
     public void onFinger(FingerEvent evt){
-        irc.sendMessage(evt.recipient, "CTCP "+evt.recipient+" FINGER");
+        if(evt.getIRC() == null)
+            irc.sendMessage(evt.recipient, "CTCP "+evt.recipient+" FINGER");
     }
     
     public void onIRC(IRCEvent evt){
@@ -168,15 +210,18 @@ public class IRCBot extends Module implements EventListener{
     }
     
     public void onInvite(InviteEvent evt){
-        irc.sendInvite(evt.recipient, evt.channel);
+        if(evt.getIRC() == null)
+            irc.sendInvite(evt.recipient, evt.channel);
     }
     
     public void onJoin(JoinEvent evt){
-        irc.joinChannel(evt.channel);
+        if(evt.getIRC() == null)
+            irc.joinChannel(evt.channel);
     }
     
     public void onKick(KickEvent evt){
-        irc.kick(evt.channel, evt.recipient, evt.reason);
+        if(evt.getIRC() == null)
+            irc.kick(evt.channel, evt.recipient, evt.reason);
     }
     
     public void onMessage(MessageEvent ev){
@@ -198,43 +243,66 @@ public class IRCBot extends Module implements EventListener{
     }
     
     public void onMode(ModeEvent evt){
-        irc.sendRawLineViaQueue("/mode "+evt.mode+" "+evt.channel);
+        if(evt.getIRC() == null)
+            irc.sendRawLineViaQueue("/mode "+evt.mode+" "+evt.channel);
     }
     
     public void onNick(NickEvent evt){
-        irc.changeNick(evt.newNick);
+        if(evt.getIRC() == null)
+            irc.changeNick(evt.newNick);
     }
     
     public void onNotice(NoticeEvent evt){
-        irc.sendNotice(evt.recipient, evt.notice);
+        if(evt.getIRC() == null)
+            irc.sendNotice(evt.recipient, evt.notice);
     }
     
     public void onOp(OpEvent evt){
-        irc.op(evt.channel, evt.recipient);
+        if(evt.getIRC() == null)
+            irc.op(evt.channel, evt.recipient);
     }
     
     public void onPart(PartEvent evt){
-        irc.partChannel(evt.channel);
+        if(evt.getIRC() == null)
+            irc.partChannel(evt.channel);
     }
     
     public void onPing(PingEvent evt){
-        irc.sendMessage(evt.recipient, "CTCP "+evt.recipient+" PING");
+        if(evt.getIRC() == null)
+            irc.sendMessage(evt.recipient, "CTCP "+evt.recipient+" PING");
     }
     
     public void onPrivateMessage(PrivateMessageEvent evt){
-        irc.sendMessage(evt.sender, evt.message);
+        if(evt.getIRC() == null){
+            irc.sendMessage(evt.sender, evt.message);
+        }else{
+            if(evt.message.startsWith(config.cmd)){
+                String cmd,args;
+                if(evt.message.contains(" ")){
+                    cmd = evt.message.substring(config.cmd.length(), evt.message.indexOf(" "));
+                    args = evt.message.substring(evt.message.indexOf(" ")+1);
+                }else{
+                    cmd = evt.message.substring(config.cmd.length());
+                    args = null;
+                }
+                bot.event(new CommandEvent(irc, cmd, args, evt.sender, evt.sender));
+            }
+        }
     }
     
     public void onQuit(QuitEvent evt){
-        irc.quitServer(evt.reason);
+        if(evt.getIRC() == null)
+            irc.quitServer(evt.reason);
     }
     
     public void onSend(SendEvent evt){
-        irc.sendMessage(evt.dest, evt.message);
+        if(evt.getIRC() == null)
+            irc.sendMessage(evt.dest, evt.message);
     }
     
     public void onServerPing(ServerPingEvent evt){
-        irc.sendRawLineViaQueue("/ping");
+        if(evt.getIRC() == null)
+            irc.sendRawLineViaQueue("/ping");
     }
     
     public void onServerResponse(ServerResponseEvent evt){
@@ -242,26 +310,32 @@ public class IRCBot extends Module implements EventListener{
     }
     
     public void onTime(TimeEvent evt){
-        irc.sendMessage(evt.recipient, "CTCP "+evt.recipient+" TIME");
+        if(evt.getIRC() == null)
+            irc.sendMessage(evt.recipient, "CTCP "+evt.recipient+" TIME");
     }
     
     public void onTopic(TopicEvent evt){
-        irc.setTopic(evt.channel, evt.topic);
+        if(evt.getIRC() == null)
+            irc.setTopic(evt.channel, evt.topic);
     }
     
     public void onUnknown(UnknownEvent evt){
-        irc.sendRawLineViaQueue(evt.line);
+        if(evt.getIRC() == null)
+            irc.sendRawLineViaQueue(evt.line);
     }
     
     public void onUserList(UserListEvent evt){
-        irc.sendRawLineViaQueue("/names "+evt.channel);
+        if(evt.getIRC() == null)
+            irc.sendRawLineViaQueue("/names "+evt.channel);
     }
     
     public void onUserMode(UserModeEvent evt){
-        irc.sendRawLineViaQueue("/mode "+evt.mode+" "+evt.recipient);
+        if(evt.getIRC() == null)
+            irc.sendRawLineViaQueue("/mode "+evt.mode+" "+evt.recipient);
     }
     
     public void onVersion(VersionEvent evt){
-        irc.sendMessage(evt.recipient, "CTCP "+evt.recipient+" VERSION");
+        if(evt.getIRC() == null)
+            irc.sendMessage(evt.recipient, "CTCP "+evt.recipient+" VERSION");
     }
 }
