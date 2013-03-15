@@ -59,64 +59,64 @@ public class IRCBot extends Module implements EventListener{
     public void onChannelChange(ChannelChangeEvent evt){
         switch(evt.change){
             case ChannelChangeEvent.TYPE_REMOVE_BAN:
-                
+                irc.sendRawLineViaQueue("/mode -b "+evt.channel+" "+evt.args);
                 break;
             case ChannelChangeEvent.TYPE_REMOVE_INVITE_ONLY:
-                
+                irc.sendRawLineViaQueue("/mode -i "+evt.channel);
                 break;
             case ChannelChangeEvent.TYPE_REMOVE_KEY:
-                
+                irc.sendRawLineViaQueue("/mode -k "+evt.channel+" "+evt.args);
                 break;
             case ChannelChangeEvent.TYPE_REMOVE_LIMIT:
-                
+                irc.sendRawLineViaQueue("/mode -l "+evt.channel);
                 break;
             case ChannelChangeEvent.TYPE_REMOVE_MODERATED:
-                
+                irc.sendRawLineViaQueue("/mode -m "+evt.channel);
                 break;
             case ChannelChangeEvent.TYPE_REMOVE_NO_EXTERNAL_MESSAGES:
-                
+                irc.sendRawLineViaQueue("/mode -n "+evt.channel);
                 break;
             case ChannelChangeEvent.TYPE_REMOVE_PRIVATE:
-                
+                irc.sendRawLineViaQueue("/mode  -p "+evt.channel);
                 break;
             case ChannelChangeEvent.TYPE_REMOVE_SECRET:
-                
+                irc.sendRawLineViaQueue("/mode  -s "+evt.channel);
                 break;
             case ChannelChangeEvent.TYPE_REMOVE_TOPIC_PROTECTION:
-                
+                irc.sendRawLineViaQueue("/mode  -t "+evt.channel);
                 break;
             case ChannelChangeEvent.TYPE_REMOVE_VOICE:
-                
+                irc.sendRawLineViaQueue("/mode -v "+evt.channel+" "+evt.args);
                 break;
             case ChannelChangeEvent.TYPE_SET_BAN:
-                
+                irc.sendRawLineViaQueue("/mode +b "+evt.channel+" "+evt.args);
                 break;
             case ChannelChangeEvent.TYPE_SET_INVITE_ONLY:
-                
+                irc.sendRawLineViaQueue("/mode +i "+evt.channel);
                 break;
             case ChannelChangeEvent.TYPE_SET_KEY:
-                
+                irc.sendRawLineViaQueue("/mode +k "+evt.channel+" "+evt.args);
                 break;
             case ChannelChangeEvent.TYPE_SET_LIMIT:
-                
+                irc.sendRawLineViaQueue("/mode +l "+evt.channel);
                 break;
             case ChannelChangeEvent.TYPE_SET_MODERATED:
-                
+                irc.sendRawLineViaQueue("/mode +m "+evt.channel);
                 break;
             case ChannelChangeEvent.TYPE_SET_NO_EXTERNAL_MESSAGES:
-                
+                irc.sendRawLineViaQueue("/mode +n "+evt.channel);
                 break;
             case ChannelChangeEvent.TYPE_SET_PRIVATE:
-                
+                irc.sendRawLineViaQueue("/mode +p "+evt.channel);
                 break;
             case ChannelChangeEvent.TYPE_SET_SECRET:
-                
+                irc.sendRawLineViaQueue("/mode +s "+evt.channel);
                 break;
             case ChannelChangeEvent.TYPE_SET_TOPIC_PROTECTION:
-                
+                irc.sendRawLineViaQueue("/mode +t "+evt.channel);
                 break;
             case ChannelChangeEvent.TYPE_SET_VOICE:
-                
+                irc.sendRawLineViaQueue("/mode +v "+evt.channel+" "+evt.args);
                 break;
             default:
                 //NOOP.
