@@ -32,7 +32,7 @@ public class ReloadingCapableClassLoader extends ClassLoader{
             return defineClass(s, bytes, 0, bytes.length);
         } catch (IOException ex) {
             Commons.log.info(toString()+" Loading "+s+" through super.");
-            return super.loadClass(s);
+            return getParent().loadClass(s);
         }
     }
 
