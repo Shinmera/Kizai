@@ -11,7 +11,7 @@ import org.w3c.dom.Node;
  * @author Mithent
  */
 abstract public class MediaWiki implements LookupProviderInterface {
-    private String apiURL;
+    String apiURL;
     
     public MediaWiki(String apiURL){
         this.apiURL=apiURL;

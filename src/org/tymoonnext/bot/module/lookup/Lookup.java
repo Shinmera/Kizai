@@ -29,12 +29,14 @@ public class Lookup extends Module implements CommandListener, EventListener{
     public Lookup(Kizai bot){
         super(bot);
         CommandModule.register(bot, "lookup", "wikipedia", "term".split(" "), "Look up a specified word on Wikipedia.", this);
+        CommandModule.register(bot, "lookup", "ed", "term".split(" "), "Look up a specified word on Encyclopedia Dramatica.", this);
 
         //I'd recommend putting all the providers into a sub-package.
         //You can then use reflection to automatically load all classes in that
         //package. There's an example of this in Core's INIT, but I'll explain
         //it further once you're there.
-        providers.put("Wikipedia", new Wikipedia());
+        providers.put("wikipedia", new Wikipedia());
+        providers.put("ed", new EncyclopediaDramatica());
     }
 
     public void shutdown(){
@@ -43,7 +45,7 @@ public class Lookup extends Module implements CommandListener, EventListener{
     
     public void onCommand(CommandEvent cmd){
         String target = cmd.getCommand().split(" ")[1];
-        target = StringUtils.firstToUpper(target);
+        target = target.toLowerCase();
         
         if (providers.containsKey(target)){
             //Original code; Please remove after the adaptation is understood and accepted.
