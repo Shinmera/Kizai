@@ -94,9 +94,10 @@ public class JSONData{
             String[] parts = field.split(":");
             
             if (parts.length != 2) throw new InvalidJSONException("Object fields must be name/value pairs.");
+            String fieldName = parts[0].trim();
             
             elements.add(new JSONData(parts[1]));
-            namedElementIndexes.put(parts[0], elements.size() - 1);
+            namedElementIndexes.put(fieldName, elements.size() - 1);
         }
     }
 
