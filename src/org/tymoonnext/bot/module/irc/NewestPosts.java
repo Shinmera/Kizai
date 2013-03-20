@@ -19,7 +19,6 @@ import org.tymoonnext.bot.module.TimedModule;
  * @license GPLv3
  * @version 0.0.0
  * @todo Very static, should be extended for general purpose usage.
- * @todo remove IRC deps.
  */
 
 @Info("Simple module that fetches the latest Stevenchan posts from the RSS feed.")
