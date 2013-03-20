@@ -16,7 +16,7 @@ public class Configuration {
     private DObject<HashMap<String,DObject>> conf;
     
     public Configuration(){
-        
+        conf = new DObject<HashMap<String,DObject>>();
     }
     
     public boolean load(File f){
