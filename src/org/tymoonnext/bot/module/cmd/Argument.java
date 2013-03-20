@@ -136,7 +136,7 @@ public class Argument {
         if(choices != null){
             boolean contained=false;
             for(String choice : choices){
-                if(value.equals(choice)){
+                if(value.equalsIgnoreCase(choice)){
                     contained=true;
                     break;
                 }
