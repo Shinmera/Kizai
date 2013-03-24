@@ -28,7 +28,7 @@ import org.tymoonnext.bot.stream.Stream;
  * @version 0.0.0
  */
 public class Commons {
-    public static final String VERSION = "2.6.4";
+    public static final String VERSION = "2.7.0";
     public static final String FQDN = "機材";
     public static final String LICENSE = "GPLv3";
     public static final String COREDEV = "TymoonNET/NexT";
