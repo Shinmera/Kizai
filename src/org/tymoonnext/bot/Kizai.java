@@ -355,7 +355,7 @@ public class Kizai implements SignalHandler{
      * registered a handle for it.
      * @param ev The CommandEvent to relay.
      */
-    private synchronized void command(CommandEvent ev){
+    private synchronized CommandEvent command(CommandEvent ev){
         Commons.log.fine("[MAIN] Command "+ev);
         
         if(!commands.containsKey(ev.getCommand())){
@@ -370,15 +370,17 @@ public class Kizai implements SignalHandler{
         }else{
             commands.get(ev.getCommand()).onCommand(ev);
         }
+        return ev;
     }
     
     /**
      * Triggers an event and propagates it to any EventListener that is bound to
      * the Event's Class.
      * @param ev The Event to trigger.
+     * @return Returns the Event again, to allow event chaining.
      * @see Kizai#event(org.tymoonnext.bot.event.Event, java.lang.Class) 
      */
-    public synchronized void event(Event ev){event(ev, EventListener.class);}
+    public synchronized Event event(Event ev){return event(ev, EventListener.class);}
     
     /**
      * Triggers an event and propagates it to any EventListener that is bound to
@@ -386,8 +388,9 @@ public class Kizai implements SignalHandler{
      * @param ev The Event to trigger.
      * @param listenerType A class type for to limit the propagation for 
      * specific listeners.
+     * @return Returns the Event again, to allow event chaining.
      */
-    public synchronized void event(Event ev, Class<? extends EventListener> listenerType){
+    public synchronized Event event(Event ev, Class<? extends EventListener> listenerType){
         Commons.log.finest("[MAIN] Event "+ev);
         for(Class<? extends Event> c : events.keySet()){
             if(c.isInstance(ev)){
@@ -399,6 +402,7 @@ public class Kizai implements SignalHandler{
                 }
             }
         }
+        return ev;
     }
     
     /**
