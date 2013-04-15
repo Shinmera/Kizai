@@ -48,7 +48,7 @@ public class SQLWrapper {
         tablePrimaryKeys = new HashMap<String,String[]>();
         try{
             sqldb = db;sqluser = user; sqlpw = pass; sqlhost = host; sqlport = port;
-            sqlurl = "jdbc:mysql://"+sqlhost+":"+sqlport+"/"+sqldb;
+            sqlurl = "jdbc:mysql://"+sqlhost+":"+sqlport+"/"+sqldb+"?useUnicode=true&characterEncoding=utf-8";
             con = DriverManager.getConnection(sqlurl, sqluser, sqlpw);
             setAutoCommit(true);
             SQLWrapper.INSTANCE = this;
