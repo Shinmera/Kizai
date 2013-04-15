@@ -150,7 +150,7 @@ public class IRC extends PircBot implements Stream{
 
     protected void onNickChange(String oldNick, String login, String hostname, String newNick){
         Commons.log.finer(toString()+" Nick: "+oldNick+"->"+newNick);
-        NickEvent evt = new NickEvent(this, oldNick, hostname, login, newNick);
+        NickEvent evt = new NickEvent(this, oldNick, newNick, hostname, login);
         bot.event(evt);
         if(!evt.isCancelled())
             super.onNickChange(evt.sender, evt.login, evt.host, evt.newNick);
