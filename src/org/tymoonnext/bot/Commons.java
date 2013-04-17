@@ -28,7 +28,7 @@ import org.tymoonnext.bot.stream.Stream;
  * @version 0.0.0
  */
 public class Commons {
-    public static final String VERSION = "2.7.0";
+    public static final String VERSION = "2.7.3";
     public static final String FQDN = "機材";
     public static final String LICENSE = "GPLv3";
     public static final String COREDEV = "TymoonNET/NexT";
@@ -42,7 +42,7 @@ public class Commons {
     public static final Level LOGLEVEL = Level.INFO;
     public static final Level LOGLEVEL_FILE = Level.FINEST;
     
-    public static final Logger log = NLogger.get("kizai", LOGLEVEL, LOGLEVEL_FILE);
+    public static final Logger log = NLogger.get("Kizai", LOGLEVEL, LOGLEVEL_FILE);
     public static final Stream stdout = new StdOut();
     public static final Reflections reflections;
     private static final List<ClassLoader> classLoadersList = new LinkedList<ClassLoader>();
