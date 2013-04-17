@@ -47,7 +47,6 @@ public class CommandEvent extends Event{
     public String getChannel(){return channel;}
     public String getCommand(){return command;}
     public String getArgs(){return args;}
-    public Stream getStream(){return origin;}
     
     public String toString(){
         return "<"+getClass().getSimpleName()+"|"+command+">";
