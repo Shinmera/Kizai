@@ -1,8 +1,8 @@
 package org.tymoonnext.bot.module.irc;
 
-import NexT.mysql.DataModel;
-import NexT.mysql.NSQLException;
-import NexT.mysql.SQLWrapper;
+import NexT.db.mysql.DataModel;
+import NexT.db.mysql.NSQLException;
+import NexT.db.mysql.MySQLWrapper;
 import java.util.logging.Level;
 import org.tymoonnext.bot.Commons;
 import NexT.data.ConfigLoader;
@@ -36,11 +36,10 @@ public class SQLLog extends Module implements EventListener, CommandListener{
     public static final char TYPE_SEND   = 's';
     
     class C extends ConfigLoader{
-        @required public String host, db, user, pw, table;
-        public Integer port = 3306;
+        @required public String table;
     };
     private C conf = new C();
-    private SQLWrapper wrapper;
+    private MySQLWrapper wrapper;
     
     public SQLLog(Kizai bot) throws NSQLException{
         super(bot);
@@ -56,8 +55,6 @@ public class SQLLog extends Module implements EventListener, CommandListener{
             bot.bindEvent(ActionEvent.class, this, "onAction");
             bot.bindEvent(SendEvent.class, this, "onSend");
         }catch(NoSuchMethodException ex){}
-        conf.load(bot.getConfig().get("modules").get("irc.SQLLog"));
-        wrapper = new SQLWrapper(conf.user, conf.pw, conf.db, conf.host, conf.port);
     }
 
     public void shutdown(){
