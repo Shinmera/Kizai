@@ -3,6 +3,7 @@ package org.tymoonnext.bot;
 import NexT.err.NLogger;
 import NexT.util.Toolkit;
 import java.io.File;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.MessageDigest;
@@ -28,7 +29,7 @@ import org.tymoonnext.bot.stream.Stream;
  * @version 0.0.0
  */
 public class Commons {
-    public static final String VERSION = "2.7.3";
+    public static final String VERSION = "2.7.4";
     public static final String FQDN = "機材";
     public static final String LICENSE = "GPLv3";
     public static final String COREDEV = "TymoonNET/NexT";
@@ -90,13 +91,18 @@ public class Commons {
     
     /**
      * Wrapper to invoke any kind of public method on an Object given the
-     * specific arguments. 
+     * specific arguments. This method returns the invoked function's result
+     * or null if no value was returned or if the call failed. This way of
+     * invoking functions is dangerous as all exceptions are caught and thus
+     * might screw up the program flow. Only use this if you absolutely do not
+     * care if the function actually works or not or if you're absolutely sure
+     * it will always work.
      * 
      * @param <T> The Object type to expect on return.
      * @param o The Object to invoke the method on.
      * @param func The method name.
      * @param arg An optional list of arguments to pass.
-     * @return The return value of the method or null on fail.
+     * @return The return value of the method or null on failure.
      */
     public static <T> T invoke(Object o, String func, Object... arg){
         log.fine("+COMMONS+ Invoking '"+func+"' on '"+o+"' with args: "+Toolkit.implode(arg, ", "));
@@ -121,6 +127,37 @@ public class Commons {
             log.log(Level.WARNING, "+COMMONS+ Invocation of '"+func+"' on '"+o+"' with '"+Toolkit.implode(arg, ",")+"' failed.", ex);
         } catch (SecurityException ex) {
             log.log(Level.WARNING, "+COMMONS+ Invocation of '"+func+"' on '"+o+"' with '"+Toolkit.implode(arg, ",")+"' failed.", ex);
+        }
+        return null;
+    }
+    
+    /**
+     * Wrapper to retrieve any kind of field on an object. This method returns
+     * the requested field's value, or null if isn't set or failed to retrieve
+     * the value. This way of retriving fields is dangerous as all exceptions
+     * are caught and thus the program might not return what you expected.
+     * Only use this if you are absolutely sure that the value you're requesting
+     * is available.
+     * 
+     * @param <T> The Object type to expect on return.
+     * @param o The Object to retrieve the value from.
+     * @param var The field name.
+     * @return The value of the field or null on failure.
+     */
+    public static <T> T retrieve(Object o, String var){
+        log.fine("+COMMONS+ Retrieving object '"+var+"' on '"+o+"'");
+        try{
+            Field f = o.getClass().getDeclaredField(var);
+            f.setAccessible(true);
+                return (T) f.get(o);
+        }catch(IllegalArgumentException ex){
+            log.log(Level.WARNING, "+COMMONS+ Retrieval of '"+var+"' on '"+o+"' failed.", ex);
+        }catch(IllegalAccessException ex){
+            log.log(Level.WARNING, "+COMMONS+ Retrieval of '"+var+"' on '"+o+"' failed.", ex);
+        }catch(NoSuchFieldException ex){
+            log.log(Level.WARNING, "+COMMONS+ Retrieval of '"+var+"' on '"+o+"' failed.", ex);
+        }catch(SecurityException ex){
+            log.log(Level.WARNING, "+COMMONS+ Retrieval of '"+var+"' on '"+o+"' failed.", ex);
         }
         return null;
     }
