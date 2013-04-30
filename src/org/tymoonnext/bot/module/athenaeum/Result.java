@@ -13,6 +13,8 @@ public class Result {
     public int changed = -1;
     public int total = 0;
     
+    public Result(){this(null);}
+    public Result(String data){this(data, -1);}
     public Result(String data, int total){this(data, -1, -1, -1, total);}    
     public Result(String data, int added, int removed, int changed, int total){
         this.data=data;this.added=added;this.removed=removed;this.changed=changed;this.total=total;
