@@ -22,11 +22,12 @@ import org.tymoonnext.bot.module.core.ext.CommandModule;
  * @version 0.0.0
  */
 public class Athenaeum extends Module implements CommandListener{
-    private static final String subjectMatch = "( [a-z0-9\\*\\-_ ]+)?";
+    private static final String directedMatch= "( (me|(?!about|of|on|everything|all|page|record|chapter)[a-z0-9\\-_]+))?";
     private static final String recordsMatch = "( (everything|all|((page|record|chapter) ([0-9]+)( (-|to|up to) ([0-9]+))?)) (about|on|of))?";
+    private static final String subjectMatch = "( [a-z0-9\\*\\-_ ]+)?";
     private static final String sourceMatch  = "(,? (using|from|in) ([a-z0-9]+))?";
     private static final String endMatch     = "(\\.)?";
-    private static final Pattern tellRegex   = Pattern.compile("tell( (me|[a-z0-9\\-_]+))?( about | of| on)?"+recordsMatch+subjectMatch+sourceMatch+endMatch, Pattern.CASE_INSENSITIVE);
+    private static final Pattern tellRegex   = Pattern.compile("tell"+directedMatch+"( about| of| on)?"+recordsMatch+subjectMatch+sourceMatch+endMatch, Pattern.CASE_INSENSITIVE);
     private static final Pattern lookRegex   = Pattern.compile("look for"+recordsMatch+subjectMatch+sourceMatch+endMatch, Pattern.CASE_INSENSITIVE);
     private static final Pattern recordRegex = Pattern.compile("record( (this |the following )?(about|of|on))?"+recordsMatch+subjectMatch+sourceMatch+"(:)?(.*)", Pattern.CASE_INSENSITIVE);
     private static final Pattern burnRegex   = Pattern.compile("burn"+recordsMatch+subjectMatch+sourceMatch+endMatch, Pattern.CASE_INSENSITIVE);
@@ -52,7 +53,7 @@ public class Athenaeum extends Module implements CommandListener{
     }
     
     public void addSource(Source s){
-        sources.put(s.getName(), s);
+        sources.put(s.getName().toLowerCase(), s);
     }
 
     public void onCommand(CommandEvent cmd){
@@ -69,7 +70,6 @@ public class Athenaeum extends Module implements CommandListener{
     }
     
     public void onTell(CommandInstanceEvent cmd, Matcher m){
-        //@TODO fr & to sanitization
         int fr = (m.group(8)==null)? 0 : Integer.parseInt(m.group(8));
         int to = (m.group(11)==null)? 1 : Integer.parseInt(m.group(11));
         String entry = (m.group(13)==null)? "" : m.group(13).toLowerCase().trim();
@@ -100,7 +100,7 @@ public class Athenaeum extends Module implements CommandListener{
             if(r.results().length>0){
                 for(int i=0;i<r.results().length;i++){
                     String msg = directedTo+r.results()[i].data;
-                    if(i==r.results().length-1)
+                    if(i==r.results().length-1 && i!= 0)
                         msg += " (Page "+fr+"-"+to+" of "+r.queryableSize()+") ["+StringUtils.firstToUpper(source)+"]";
                     cmd.getStream().send(msg, cmd.getChannel());
                 }
@@ -112,7 +112,7 @@ public class Athenaeum extends Module implements CommandListener{
             Commons.log.log(Level.WARNING, "Error in "+sources.get(source)+" while processing query: "+cmd.getCommand()+" "+cmd.getArgs(), ex);
             cmd.getStream().send("Some kind of error occurred in the source! ("+ex.getMessage()+")", cmd.getChannel());
         }catch(InexistentVolumeException ex){
-            cmd.getStream().send("I couldn't find a volume like that.", cmd.getChannel());
+            cmd.getStream().send("I couldn't find a volume like that. "+ex.getMessage(), cmd.getChannel());
         }
     }
     
@@ -174,8 +174,9 @@ public class Athenaeum extends Module implements CommandListener{
         int to = (m.group(11)==null)? -1 : Integer.parseInt(m.group(11));
         String entry = (m.group(13)==null)? "" : m.group(13).toLowerCase().trim();
         String source = (m.group(15)==null)? "athenaeum" : m.group(15).toLowerCase();
-        String data = m.group(17);
+        String[] data = m.group(18).trim().split("\\\\\\\\");
         if(to<fr)to=fr+1;
+        if(to-fr>data.length)to=fr+data.length;
         
         if(entry.isEmpty()){
             cmd.getStream().send("Record what?", cmd.getChannel());
@@ -185,14 +186,14 @@ public class Athenaeum extends Module implements CommandListener{
             cmd.getStream().send("I can't reach it.", cmd.getChannel());
             return;
         }
-        if(!sources.get(source).getClass().isInstance(ModifiableSource.class)){
+        if(!(sources.get(source) instanceof ModifiableSource)){
             cmd.getStream().send("I don't do graffiti.", cmd.getChannel());
             return;
         }
         
         try{
             //@TODO actually implement the continuous lines adding as well as the "more" term.
-            Result r = ((ModifiableSource)sources.get(source)).modify(entry, fr, to, data.split("\\\\\\\\"), cmd.getUser());
+            Result r = ((ModifiableSource)sources.get(source)).modify(entry, fr, to, data, cmd.getUser());
             cmd.getStream().send(buildResponse(r), cmd.getChannel());
         }catch(SourceException ex){
             Commons.log.log(Level.WARNING, "Error in "+sources.get(source)+" while processing query: "+cmd.getCommand()+" "+cmd.getArgs(), ex);
@@ -215,12 +216,13 @@ public class Athenaeum extends Module implements CommandListener{
             cmd.getStream().send("I don't know that place.", cmd.getChannel());
             return;
         }
-        if(!sources.get(source).getClass().isInstance(ModifiableSource.class)){
+        if(!(sources.get(source) instanceof ModifiableSource)){
             cmd.getStream().send("That place is fire-proof!", cmd.getChannel());
             return;
         }
         
         try{
+            //@TODO implement the "more" term.  
             Result r = ((ModifiableSource)sources.get(source)).remove(entry, fr, to, cmd.getUser());
             cmd.getStream().send(buildResponse(r), cmd.getChannel());
         }catch(SourceException ex){
