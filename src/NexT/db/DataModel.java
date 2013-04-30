@@ -13,7 +13,7 @@ public abstract class DataModel {
     public static DataModel getHull(String table) throws DBException{return null;}
     
     public abstract DataModel set(String column, Object o);
-    public abstract Object get(String column);
+    public abstract <T> T get(String column);
     
     public abstract DataModel insert() throws DBException;
     public abstract DataModel update() throws DBException;

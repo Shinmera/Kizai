@@ -5,6 +5,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import java.util.List;
+import org.bson.types.ObjectId;
 
 /**
  * 
@@ -15,16 +16,16 @@ import java.util.List;
 public class DataModel extends NexT.db.DataModel{    
     private MongoWrapper wrapper;
     private DBCollection collection;
-    private DBObject dataOrig;
     private DBObject data;
     
     private DataModel(DBCollection collection, DBObject data){
         this.wrapper = MongoWrapper.getInstance();
         this.collection = collection;
-        this.dataOrig = new BasicDBObject();
-        this.dataOrig.putAll(data);
-        if(data == null)    this.data = new BasicDBObject();
-        else                this.data = data;
+        if(data == null){
+            this.data = new BasicDBObject();
+        }else{
+            this.data = data;
+        }
     }
     
     /**
@@ -107,7 +108,7 @@ public class DataModel extends NexT.db.DataModel{
      * @param column
      * @return The requested Object or null.
      */
-    public Object get(String column) {return (data.containsField(column)) ? data.get(column) : null;}
+    public <T> T get(String column) {return (data.containsField(column)) ? (T)data.get(column) : null;}
     
     /**
      * Returns whether a given key exists in the model or not.
@@ -115,6 +116,8 @@ public class DataModel extends NexT.db.DataModel{
      * @return 
      */
     public boolean hasColumn(String column){return data.containsField(column);}
+    
+    public String id(){return ((ObjectId)get("_id")).toString();}
     
     /**
      * Inserts the data into the db as a new record and replaces the original
@@ -125,8 +128,8 @@ public class DataModel extends NexT.db.DataModel{
      */
     public DataModel insert() throws MongoException{
         try{
-            collection.insert(data);
-            dataOrig=data;
+            int affected = collection.insert(data).getN();
+            MongoWrapper.LOG.info("Record "+data+" inserted. "+affected+" records affected.");
         }catch(Exception ex){throw new MongoException("Insert failed!", ex);}
         return this;
     }
@@ -140,11 +143,10 @@ public class DataModel extends NexT.db.DataModel{
      * @see DataModel#insert() 
      */
     public DataModel update() throws MongoException{
-        if(dataOrig == null) throw new MongoException("Model is only a hull. Perform an insert first!");
+        if(!data.containsField("_id")) throw new MongoException("Model is only a hull. Perform an insert first!");
         try{
-            int affected = collection.update(dataOrig, data).getN();
-            MongoWrapper.LOG.info("Record matching "+dataOrig+" changed to "+data+". "+affected+" records affected.");
-            dataOrig=data;
+            int affected = collection.update(new BasicDBObject().append("_id", get("_id")), data).getN();
+            MongoWrapper.LOG.info("Record updated to "+data+". "+affected+" records affected.");
         }catch(Exception ex){throw new MongoException("Update failed!", ex);}
         return this;
     }
@@ -158,7 +160,7 @@ public class DataModel extends NexT.db.DataModel{
      * @see DataModel#insert() 
      */
     public DataModel delete() throws MongoException{
-        if(dataOrig == null) throw new MongoException("Model is only a hull. Perform an insert first!");
+        if(!data.containsField("_id")) throw new MongoException("Model is only a hull. Perform an insert first!");
         try{
             int affected = collection.remove(data).getN();
             MongoWrapper.LOG.info("Record matching "+data+" deleted. "+affected+" records affected.");

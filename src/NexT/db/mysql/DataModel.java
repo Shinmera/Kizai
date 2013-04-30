@@ -71,7 +71,7 @@ public class DataModel extends NexT.db.DataModel{
     }
     
     public DataModel set(String column, Object o) {data.put(column, o);return this;}
-    public Object get(String column) {return (data.containsKey(column)) ? data.get(column) : null;}
+    public <T> T get(String column) {return (data.containsKey(column)) ? (T)data.get(column) : null;}
     public String[] getColumns(){ 
         if(columns == null){
             try{columns = wrapper.getTableColumns(table);
