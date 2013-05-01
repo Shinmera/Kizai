@@ -28,6 +28,7 @@ public class DataModel extends NexT.db.DataModel{
         }
     }
     
+    
     /**
      * Attempt to retrieve records from the specified collection using the
      * given query. If no records were found, null is returned instead.
@@ -38,10 +39,26 @@ public class DataModel extends NexT.db.DataModel{
      * initialized yet or if there was an error reading the objects from the db.
      */
     public static DataModel[] getData(String collection, DBObject query) throws MongoException{
+        return getData(collection, query, 0, -1);
+    }
+    
+    /**
+     * Attempt to retrieve records from the specified collection using the
+     * given query. If no records were found, null is returned instead.
+     * @param collection The collection to query
+     * @param query A DBObject representing the query parameters.
+     * @param from From offset.
+     * @param limit Max. number of entries.
+     * @return Null if no documents were found or an array of records.
+     * @throws MongoException Thrown if the MongoWrapper has not been
+     * initialized yet or if there was an error reading the objects from the db.
+     */
+    public static DataModel[] getData(String collection, DBObject query, int from, int limit) throws MongoException{
         MongoWrapper wrapper = MongoWrapper.getInstance();
         if(wrapper == null) throw new MongoException("MongoWrapper has not been initiated.");
         DBCollection col = wrapper.getCollection(collection);
-        DBCursor cursor = col.find(query);
+        DBCursor cursor = col.find(query).skip(from);
+        if(limit != -1)cursor = cursor.limit(limit);
         List<DBObject> modelsList;
         DataModel[] models;
         try{
