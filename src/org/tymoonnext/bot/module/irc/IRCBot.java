@@ -229,13 +229,16 @@ public class IRCBot extends Module implements EventListener{
             irc.sendMessage(ev.channel, ev.message);
         }else{
             ev.message += " ";
-            String args = ev.message.substring(ev.message.indexOf(" ")+1).trim();
-            String cmd = null;
+            String cmd = null, args = null;
             if(ev.message.startsWith(config.cmd)){
+                args = ev.message.substring(ev.message.indexOf(" ")+1).trim();
                 cmd = ev.message.substring(config.cmd.length(), ev.message.indexOf(" ")).trim();
                 
-            }else if(ev.message.startsWith(config.server.get("nick")+":")){
-                cmd = ev.message.substring(config.server.get("nick").toString().length()+1, ev.message.indexOf(" ")).trim();
+            }else if(ev.message.startsWith(config.server.get("nick")+": ")){
+                int nicklen = (config.server.get("nick")+": ").length();
+                int argsstart = ev.message.indexOf(" ", nicklen);
+                args = ev.message.substring(argsstart).trim();
+                cmd = ev.message.substring(nicklen, argsstart).trim();
             }
             
             if(cmd != null)
