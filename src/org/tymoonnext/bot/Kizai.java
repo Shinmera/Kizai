@@ -258,7 +258,7 @@ public class Kizai implements SignalHandler{
             if(!force)  throw new IllegalArgumentException(cmd+" is already used!");
             else        Commons.log.warning("[MAIN]"+m+" is overriding "+commands.get(cmd)+".");
         }
-        Commons.log.info("[MAIN]"+m+" Registering command "+cmd);
+        Commons.log.fine("[MAIN]"+m+" Registering command "+cmd);
         commands.put(cmd, m);
     }
     
@@ -275,7 +275,7 @@ public class Kizai implements SignalHandler{
      * within the listener.
      */
     public synchronized void bindEvent(Class<? extends Event> evt, EventListener m, String func, int priority) throws NoSuchMethodException{
-        Commons.log.info("[MAIN]"+m+" Binding event "+evt.getSimpleName()+" to function "+func);
+        Commons.log.fine("[MAIN]"+m+" Binding event "+evt.getSimpleName()+" to function "+func);
         if(!events.containsKey(evt))events.put(evt, new ArrayList<EventBind>());
         else{
             for(EventBind bind : events.get(evt)){
@@ -308,7 +308,7 @@ public class Kizai implements SignalHandler{
      * @param m The CommandListener to unbind.
      */
     public synchronized void unregisterCommand(String cmd){
-        Commons.log.info("[MAIN]"+commands.get(cmd) +" Unregistering command "+cmd);
+        Commons.log.fine("[MAIN]"+commands.get(cmd) +" Unregistering command "+cmd);
         commands.remove(cmd);
     }
     
@@ -321,7 +321,7 @@ public class Kizai implements SignalHandler{
         if(events.containsKey(evt)){
             for(EventBind bind : events.get(evt)){
                 if(bind.getListener() == m){
-                    Commons.log.info("[MAIN]"+m+" Unbinding event "+evt);
+                    Commons.log.fine("[MAIN]"+m+" Unbinding event "+evt);
                     events.get(evt).remove(bind);
                     break;
                 }
@@ -356,7 +356,7 @@ public class Kizai implements SignalHandler{
      * @param ev The CommandEvent to relay.
      */
     private synchronized CommandEvent command(CommandEvent ev){
-        Commons.log.fine("[MAIN] Command "+ev);
+        Commons.log.finer("[MAIN] Command "+ev);
         
         if(!commands.containsKey(ev.getCommand())){
             if(!ev.getCommand().equals(CommandEvent.CMD_UNBOUND)){

@@ -31,7 +31,7 @@ public class ReloadingCapableClassLoader extends ClassLoader{
             byte[] bytes = loadClassData(s);
             return defineClass(s, bytes, 0, bytes.length);
         } catch (IOException ex) {
-            Commons.log.info(toString()+" Loading "+s+" through super.");
+            Commons.log.finer(toString()+" Loading "+s+" through super.");
             return getParent().loadClass(s);
         }
     }
