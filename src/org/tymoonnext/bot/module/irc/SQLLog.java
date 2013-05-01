@@ -55,6 +55,7 @@ public class SQLLog extends Module implements EventListener, CommandListener{
             bot.bindEvent(ActionEvent.class, this, "onAction");
             bot.bindEvent(SendEvent.class, this, "onSend");
         }catch(NoSuchMethodException ex){}
+        conf.load(bot.getConfig().get("modules").get("irc.SQLLog"));
     }
 
     public void shutdown(){
