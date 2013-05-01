@@ -70,8 +70,9 @@ public class Athenaeum extends Module implements CommandListener{
     }
     
     public void onTell(CommandInstanceEvent cmd, Matcher m){
-        int fr = (m.group(8)==null)? 0 : Integer.parseInt(m.group(8));
+        int fr = (m.group(8)==null)? 1 : Integer.parseInt(m.group(8));
         int to = (m.group(11)==null)? 1 : Integer.parseInt(m.group(11));
+        String howmuch = (m.group(5)==null)? "" : m.group(5).toLowerCase().trim();
         String entry = (m.group(13)==null)? "" : m.group(13).toLowerCase().trim();
         String source = (m.group(15)==null)? "athenaeum" : m.group(15).toLowerCase();
         String directedTo = (m.group(2) == null)? "" : 
@@ -86,6 +87,7 @@ public class Athenaeum extends Module implements CommandListener{
             cmd.getStream().send("I don't know that place.", cmd.getChannel());
         }
         
+        fr--; //Switch to zero-indexed.
         if(fr<0)fr=0;
         if(to<0)to=1;
         if(to<fr)to=fr+1;
@@ -93,6 +95,8 @@ public class Athenaeum extends Module implements CommandListener{
             cmd.getStream().send("Cannot display more than "+max_tell_entries+" pages at once, use paginated tell instead.", cmd.getChannel());
             to = fr+max_tell_entries;
         }
+        if(howmuch.equals("everything") || howmuch.equals("all"))
+            to=-1;
         
         try{
             //@TODO implement the "more" term.  
@@ -101,7 +105,8 @@ public class Athenaeum extends Module implements CommandListener{
                 for(int i=0;i<r.results().length;i++){
                     String msg = directedTo+r.results()[i].data;
                     if(i==r.results().length-1 && i!= 0)
-                        msg += " (Page "+fr+"-"+to+" of "+r.queryableSize()+") ["+StringUtils.firstToUpper(source)+"]";
+                        msg += " (Page "+(fr+1)+"-"+((to == -1)? r.results().length : to)+" of "+r.queryableSize()+")"+
+                               " ["+StringUtils.firstToUpper(source)+"]";
                     cmd.getStream().send(msg, cmd.getChannel());
                 }
             }else{
@@ -112,7 +117,7 @@ public class Athenaeum extends Module implements CommandListener{
             Commons.log.log(Level.WARNING, "Error in "+sources.get(source)+" while processing query: "+cmd.getCommand()+" "+cmd.getArgs(), ex);
             cmd.getStream().send("Some kind of error occurred in the source! ("+ex.getMessage()+")", cmd.getChannel());
         }catch(InexistentVolumeException ex){
-            cmd.getStream().send("I couldn't find a volume like that. "+ex.getMessage(), cmd.getChannel());
+            cmd.getStream().send("I couldn't find a volume like that. ", cmd.getChannel());
         }
     }
     
@@ -120,12 +125,12 @@ public class Athenaeum extends Module implements CommandListener{
         boolean everything = (m.group(2)!=null) && 
                                 (m.group(2).equalsIgnoreCase("everything") ||
                                  m.group(2).equalsIgnoreCase("all"));
-        int fr = (m.group(5)==null)? 0 :
-                                     Integer.parseInt(m.group(5));
+        int fr = (m.group(5)==null)? 1 : Integer.parseInt(m.group(5));
         int to = (m.group(8)==null)? (fr+((everything)?max_look_entries:std_look_entries)) :
                                      Integer.parseInt(m.group(8));
         String entry = (m.group(10)==null)? "" : m.group(10).toLowerCase().trim();
-        String source = (m.group(12)==null)? null : m.group(12).toLowerCase();
+        String source = (m.group(12)==null)? "athenaeum" : m.group(12).toLowerCase();
+        entry = entry.replaceAll("[^a-z0-9\\-_\\*]", "");
         
         if(entry.isEmpty()){
             cmd.getStream().send("What? Where?!", cmd.getChannel());
@@ -136,6 +141,7 @@ public class Athenaeum extends Module implements CommandListener{
             return;
         }
         
+        fr--; //Switch to zero-indexed.
         if(fr<0)fr=0;
         if(to<0)to=std_look_entries;
         if(to<fr)to=fr+1;
@@ -160,7 +166,7 @@ public class Athenaeum extends Module implements CommandListener{
                 for(int i=0;i<t.length;i++){t[i]=r.results()[i].data;}
                 cmd.getStream().send("["+s.getName()+"] "+
                                      StringUtils.implode(t, ", ")+
-                                     "("+(fr+1)+"-"+to+" of "+r.queryableSize()+")", cmd.getChannel());
+                                     " ("+(fr+1)+"-"+to+" of "+r.queryableSize()+")", cmd.getChannel());
             }
             
         }catch(SourceException ex){
@@ -170,11 +176,12 @@ public class Athenaeum extends Module implements CommandListener{
     }
     
     public void onRecord(CommandInstanceEvent cmd, Matcher m){
-        int fr = (m.group(8)==null)? -1 : Integer.parseInt(m.group(8));
+        int fr = (m.group(8)==null)? 0 : Integer.parseInt(m.group(8));
         int to = (m.group(11)==null)? -1 : Integer.parseInt(m.group(11));
         String entry = (m.group(13)==null)? "" : m.group(13).toLowerCase().trim();
         String source = (m.group(15)==null)? "athenaeum" : m.group(15).toLowerCase();
         String[] data = m.group(18).trim().split("\\\\\\\\");
+        fr--; // Change to zero-index
         if(to<fr)to=fr+1;
         if(to-fr>data.length)to=fr+data.length;
         
@@ -202,10 +209,11 @@ public class Athenaeum extends Module implements CommandListener{
     }
     
     public void onBurn(CommandInstanceEvent cmd, Matcher m){
-        int fr = (m.group(5)==null)? -1 : Integer.parseInt(m.group(5));
+        int fr = (m.group(5)==null)? 0 : Integer.parseInt(m.group(5));
         int to = (m.group(8)==null)? -1 : Integer.parseInt(m.group(8));
         String entry = (m.group(10)==null)? "" : m.group(10).toLowerCase().trim();
         String source = (m.group(12)==null)? "athenaeum" : m.group(12).toLowerCase();
+        fr--; // Change to zero-index
         if(to<fr)to=fr+1;
         
         if(entry.isEmpty()){
