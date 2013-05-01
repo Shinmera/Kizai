@@ -41,7 +41,7 @@ public class CommandGroupModule extends Module implements EventListener, Command
     
     public void onGroupRegister(GroupRegisterEvent evt){
         if(!groups.containsKey(evt.getGroupName())){
-            Commons.log.info(toString()+" Creating command group "+evt.getGroupName());
+            Commons.log.finer(toString()+" Creating command group "+evt.getGroupName());
             CommandGroup group = new CommandGroup(bot, evt.getGroupName());
             group.onGroupRegisterEvent(evt);
             groups.put(evt.getGroupName(), group);

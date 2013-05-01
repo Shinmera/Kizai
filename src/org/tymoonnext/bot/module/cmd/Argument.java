@@ -56,7 +56,7 @@ public class Argument {
      * @param arg 
      */
     public static Argument generate(String arg){
-        Commons.log.fine("{Argument} Generating '"+arg+"'");
+        Commons.log.finest("{Argument} Generating '"+arg+"'");
         String name = null;
         String defval = null;
         String[] choices = null;
@@ -100,7 +100,7 @@ public class Argument {
      * @throws ParseException 
      */
     public void parse(LinkedList<String> args, HashMap<String,String> kwargs) throws ParseException{
-        Commons.log.fine("{Argument|"+name+"} Parsing ARGS: "+StringUtils.implode(args.toArray(), ", ")+"  KWARGS: "+StringUtils.implode(kwargs, ": ",", "));
+        Commons.log.finest("{Argument|"+name+"} Parsing ARGS: "+StringUtils.implode(args.toArray(), ", ")+"  KWARGS: "+StringUtils.implode(kwargs, ": ",", "));
         value = defval;
         
         //Empty check
@@ -124,7 +124,7 @@ public class Argument {
         //No keyword found, simply swallow next positional argument.
         if(((value == null) || value.equals(defval)) && args.size() > 0){
             value = args.pop();
-            Commons.log.finer("{Argument|"+name+"} Consuming '"+value+"'");
+            Commons.log.finest("{Argument|"+name+"} Consuming '"+value+"'");
         }
         
         //No keyword args found, no positional args and no default. Fuck.

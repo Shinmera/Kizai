@@ -29,7 +29,7 @@ public class CommandHandler implements EventListener, CommandListener{
     }
 
     public void onCommandRegister(CommandRegisterEvent evt){
-        Commons.log.info(toString()+evt.getListener()+" Registering new bind for '"+evt.getCommand()+"'");
+        Commons.log.fine(toString()+evt.getListener()+" Registering new bind for '"+evt.getCommand()+"'");
         if(commands.containsKey(evt.getCommand().getName())){
             if(!evt.isForced()) throw new IllegalArgumentException(evt.getCommand()+" is already used!");
             else                Commons.log.warning(toString()+evt.getListener()+" is overriding "+commands.get(evt.getCommand())+".");
@@ -41,14 +41,14 @@ public class CommandHandler implements EventListener, CommandListener{
 
     public void onCommand(CommandEvent cmd){
         if(commands.containsKey(cmd.getCommand())){
-            Commons.log.fine(toString()+" Received event: "+cmd);
+            Commons.log.finer(toString()+" Received event: "+cmd);
             Command command = commands.get(cmd.getCommand());
             try{
                 CommandInstance instance = new CommandInstance(commands.get(cmd.getCommand()), cmd.getArgs());
                 CommandInstanceEvent cmde = new CommandInstanceEvent(cmd, instance);
                 listeners.get(cmd.getCommand()).onCommand(cmde);
             }catch(ParseException ex){
-                Commons.log.info(toString()+command+" Failed to parse: "+ex.getMessage());
+                Commons.log.fine(toString()+command+" Failed to parse: "+ex.getMessage());
                 cmd.getStream().send("Usage: "+command.toDescriptiveString(), cmd.getChannel());
             }
         }

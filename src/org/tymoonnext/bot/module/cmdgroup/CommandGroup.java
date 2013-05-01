@@ -29,7 +29,7 @@ public class CommandGroup implements CommandListener{
     
     public void onCommand(CommandEvent cmd){
         if(cmd.getCommand().equals(name)){
-            Commons.log.fine(toString()+" Received group command ("+cmd.getArgs()+")");
+            Commons.log.finer(toString()+" Received group command ("+cmd.getArgs()+")");
             if((cmd.getArgs() == null) || (cmd.getArgs().trim().isEmpty()) || (cmd.getArgs().toLowerCase().startsWith("help"))){
                 onHelp(cmd);
             }else{ 
@@ -51,7 +51,7 @@ public class CommandGroup implements CommandListener{
     
     public void onGroupRegisterEvent(GroupRegisterEvent evt){
         if(evt.getGroupName().equals(name)){
-            Commons.log.info(toString()+evt.getListener()+" Registering sub-command "+evt.getSubCommand());
+            Commons.log.fine(toString()+evt.getListener()+" Registering sub-command "+evt.getSubCommand());
             if(commands.containsKey(evt.getSubCommand())){
                 if(!evt.isForced()) throw new IllegalArgumentException(evt.getSubCommand()+" is already used!");
                 else                Commons.log.warning(toString()+evt.getListener()+" is overriding "+commands.get(evt.getSubCommand())+".");

@@ -146,7 +146,7 @@ public class DataModel extends NexT.db.DataModel{
     public DataModel insert() throws MongoException{
         try{
             int affected = collection.insert(data).getN();
-            MongoWrapper.LOG.info("Record "+data+" inserted. "+affected+" records affected.");
+            MongoWrapper.LOG.fine("[DataModel] Record "+data+" inserted. "+affected+" records affected.");
         }catch(Exception ex){throw new MongoException("Insert failed!", ex);}
         return this;
     }
@@ -163,7 +163,7 @@ public class DataModel extends NexT.db.DataModel{
         if(!data.containsField("_id")) throw new MongoException("Model is only a hull. Perform an insert first!");
         try{
             int affected = collection.update(new BasicDBObject().append("_id", get("_id")), data).getN();
-            MongoWrapper.LOG.info("Record updated to "+data+". "+affected+" records affected.");
+            MongoWrapper.LOG.fine("[DataModel] Record updated to "+data+". "+affected+" records affected.");
         }catch(Exception ex){throw new MongoException("Update failed!", ex);}
         return this;
     }
@@ -180,7 +180,7 @@ public class DataModel extends NexT.db.DataModel{
         if(!data.containsField("_id")) throw new MongoException("Model is only a hull. Perform an insert first!");
         try{
             int affected = collection.remove(data).getN();
-            MongoWrapper.LOG.info("Record matching "+data+" deleted. "+affected+" records affected.");
+            MongoWrapper.LOG.fine("[DataModel] Record matching "+data+" deleted. "+affected+" records affected.");
         }catch(Exception ex){throw new MongoException("Delete failed!", ex);}
         return this;
     }

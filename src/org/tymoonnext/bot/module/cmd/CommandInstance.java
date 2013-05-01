@@ -56,7 +56,7 @@ public class CommandInstance {
      * @throws ParseException 
      */
     public void parse(String argscall) throws ParseException{
-        Commons.log.fine(toString()+" Parsing '"+argscall+"'");
+        Commons.log.finest(toString()+" Parsing '"+argscall+"'");
         argscall = argscall.trim();
         
         LinkedList<String> args = new LinkedList<String>();
