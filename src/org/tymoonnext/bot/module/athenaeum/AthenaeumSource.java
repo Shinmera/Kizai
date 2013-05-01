@@ -2,10 +2,12 @@ package org.tymoonnext.bot.module.athenaeum;
 
 import NexT.db.mongo.DataModel;
 import NexT.db.mongo.MongoException;
+import NexT.db.mongo.MongoWrapper;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import java.util.Arrays;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
 import org.tymoonnext.bot.Commons;
 
 /**
@@ -15,10 +17,31 @@ import org.tymoonnext.bot.Commons;
  * @version 0.0.0
  */
 public class AthenaeumSource implements ModifiableSource{
+    
+    public AthenaeumSource(){
+        MongoWrapper.getInstance().getCollection("athenaeum").ensureIndex(new BasicDBObject("title", 1), new BasicDBObject("unique", true));
+    }
+    
+    public Pattern regex(String regex){
+        regex = regex.replaceAll("\\*", ".*").replaceAll("\\-","\\-");
+        return Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+    }
 
     @Override
     public ResultSet search(String query, int from, int to, String user) throws SourceException{
-        return null;
+        try{
+            DataModel[] mods = DataModel.getData("athenaeum", new BasicDBObject("title", regex(query)), from, to-from);
+            if(mods == null)return new ResultSet(new Result[0], 0);
+            
+            Result[] res = new Result[mods.length];
+            for(int i=0;i<res.length;i++){
+                res[i]=new Result(mods[i].get("title").toString());
+            }
+            return new ResultSet(res); //@TODO Not actual maximum pages returned...
+        }catch(MongoException ex){
+            Commons.log.log(Level.WARNING, "Failed to retrieve record from the athenaeum collection!", ex);
+            throw new SourceException("Error in MongoDB", ex);
+        }
     }
 
     @Override
@@ -29,6 +52,7 @@ public class AthenaeumSource implements ModifiableSource{
             BasicDBList pages = mod.get("pages");
             
             if(to > pages.size())to = pages.size();
+            if(to == -1)to = pages.size();
             if(from > to)from = to;
             
             Result[] res = new Result[to-from];
