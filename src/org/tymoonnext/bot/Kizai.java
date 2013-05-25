@@ -126,7 +126,7 @@ public class Kizai implements SignalHandler{
         Commons.log.info("[MAIN] Attempting to load "+module);
         if(modules.containsKey(module)){
             Commons.log.warning("[MAIN] Module already loaded.");
-            return false;
+            return true;
         }
         try{
             Class modClass = Class.forName(Commons.MODULE_PACKAGE+module, true, classLoader);
