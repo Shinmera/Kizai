@@ -26,6 +26,17 @@ public class AthenaeumSource implements ModifiableSource{
         regex = regex.replaceAll("\\*", ".*").replaceAll("\\-","\\-");
         return Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
     }
+    
+    public DataModel resolveModel(String volume) throws MongoException{
+        DataModel mod = DataModel.getFirst("athenaeum", new BasicDBObject("title", volume));
+        if (mod != null){
+            String first = ((BasicDBList)mod.get("pages")).get(0).toString();
+            if(first.startsWith("link to ")){
+                mod = resolveModel(first.substring(7).trim());
+            }
+        }
+        return mod;
+    }
 
     @Override
     public ResultSet search(String query, int from, int to, String user) throws SourceException{
@@ -47,7 +58,7 @@ public class AthenaeumSource implements ModifiableSource{
     @Override
     public ResultSet get(String volume, int from, int to, String user) throws SourceException, InexistentVolumeException{
         try{
-            DataModel mod = DataModel.getFirst("athenaeum", new BasicDBObject("title", volume));
+            DataModel mod = resolveModel(volume);
             if(mod == null)throw new InexistentVolumeException("No results for '"+volume+"'.");
             BasicDBList pages = mod.get("pages");
             
@@ -73,7 +84,7 @@ public class AthenaeumSource implements ModifiableSource{
             res.changed=0;
             res.added  =0;
             res.removed=-1;
-            DataModel mod = DataModel.getFirst("athenaeum", new BasicDBObject("title", volume));
+            DataModel mod = resolveModel(volume);
             if(mod == null){
                 res.data = "Volume created";
                 mod = DataModel.getHull("athenaeum");
