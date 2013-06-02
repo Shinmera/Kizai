@@ -32,7 +32,7 @@ public class AthenaeumSource implements ModifiableSource{
         if (mod != null){
             String first = ((BasicDBList)mod.get("pages")).get(0).toString();
             if(first.startsWith("link to ")){
-                mod = resolveModel(first.substring(7).trim());
+                mod = resolveModel(first.substring(7).trim().toLowerCase());
             }
         }
         return mod;
