@@ -1,6 +1,5 @@
 package org.tymoonnext.bot.module.misc;
 
-import NexT.Commons;
 import NexT.data.ConfigLoader;
 import NexT.data.required;
 import NexT.util.Toolkit;
@@ -11,6 +10,7 @@ import com.google.gson.JsonParser;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
+import org.tymoonnext.bot.Commons;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.core.CommandEvent;
@@ -79,13 +79,15 @@ public class Weather extends Module implements CommandListener{
         }
     }
 
-    public double[] getCoordinates(String place){
+    public double[] getCoordinates(String place) throws UnknownLocationException{
         try{
-            String response = Toolkit.downloadFileToString(new URL(locationAPI.replace("$ADDRESS", place)));
+            String response = Toolkit.downloadFileToString(new URL(locationAPI.replace("$ADDRESS", place.replaceAll(" ", "%20"))));
             Commons.log.finest(toString()+" Received response for '"+place+"': "+response);
             
             JsonObject root = new JsonParser().parse(response).getAsJsonObject();
             JsonArray results = root.getAsJsonArray("results");
+            if(results.size() == 0) throw new UnknownLocationException(place);
+            
             JsonObject result = results.get(0).getAsJsonObject();
             JsonObject geometry = result.getAsJsonObject("geometry");
             JsonObject location = geometry.getAsJsonObject("location");
@@ -98,9 +100,13 @@ public class Weather extends Module implements CommandListener{
             return coords;
         }catch(MalformedURLException ex){
             Commons.log.log(Level.WARNING, toString()+" Failed to retrieve coordinates for '"+place+"'.", ex);
-            throw new IllegalArgumentException("Failed to retrieve coordinates for '"+place+"'.");
+            throw new UnknownLocationException(place);
         }
     }
+}
+
+class UnknownLocationException extends Exception{
+    public UnknownLocationException(String place){super("Location '"+place+"' not found.");}
 }
 
 class WeatherData{
