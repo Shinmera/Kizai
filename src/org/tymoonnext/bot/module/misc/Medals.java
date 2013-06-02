@@ -9,7 +9,6 @@ import NexT.util.StringUtils;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.cmd.CommandInstanceEvent;
@@ -34,7 +33,7 @@ public class Medals extends Module implements CommandListener{
                              new BasicDBObject("unique", true));
         
         CommandModule.register(bot, "award", "username medal".split(" "), "Award a medal to someone.", this);
-        CommandModule.register(bot, "medals", "username".split(" "), "View the medal collection of a user.", this);
+        CommandModule.register(bot, "medals", "username[]".split(" "), "View the medal collection of a user.", this);
     }
 
     @Override
@@ -61,6 +60,7 @@ public class Medals extends Module implements CommandListener{
             
         }else if(cmd.getCommand().equals("medals")){
             try {
+                if(user==null)user = cmd.getUser();
                 DataModel mod = DataModel.getFirst("medals", new BasicDBObject("user", user));
                 
                 if(mod == null) cmd.getStream().send(i.getValue("username")+" has no medals.", cmd.getChannel());
