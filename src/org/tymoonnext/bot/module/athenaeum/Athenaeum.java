@@ -49,6 +49,9 @@ public class Athenaeum extends Module implements CommandListener{
         
         //@Todo Athenaeum command
         //@Todo sources loading through config
+        //ugly hack
+        bot.loadModule("misc.Weather");
+        addSource((Source)bot.getModule("misc.Weather"));
     }
 
     public void shutdown(){
@@ -56,6 +59,7 @@ public class Athenaeum extends Module implements CommandListener{
     }
     
     public void addSource(Source s){
+        Commons.log.info("[Athenaeum] Adding source "+s.getName().toLowerCase());
         sources.put(s.getName().toLowerCase(), s);
     }
 
@@ -77,7 +81,7 @@ public class Athenaeum extends Module implements CommandListener{
         int to = (m.group(11)==null)? 1 : Integer.parseInt(m.group(11));
         String howmuch = (m.group(5)==null)? "" : m.group(5).toLowerCase().trim();
         String entry = (m.group(13)==null)? "" : m.group(13).toLowerCase().trim();
-        String source = (m.group(15)==null)? "athenaeum" : m.group(15).toLowerCase();
+        String source = (m.group(16)==null)? "athenaeum" : m.group(16).toLowerCase();
         String directedTo = (m.group(2) == null)? "" : 
                             (m.group(2).equalsIgnoreCase("me"))? cmd.getUser()+": " :
                             m.group(2)+": ";
@@ -88,6 +92,7 @@ public class Athenaeum extends Module implements CommandListener{
         }        
         if(!sources.containsKey(source)){
             cmd.getStream().send("I don't know that place.", cmd.getChannel());
+            return;
         }
         
         fr--; //Switch to zero-indexed.
@@ -173,7 +178,7 @@ public class Athenaeum extends Module implements CommandListener{
             }
             
         }catch(SourceException ex){
-            Commons.log.log(Level.WARNING, "Error in "+sources.get(source)+" while processing query: "+cmd.getCommand()+" "+cmd.getArgs(), ex);
+            Commons.log.log(Level.WARNING, "[Athenaeum] Error in "+sources.get(source)+" while processing query: "+cmd.getCommand()+" "+cmd.getArgs(), ex);
             cmd.getStream().send("Some kind of error occurred in the source! ("+ex.getMessage()+")", cmd.getChannel());
         }
     }
@@ -206,7 +211,7 @@ public class Athenaeum extends Module implements CommandListener{
             Result r = ((ModifiableSource)sources.get(source)).modify(entry, fr, to, data, cmd.getUser());
             cmd.getStream().send(buildResponse(r), cmd.getChannel());
         }catch(SourceException ex){
-            Commons.log.log(Level.WARNING, "Error in "+sources.get(source)+" while processing query: "+cmd.getCommand()+" "+cmd.getArgs(), ex);
+            Commons.log.log(Level.WARNING, "[Athenaeum] Error in "+sources.get(source)+" while processing query: "+cmd.getCommand()+" "+cmd.getArgs(), ex);
             cmd.getStream().send("Some kind of error occurred in the source! ("+ex.getMessage()+")", cmd.getChannel());
         }
     }
@@ -237,7 +242,7 @@ public class Athenaeum extends Module implements CommandListener{
             Result r = ((ModifiableSource)sources.get(source)).remove(entry, fr, to, cmd.getUser());
             cmd.getStream().send(buildResponse(r), cmd.getChannel());
         }catch(SourceException ex){
-            Commons.log.log(Level.WARNING, "Error in "+sources.get(source)+" while processing query: "+cmd.getCommand()+" "+cmd.getArgs(), ex);
+            Commons.log.log(Level.WARNING, "[Athenaeum] Error in "+sources.get(source)+" while processing query: "+cmd.getCommand()+" "+cmd.getArgs(), ex);
             cmd.getStream().send("Some kind of error occurred in the source! ("+ex.getMessage()+")", cmd.getChannel());
         }catch(InexistentVolumeException ex){
             cmd.getStream().send("I can't burn what doesn't exist.", cmd.getChannel());
