@@ -45,7 +45,10 @@ public class Athenaeum extends Module implements CommandListener{
         CommandModule.register(bot, "look", null, "Search the athenaeum for entries.", this);
         CommandModule.register(bot, "record", null, "Record a new entry in the athenaeum.", this);
         CommandModule.register(bot, "burn", null, "Burn an entry from the athenaeum.", this);
-        CommandModule.register(bot, "athenaeum", "action{source|set|get|close|open}".split(""), "Manage the athenaeum.", this);
+        CommandModule.register(bot, "athenaeum", "action{source|set|get|close|open}".split(" "), "Manage the athenaeum.", this);
+        
+        //@Todo Athenaeum command
+        //@Todo sources loading through config
     }
 
     public void shutdown(){
