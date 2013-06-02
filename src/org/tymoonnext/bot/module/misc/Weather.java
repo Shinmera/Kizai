@@ -15,7 +15,13 @@ import org.tymoonnext.bot.Kizai;
 import org.tymoonnext.bot.event.CommandListener;
 import org.tymoonnext.bot.event.core.CommandEvent;
 import org.tymoonnext.bot.module.Module;
+import org.tymoonnext.bot.module.athenaeum.InexistentVolumeException;
+import org.tymoonnext.bot.module.athenaeum.Result;
+import org.tymoonnext.bot.module.athenaeum.ResultSet;
+import org.tymoonnext.bot.module.athenaeum.Source;
+import org.tymoonnext.bot.module.athenaeum.SourceException;
 import org.tymoonnext.bot.module.core.ext.CommandModule;
+
 
 /**
  * 
@@ -23,7 +29,7 @@ import org.tymoonnext.bot.module.core.ext.CommandModule;
  * @license GPLv3
  * @version 0.0.0
  */
-public class Weather extends Module implements CommandListener{
+public class Weather extends Module implements CommandListener, Source{
     private static final String weatherAPI = "https://api.forecast.io/forecast/$APIKEY/$LATITUDE,$LONGITUDE,$TIMESTAMP?units=si&exclude=hourly,daily,flags";
     private static final String locationAPI = "https://maps.googleapis.com/maps/api/geocode/json?sensor=false&address=$ADDRESS";
     
@@ -103,8 +109,38 @@ public class Weather extends Module implements CommandListener{
             throw new UnknownLocationException(place);
         }
     }
-}
 
+    @Override
+    public ResultSet search(String query, int from, int to, String user) throws SourceException {
+        try{
+            double[] coords = getCoordinates(query);
+            return new ResultSet(new Result(query));
+        }catch(UnknownLocationException ex){
+            return new ResultSet(new Result[0], 0);
+        }
+    }
+
+    @Override
+    public ResultSet get(String volume, int from, int to, String user) throws SourceException, InexistentVolumeException {
+        try{
+            double[] coords = getCoordinates(volume);
+            WeatherData data = getWeather(coords[0], coords[1]);
+            
+            return new ResultSet(new Result(data.summary+", "+
+                                            data.temperature+"°C "+
+                                            data.windSpeed+"m/s "+
+                                            data.humidity+"hum "+
+                                            data.pressure+"hPa"));
+        }catch(UnknownLocationException ex){
+            throw new InexistentVolumeException(ex.getMessage());
+        }catch(Exception ex){
+            throw new SourceException(ex.getMessage());
+        }
+    }
+
+    @Override
+    public String getName() {return "weather";}
+}
 class UnknownLocationException extends Exception{
     public UnknownLocationException(String place){super("Location '"+place+"' not found.");}
 }
