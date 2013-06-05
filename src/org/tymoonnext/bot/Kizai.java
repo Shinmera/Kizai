@@ -85,7 +85,8 @@ public class Kizai implements SignalHandler{
     /**
      * Shuts everything down.
      */
-    public synchronized void shutdown(){
+    public synchronized void shutdown(){shutdown(true);}
+    public synchronized void shutdown(boolean exit){
         if(shutdown)return;
         shutdown = true;
         try{
@@ -105,14 +106,14 @@ public class Kizai implements SignalHandler{
                     Commons.log.log(Level.WARNING, "[MAIN]"+stream+" Failed to close cleanly!", t);
                 }
             }
-            Commons.log.info("[MAIN] Saving config.");
-            conf.save(Commons.f_CONFIG);
+            //Commons.log.info("[MAIN] Saving config.");
+            //conf.save(Commons.f_CONFIG);
         }catch(Throwable t){
             Commons.log.log(Level.SEVERE, "[MAIN] WTF!", t);
-            System.exit(2);
+            if(exit)System.exit(2);
         }finally{
             Commons.log.info("[MAIN] Goodbye!");
-            System.exit(0);
+            if(exit)System.exit(0);
         }
     }
     
