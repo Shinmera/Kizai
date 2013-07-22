@@ -1,0 +1,42 @@
+
+== Instruction for adding Eclipse projects into your Eclipse ==
+
+First set the Path Variables in 
+  Window > Preferences > General > Workspace Linked Resources
+to following:
+
+Name: "HOME", Value: "/home/<user>"
+Name: "KIZAI", Value: "/home/<user>/kizai"
+Name: "NEXT", Value: "/home/<user>/next"
+
+If the git repositories are under a different path, then edit the paths as
+required.
+
+---
+
+Now go find the file "/home/<user>/kizai/eclipse/Template.userlibraries" and
+replace occurrences of $HOME with your home direcotory '/home/<user>'.
+
+This can be done easiest with the UNIX console command
+  "sed 's_$HOME_/home/<user>_g' <Template.userlibraries >eclipse.userlibraries"
+in the folder with the file.
+
+Once this is done go to
+  Window > Preferences > Java > Build Path > User Libraries
+and press 'Import...', 'Browse...', find the new eclipse.userlibraries file.
+
+---
+
+Once path variables and the user libraries are set go to
+  File > Import... > General > Existing Projects into Workspace
+
+Mark 'Select root directory:', click 'Browse' and choose path 
+  "/home/<user>/kizai/eclipse".
+Click 'Select All' and 'Finish'.
+
+Repeat the same for "/home/<user>/next/eclipse".
+
+---
+
+You are now ready to get programming.
+
