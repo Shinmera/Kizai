@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<eclipse-userlibraries version="2">
+    <library name="chatter-bot-api" systemlibrary="false">
+        <archive path="$HOME/kizai/lib/Chatterbot/chatter-bot-api.jar"/>
+    </library>
+    <library name="copylibs" systemlibrary="false">
+        <archive path="$HOME/kizai/lib/CopyLibs/org-netbeans-modules-java-j2seproject-copylibstask.jar"/>
+    </library>
+    <library name="gson-2.2.2" systemlibrary="false">
+        <archive javadoc="jar:file:$HOME/kizai/lib/GSON/gson-2.2.2-javadoc.jar!/" path="$HOME/kizai/lib/GSON/gson-2.2.2.jar" source="$HOME/kizai/lib/GSON/gson-2.2.2-sources.jar"/>
+    </library>
+    <library name="jdom-1.1.2" systemlibrary="false">
+        <archive javadoc="jar:file:$HOME/kizai/lib/JDom/jdom-1.1.2-javadoc.jar!/" path="$HOME/kizai/lib/JDom/jdom-1.1.2.jar" source="$HOME/kizai/lib/JDom/jdom-1.1.2-sources.jar"/>
+    </library>
+    <library name="mongo-java-driver-2.9.3" systemlibrary="false">
+        <archive javadoc="jar:file:$HOME/kizai/lib/MongoDB/mongo-java-driver-2.9.3-javadoc.jar!/" path="$HOME/kizai/lib/MongoDB/mongo-java-driver-2.9.3.jar" source="$HOME/kizai/lib/MongoDB/mongo-java-driver-2.9.3-sources.jar"/>
+    </library>
+    <library name="mysql-connector-5.1.16" systemlibrary="false">
+        <archive path="$HOME/kizai/lib/MySQL/mysql-connector-java-5.1.16-bin.jar"/>
+    </library>
+    <library name="pircbot" systemlibrary="false">
+        <archive path="$HOME/kizai/lib/pIRCbot/pircbot.jar"/>
+        <archive path="$HOME/kizai/lib/pIRCbot/pircbot-2.jar"/>
+    </library>
+    <library name="reflections-0.9.8" systemlibrary="false">
+        <archive path="$HOME/kizai/lib/Reflections/guava-11.0.2.jar"/>
+        <archive path="$HOME/kizai/lib/Reflections/javassist-3.12.1.GA.jar"/>
+        <archive javadoc="jar:file:$HOME/kizai/lib/Reflections/reflections-0.9.5-javadoc.jar!/" path="$HOME/kizai/lib/Reflections/reflections-0.9.8.jar" source="$HOME/kizai/lib/Reflections/reflections-0.9.5-sources.jar"/>
+    </library>
+    <library name="rome-1.0" systemlibrary="false">
+        <archive javadoc="jar:file:$HOME/kizai/lib/Rome/rome-1.0-javadoc.jar!/" path="$HOME/kizai/lib/Rome/rome-1.0.jar" source="$HOME/kizai/lib/Rome/rome-1.0-sources.jar"/>
+    </library>
+</eclipse-userlibraries>
