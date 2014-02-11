@@ -44,7 +44,7 @@ public class Notify extends Module implements EventListener, CommandListener{
             DataModel mod = DataModel.getHull("notify");
             mod.set("source", cmd.getUser());
             mod.set("channel", cmd.getChannel());
-            mod.set("target", i.getValue("user"));
+            mod.set("target", i.getValue("user").toLowerCase());
             mod.set("time", new Date().getTime());
             mod.set("message", cmd.getArgs().substring(i.getValue("user").length()+1).trim());
             mod.insert();
@@ -57,10 +57,12 @@ public class Notify extends Module implements EventListener, CommandListener{
     
     public void onMessage(MessageEvent ev){
         try{
-            DataModel[] mods = DataModel.getData("notify", new BasicDBObject("target", ev.sender));
-            for(DataModel mod : mods){
-                ev.getStream().send(String.format("%s: %s wrote to you on %s: %s", mod.get("target"), mod.get("source"), StringUtils.toHumanTime((Long)mod.get("time")), mod.get("message")), ev.channel);
-                mod.delete();
+            DataModel[] mods = DataModel.getData("notify", new BasicDBObject("target", ev.sender.toLowerCase()));
+            if(mods != null){
+                for(DataModel mod : mods){
+                    ev.getStream().send(String.format("%s: %s wrote to you on %s: %s", ev.sender, mod.get("source"), StringUtils.toHumanTime((Long)mod.get("time")), mod.get("message")), ev.channel);
+                    mod.delete();
+                }
             }
         } catch (MongoException ex) {
             Commons.log.log(Level.WARNING, "[Notify] Failed to retrieve notes. ", ex);
