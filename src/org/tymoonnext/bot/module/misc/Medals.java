@@ -60,7 +60,7 @@ public class Medals extends Module implements CommandListener{
             
         }else if(cmd.getCommand().equals("medals")){
             try {
-                if(user.isEmpty())user = cmd.getUser();
+                if(user.isEmpty())user = cmd.getUser().toLowerCase();
                 DataModel mod = DataModel.getFirst("medals", new BasicDBObject("user", user));
                 
                 if(mod == null) cmd.getStream().send(i.getValue("username")+" has no medals.", cmd.getChannel());
